@@ -1,6 +1,6 @@
 // Service worker — Manon Royale 3D
 // Bump CACHE when you ship changes so clients pull the new version.
-const CACHE = 'manon-royale-v4';
+const CACHE = 'manon-royale-v5';
 
 // App shell precached on install so the game boots offline.
 const SHELL = [

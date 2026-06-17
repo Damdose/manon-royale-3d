@@ -25,7 +25,7 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
   html,body{height:100%;overflow:hidden;background:#0a1736;font-family:'Lilita One',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     overscroll-behavior:none;touch-action:none;position:fixed;width:100%;-webkit-text-size-adjust:100%;}
-  #wrap{position:relative;width:100vw;height:100dvh;height:var(--app-h,100dvh);overflow:hidden;background:#0a1736;touch-action:none;}
+  #wrap{position:relative;width:100vw;height:100vh;height:100dvh;overflow:hidden;background:#0a1736;touch-action:none;}
   #gl,#ui{position:absolute;display:block;touch-action:none;}
   #ui{touch-action:none;}
   .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff7e6;
@@ -50,14 +50,11 @@
   /* ===================== FUNNEL / ÉCRANS ===================== */
   .scr{z-index:20;}
   /* 0) Brand : écran noir + logo blanc lumineux (façon Supercell) */
-  #brand{background:#000;}
-  #brand::before{content:"";position:absolute;width:78vmin;height:78vmin;border-radius:50%;pointer-events:none;
-    background:radial-gradient(circle,rgba(255,255,255,.2),rgba(255,255,255,0) 62%);animation:brandglow 1.9s ease-in-out both;}
+  #brand{background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.18),rgba(255,255,255,0) 40%),#000;}
   .brand-logo{position:relative;font-family:'Lilita One',sans-serif;color:#fff;text-align:center;
     font-size:clamp(46px,15vw,88px);line-height:.84;letter-spacing:1px;text-shadow:0 0 30px rgba(255,255,255,.55);
-    animation:brandin 1.9s ease both;}
-  @keyframes brandin{0%{opacity:0;transform:scale(.9)}20%,80%{opacity:1;transform:scale(1)}100%{opacity:0}}
-  @keyframes brandglow{0%{opacity:0}32%,80%{opacity:1}100%{opacity:0}}
+    animation:brandin 1.2s ease-out both;}
+  @keyframes brandin{0%{opacity:0;transform:scale(.92)}55%,100%{opacity:1;transform:scale(1)}}
   /* 2) Chargement */
   .logo-title{font-size:clamp(40px,13vw,76px);line-height:.95;color:var(--cr-gold);margin-bottom:34px;
     text-shadow:3px 0 0 #5a3408,-3px 0 0 #5a3408,0 3px 0 #5a3408,0 -3px 0 #5a3408,0 8px 0 #2b1804,0 12px 16px rgba(0,0,0,.55);}
@@ -117,7 +114,7 @@
   .tabbar{width:100%;max-width:520px;display:flex;align-items:flex-end;background:linear-gradient(180deg,#34456a 0%,#222f4c 55%,#1a2540 100%);border-top:2px solid rgba(160,185,230,.35);padding:0;box-shadow:inset 0 3px 8px rgba(0,0,0,.35);}
   .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;font-size:22px;color:#cdd8ee;opacity:.7;padding:8px 0 7px;cursor:pointer;position:relative;border-left:1px solid rgba(0,0,0,.28);box-shadow:inset 1px 0 0 rgba(255,255,255,.05);}
   .tab:first-child{border-left:none;box-shadow:none;}
-  .tab-ico{width:32px;height:32px;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));transition:transform .16s ease;transform-origin:bottom center;}
+  .tab-ico{width:36px;height:36px;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.45));transition:transform .16s ease;transform-origin:bottom center;}
   .avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
   .f-av img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
   #loading{background:linear-gradient(rgba(8,18,46,.30),rgba(8,18,46,.72)),url('assets/ui_splash.png') center/cover no-repeat,#0c1f55;justify-content:flex-end;padding-bottom:60px;}
@@ -993,13 +990,14 @@ function addTowerMesh(t){
     const sh=new THREE.Mesh(new THREE.CircleGeometry(Rs*1.2,18),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:0.28}));sh.rotation.x=-Math.PI/2;sh.position.y=0.015;g.add(sh);
     const cmap=TEX[castleKey],csp=new THREE.Sprite(new THREE.SpriteMaterial({map:cmap,transparent:true,alphaTest:0.5,depthTest:true}));
     csp.center.set(0.5,0);let ca=1;if(cmap.image&&cmap.image.width)ca=cmap.image.width/cmap.image.height;
-    const Hs=ws(t.r)*(king?5.5:5.2);csp.scale.set(Hs*ca,Hs,1);csp.position.y=0.02;g.add(csp);
-    // perso animé dans le rempart
+    const Hs=ws(t.r)*(king?4.5:4.5),sink=0;
+    csp.scale.set(Hs*ca,Hs,1);csp.position.y=0.02-sink;g.add(csp);
+    // buste animé posé DANS le rempart (devant le château, bien dimensionné)
     if(TEXR[pKey]){
-      const pmap=TEX[pKey],psp=new THREE.Sprite(new THREE.SpriteMaterial({map:pmap,transparent:true,alphaTest:0.5,depthTest:true}));
-      psp.center.set(0.5,0);let pa=0.6;if(pmap.image&&pmap.image.width)pa=pmap.image.width/pmap.image.height;
-      const pH=Hs*(king?0.50:0.46),pW=pH*pa;psp.scale.set(pW,pH,1);
-      psp.position.set(0,Hs*(king?0.47:0.47),0.01);g.add(psp);
+      const pmap=TEX[pKey],psp=new THREE.Sprite(new THREE.SpriteMaterial({map:pmap,transparent:true,alphaTest:0.5,depthTest:false}));
+      psp.center.set(0.5,0);let pa=0.7;if(pmap.image&&pmap.image.width)pa=pmap.image.width/pmap.image.height;
+      const pH=Hs*(king?0.52:0.48),pW=pH*pa;psp.scale.set(pW,pH,1);
+      psp.position.set(0,Hs*(king?0.52:0.52)-sink,0.3);psp.renderOrder=2;g.add(psp);
       t.charSpr=psp;t.charW=pW;t.charH=pH;t.charBaseY=psp.position.y;t.charAnim=true;t.phase=(t.x*1.7+t.y*0.9)%6.283;
     }
     g.position.set(wx(t.x),0,wz(t.y));t.mesh=g;t.base=null;dynGroup&&dynGroup.add(g);return;
@@ -1250,13 +1248,14 @@ function worldToScreen(x,y,h){const v=new THREE.Vector3(wx(x),h||0,wz(y));v.proj
 let uic,VW,VH,DPR;
 const MAXA=0.60;    // ratio l/h max : au-delà (paysage/PC) on borne pour garder tout le plateau visible
 function resize(){
-  const winW=window.innerWidth, winH=window.innerHeight; DPR=Math.min(2.75,window.devicePixelRatio||1);
-  // Le jeu remplit TOUT l'écran visible (même surface que le menu) -> plein écran, pas de bande latérale.
+  DPR=Math.min(2.75,window.devicePixelRatio||1);
+  // On mesure la taille RÉELLE du conteneur (#wrap = 100dvh en CSS, qui s'auto-corrige sur tous les écrans/encoches)
+  // au lieu de figer window.innerHeight (valeur parfois transitoire au lancement en mode app installée).
+  const wrap=document.getElementById('wrap'), rect=wrap.getBoundingClientRect();
+  const winW=Math.round(rect.width)||window.innerWidth, winH=Math.round(rect.height)||window.innerHeight;
   let cw=winW, ch=winH, left=0, top=0, aspect=cw/ch;
   if(aspect>MAXA){ cw=Math.round(ch*MAXA); left=Math.round((winW-cw)/2); aspect=MAXA; }   // écran trop large : on centre
   VW=cw; VH=ch;
-  // hauteur réellement visible -> partagée avec le DOM (menu) pour que rien ne passe sous les barres Safari
-  document.documentElement.style.setProperty('--app-h', winH+'px');
   const uiEl=document.getElementById('ui');
   for(const el of [glcanvas,uiEl]){ el.style.left=left+'px'; el.style.top=top+'px'; el.style.width=cw+'px'; el.style.height=ch+'px'; }
   if(renderer){
@@ -1269,8 +1268,11 @@ function resize(){
   uiEl.width=cw*DPR; uiEl.height=ch*DPR; uic=uiEl.getContext('2d'); uic.setTransform(DPR,0,0,DPR,0,0);
 }
 window.addEventListener('resize',resize);
-window.addEventListener('orientationchange',resize);
+window.addEventListener('orientationchange',()=>{resize();setTimeout(resize,300);});
+window.addEventListener('pageshow',resize);   // retour depuis l'arrière-plan (app installée)
 if(window.visualViewport)window.visualViewport.addEventListener('resize',resize);
+// iOS standalone : la hauteur peut se stabiliser un instant après le lancement -> on re-mesure
+[150,500,1200].forEach(ms=>setTimeout(()=>{try{resize();}catch(e){}},ms));
 function rr(x,y,w,h,r){uic.beginPath();uic.moveTo(x+r,y);uic.arcTo(x+w,y,x+w,y+h,r);uic.arcTo(x+w,y+h,x,y+h,r);uic.arcTo(x,y+h,x,y,r);uic.arcTo(x,y,x+w,y,r);uic.closePath();}
 // image de carte (object-fit: cover) si dispo, sinon null
 function cardImg(key){const im=IMG['card_'+key];return (im&&im.complete&&im.naturalWidth)?im:null;}
@@ -1318,7 +1320,7 @@ function drawHUD(){
   uic.clearRect(0,0,VW,VH);
   drawWorldFx();
   // barres de vie tours
-  for(const t of towers){const s=worldToScreen(t.x,t.y,(t.role==='king'?3.4:2.9));if(!s.vis)continue;
+  for(const t of towers){const s=worldToScreen(t.x,t.y,(t.role==='king'?3.2:2.7));if(!s.vis)continue;
     const lvl=t.level||1,col=TEAM[t.side].hp,colD=TEAM[t.side].main,ratio=Math.max(0,t.hp/t.max);
     const bw=54,bh=12,R0=bh/2,badge=11,bx=s.x-bw/2+badge*0.5,by=s.y;
     // piste (pill arrondie + contour sombre)
