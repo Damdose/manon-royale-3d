@@ -67,7 +67,21 @@ TOWERCHAR_KEYS = ['king_blue','king_red','princess_blue','princess_red']
 
 if __name__ == '__main__':
     args = sys.argv[1:]
-    if '--towerchars' in args:
+    if '--towercastle' in args:
+        keys = [a for a in args if a != '--towercastle'] or TOWERCHAR_KEYS
+        print('Détourage IA de %d château(x) vide(s) -> %s' % (len(keys), ASSETS))
+        ok=0
+        for k in keys:
+            if detour_pair('towercastle_%s.png' % k, 'towercastle_cut_%s.png' % k): ok+=1
+        print('Terminé : %d/%d' % (ok, len(keys)))
+    elif '--towerfull' in args:
+        keys = [a for a in args if a != '--towerfull'] or TOWERCHAR_KEYS
+        print('Détourage IA de %d tour(s) complète(s) -> %s' % (len(keys), ASSETS))
+        ok=0
+        for k in keys:
+            if detour_pair('towerbuild_%s.png' % k, 'towerfull_%s.png' % k): ok+=1
+        print('Terminé : %d/%d' % (ok, len(keys)))
+    elif '--towerchars' in args:
         keys = [a for a in args if a != '--towerchars'] or TOWERCHAR_KEYS
         print('Détourage IA de %d perso(s) de tour -> %s' % (len(keys), ASSETS))
         ok=0

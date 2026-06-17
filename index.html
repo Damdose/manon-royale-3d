@@ -49,14 +49,15 @@
 
   /* ===================== FUNNEL / ÉCRANS ===================== */
   .scr{z-index:20;}
-  /* 1) Splash studio (façon Supercell) */
-  #splash{background:radial-gradient(120% 120% at 50% 40%,#ff9a3c,#f47b20 60%,#d65f10);}
-  .studio{display:flex;flex-direction:column;align-items:center;gap:14px;animation:pop .6s ease;}
-  .studio-badge{width:104px;height:104px;border-radius:26px;background:#fff;color:#f47b20;display:flex;align-items:center;justify-content:center;font-size:64px;
-    box-shadow:0 10px 0 rgba(0,0,0,.18),0 16px 30px rgba(0,0,0,.3);}
-  .studio-name{font-size:clamp(26px,7vw,34px);color:#fff;letter-spacing:3px;text-shadow:0 3px 0 rgba(0,0,0,.25);}
-  .studio-tag{font-family:-apple-system,sans-serif;font-size:13px;color:rgba(255,255,255,.85);letter-spacing:2px;}
-  @keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+  /* 0) Brand : écran noir + logo blanc lumineux (façon Supercell) */
+  #brand{background:#000;}
+  #brand::before{content:"";position:absolute;width:78vmin;height:78vmin;border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle,rgba(255,255,255,.2),rgba(255,255,255,0) 62%);animation:brandglow 1.9s ease-in-out both;}
+  .brand-logo{position:relative;font-family:'Lilita One',sans-serif;color:#fff;text-align:center;
+    font-size:clamp(46px,15vw,88px);line-height:.84;letter-spacing:1px;text-shadow:0 0 30px rgba(255,255,255,.55);
+    animation:brandin 1.9s ease both;}
+  @keyframes brandin{0%{opacity:0;transform:scale(.9)}20%,80%{opacity:1;transform:scale(1)}100%{opacity:0}}
+  @keyframes brandglow{0%{opacity:0}32%,80%{opacity:1}100%{opacity:0}}
   /* 2) Chargement */
   .logo-title{font-size:clamp(40px,13vw,76px);line-height:.95;color:var(--cr-gold);margin-bottom:34px;
     text-shadow:3px 0 0 #5a3408,-3px 0 0 #5a3408,0 3px 0 #5a3408,0 -3px 0 #5a3408,0 8px 0 #2b1804,0 12px 16px rgba(0,0,0,.55);}
@@ -102,6 +103,7 @@
   .chest-t{font-family:-apple-system,sans-serif;font-size:9px;color:#fff;margin-top:3px;}
   /* fonds losange CSS (couleur uniforme, pas de vignette qui assombrit le bas) */
   #lobby.lobby{background:url('assets/ui_bg_lobby.png') center/cover no-repeat,#2a5fb0;}
+  #panelCards{background:url('assets/ui_bg_cards.png') center/cover no-repeat,#2a5fb0;border-radius:0;}
   #panelShop{background:
     repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 2px,transparent 2px 30px),
     repeating-linear-gradient(-45deg,rgba(0,0,0,.08) 0 2px,transparent 2px 30px),
@@ -112,14 +114,26 @@
     #5238a0;}
   #over{background:linear-gradient(rgba(8,18,46,.42),rgba(8,18,46,.66)),url('assets/ui_bg_victory.png') center/cover no-repeat,radial-gradient(130% 100% at 50% 0%,#2f6ad0,#0c1f55);}
   .cur img,.trophybar img{width:18px;height:18px;object-fit:contain;vertical-align:-3px;}
-  .tabbar{width:100%;max-width:520px;display:flex;background:linear-gradient(180deg,#6d4a23,#3a2614);border-top:3px solid #ffce3a;padding:6px 4px;}
-  .tab{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;font-size:22px;color:#f0e2bf;opacity:.7;padding:4px 0;cursor:pointer;}
-  .tab-ico{width:30px;height:30px;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));}
+  .tabbar{width:100%;max-width:520px;display:flex;align-items:flex-end;background:linear-gradient(180deg,#34456a 0%,#222f4c 55%,#1a2540 100%);border-top:2px solid rgba(160,185,230,.35);padding:0;box-shadow:inset 0 3px 8px rgba(0,0,0,.35);}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;font-size:22px;color:#cdd8ee;opacity:.7;padding:8px 0 7px;cursor:pointer;position:relative;border-left:1px solid rgba(0,0,0,.28);box-shadow:inset 1px 0 0 rgba(255,255,255,.05);}
+  .tab:first-child{border-left:none;box-shadow:none;}
+  .tab-ico{width:32px;height:32px;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));transition:transform .16s ease;transform-origin:bottom center;}
   .avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
   .f-av img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
   #loading{background:linear-gradient(rgba(8,18,46,.30),rgba(8,18,46,.72)),url('assets/ui_splash.png') center/cover no-repeat,#0c1f55;justify-content:flex-end;padding-bottom:60px;}
   .tab span{display:block;font-family:-apple-system,sans-serif;font-size:9px;margin-top:1px;}
-  .tab.sel{opacity:1;color:#ffce3a;transform:translateY(-4px);}
+  .tab:not(.sel) span{display:none;}
+  .tab.sel{opacity:1;color:#fff;border-left-color:transparent;box-shadow:none;
+    background:linear-gradient(180deg,#5470a4 0%,#3a5181 60%,#2e4068 100%);
+    border-radius:12px 12px 0 0;margin-top:-9px;padding-top:13px;
+    box-shadow:inset 0 2px 0 rgba(255,255,255,.28),0 -2px 6px rgba(0,0,0,.25);}
+  .tab.sel .tab-ico{transform:scale(1.55) translateY(-1px);}
+  .tab.sel span{color:#fff;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.5);}
+  .tab.sel::before,.tab.sel::after{position:absolute;top:46%;transform:translateY(-50%);
+    font-family:-apple-system,sans-serif;font-size:26px;font-weight:700;line-height:1;color:#e6eeff;
+    text-shadow:0 1px 2px rgba(0,0,0,.5);pointer-events:none;}
+  .tab.sel::before{content:'‹';left:-9px;}
+  .tab.sel::after{content:'›';right:-9px;}
   /* 4) Matchmaking */
   .match-vs{display:flex;align-items:center;gap:18px;margin-bottom:28px;}
   .fighter{display:flex;flex-direction:column;align-items:center;gap:6px;animation:slidein .5s ease;}
@@ -310,13 +324,9 @@
 <div id="wrap">
   <canvas id="gl"></canvas>
   <canvas id="ui"></canvas>
-  <!-- 1) SPLASH studio -->
-  <div id="splash" class="overlay scr">
-    <div class="studio">
-      <div class="studio-badge">D</div>
-      <div class="studio-name">DAMIEN&nbsp;GAMES</div>
-      <div class="studio-tag">présente</div>
-    </div>
+  <!-- 1) STUDIO : écran noir lumineux (façon Supercell) -->
+  <div id="brand" class="overlay scr">
+    <div class="brand-logo">DAMIEN<br>GAMES</div>
   </div>
 
   <!-- 2) CHARGEMENT -->
@@ -541,14 +551,14 @@ function crowns(side){return towers.filter(t=>t.side===side&&t.hp<=0).length;}
 // ===================== DÉPLOIEMENT =====================
 // ===== TAILLE VISUELLE selon les attributs (PV/rôle) — n'affecte PAS les collisions (r reste pour le gameplay) =====
 function visR(c){
-  if(c.building) return Math.min(22, 14 + (c.hp||300)/300*2.4);        // bâtiments imposants
+  if(c.building) return Math.min(18, 12.5 + (c.hp||300)/300*1.6);     // bâtiments un peu plus imposants
   const hp=c.hp||100, cnt=c.count||1;
-  let s = 10 + Math.pow(hp,0.5)*0.40;          // PV -> taille : 70≈13, 380≈18, 760≈21, 1350≈25, 2000≈27
-  if(c.range>=70) s -= 1.5;                      // tireurs/“glass cannon” un peu plus fins
-  if(cnt>=4) s *= 0.88;                          // essaims compactés
+  let s = 8.5 + Math.pow(hp,0.5)*0.30;         // PV -> taille : 70≈11, 380≈14, 760≈17, 1350≈19.5, 2000≈22
+  if(c.range>=70) s -= 1.2;                      // tireurs/“glass cannon” un peu plus fins
+  if(cnt>=4) s *= 0.90;                          // essaims compactés
   if(cnt>=5) s *= 0.92;
-  if(c.invis) s += 1.5;                          // l’assassin reste bien lisible
-  return Math.max(11, Math.min(27, s));
+  if(c.invis) s += 1;                            // l’assassin reste bien lisible
+  return Math.max(9.5, Math.min(20, s));
 }
 function spawnTroop(side,c,x,y){const n=c.count||1;const M=lvlMult(c,side);
   for(let i=0;i<n;i++){const ox=(n>1)?(i-(n-1)/2)*16:0,oy=(n>1)?(i%2)*9:0;
@@ -664,7 +674,7 @@ function separate(){for(let i=0;i<units.length;i++)for(let j=i+1;j<units.length;
   const d=dist(a,b),m=a.r+b.r;if(d>0&&d<m){const p=(m-d)/2,an=Math.atan2(b.y-a.y,b.x-a.x);a.x-=Math.cos(an)*p;a.y-=Math.sin(an)*p;b.x+=Math.cos(an)*p;b.y+=Math.sin(an)*p;}}}
 function updateTower(t,dt){if(t.hp<=0||!t.active)return;if(t.hit>0)t.hit-=dt;let tgt=null,bd=1e9;
   for(const o of units){if(o.side===t.side||o.hp<=0||o.building||o.deploy>0||(o.invis&&o.moving))continue;const d=dist(t,o);if(d<t.range&&d<bd){bd=d;tgt=o;}}
-  if(tgt){t.cd-=dt;if(t.cd<=0){hurt(tgt,t.dmg);t.cd=t.atk;fx.push({type:'shot',x:t.x,y:t.y,tx:tgt.x,ty:tgt.y,t:.12,life:.12});}}}
+  if(tgt){t.cd-=dt;if(t.cd<=0){hurt(tgt,t.dmg);t.cd=t.atk;t.swing=0.2;fx.push({type:'shot',x:t.x,y:t.y,tx:tgt.x,ty:tgt.y,t:.12,life:.12});}}}
 function endGame(res){state='over';const T=document.getElementById('overTitle');
   const rn=document.getElementById('rivalName');document.getElementById('overFoeName').textContent=(rn&&rn.textContent)||'Robot DamtamZ';
   T.textContent=res==='win'?'Victoire !':res==='lose'?'Défaite':'Égalité';
@@ -863,6 +873,12 @@ function loadAssets(){
   for(const r of ['king','princess'])for(const s of ['blue','red'])loadTex('tower_'+r+'_'+s,'assets/tower_'+r+'_'+s+'.png',()=>rebuildTowers());
   // personnages des tours (reine/roi/archères) en style carte
   for(const r of ['king','princess'])for(const s of ['blue','red'])loadTex('towerchar_cut_'+r+'_'+s,'assets/towerchar_cut_'+r+'_'+s+'.png',()=>rebuildTowers());
+  // tours COMPLÈTES en image (pierre + perso intégré, style CR) -> repli
+  for(const r of ['king','princess'])for(const s of ['blue','red'])loadTex('towerfull_'+r+'_'+s,'assets/towerfull_'+r+'_'+s+'.png',()=>rebuildTowers());
+  // châteaux VIDES (image) -> prioritaires, le perso animé est posé dessus
+  for(const r of ['king','princess'])for(const s of ['blue','red'])loadTex('towercastle_cut_'+r+'_'+s,'assets/towercastle_cut_'+r+'_'+s+'.png',()=>rebuildTowers());
+  // bustes (tête+torse) des persos de tour -> se posent dans le rempart
+  for(const r of ['king','princess'])for(const s of ['blue','red'])loadTex('towerchar_bust_'+r+'_'+s,'assets/towerchar_bust_'+r+'_'+s+'.png',()=>rebuildTowers());
   loadTex('arena','assets/arena.png',t=>{t.anisotropy=4;groundMesh.material.map=t;groundMesh.material.needsUpdate=true;});
   loadTex('bg','assets/background.png',t=>{scene.background=t;scene.fog=null;});
   for(const k of CARD_KEYS)loadImg('card_'+k,'assets/card_'+k+'.png');
@@ -880,7 +896,7 @@ function initThree(){
   if(THREE.NoToneMapping!==undefined)renderer.toneMapping=THREE.NoToneMapping;
   scene=new THREE.Scene();scene.background=THREEC('#2a571f');scene.fog=new THREE.Fog('#2a571f',64,112); // bordure "forêt" verte, pas de voile bleu
   camera=new THREE.PerspectiveCamera(26,1,0.1,200);                 // FOV faible -> quasi orthographique, façon CR
-  camera.position.set(0,42,15);camera.lookAt(0,0,0.2);   // inclinaison douce : on voit les 6 tours (roi du bas inclus), façon CR
+  camera.position.set(0,44,13.5);camera.lookAt(0,0,2.0);   // cadrage CR : tout le plateau visible, la tour-reine du bas entièrement dégagée au-dessus des cartes
   // éclairage CR : soleil franc + ambiance basse => contraste fort, couleurs saturées (pas pâle)
   scene.add(new THREE.HemisphereLight('#d4e8ff','#356b1e',0.4));
   sunLight=new THREE.DirectionalLight('#fff3da',1.0);sunLight.position.set(-8,24,10);sunLight.castShadow=true;
@@ -969,7 +985,36 @@ function addTowerMesh(t){
     spr.center.set(0.5,0);const Hs=ws(t.r)*(king?9:7.5);spr.scale.set(Hs*0.82,Hs,1);spr.position.y=0.02;g.add(spr);
     g.position.set(wx(t.x),0,wz(t.y));t.mesh=g;t.base=null;dynGroup&&dynGroup.add(g);return;
   }
-  // ----- TOUR EN PIERRE (façon Clash Royale) : pierre grise dominante, accents d'équipe -----
+  const sd=(t.side==='me'?'blue':'red');
+  const castleKey='towercastle_cut_'+t.role+'_'+sd, pKey='towerchar_bust_'+t.role+'_'+sd, fullKey='towerfull_'+t.role+'_'+sd;
+  // ----- CHÂTEAU VIDE (image) + PERSO ANIMÉ posé dessus : prioritaire -----
+  if(TEXR[castleKey]){
+    const Rs=ws(t.r);
+    const sh=new THREE.Mesh(new THREE.CircleGeometry(Rs*1.2,18),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:0.28}));sh.rotation.x=-Math.PI/2;sh.position.y=0.015;g.add(sh);
+    const cmap=TEX[castleKey],csp=new THREE.Sprite(new THREE.SpriteMaterial({map:cmap,transparent:true,alphaTest:0.5,depthTest:true}));
+    csp.center.set(0.5,0);let ca=1;if(cmap.image&&cmap.image.width)ca=cmap.image.width/cmap.image.height;
+    const Hs=ws(t.r)*(king?5.5:5.2);csp.scale.set(Hs*ca,Hs,1);csp.position.y=0.02;g.add(csp);
+    // perso animé dans le rempart
+    if(TEXR[pKey]){
+      const pmap=TEX[pKey],psp=new THREE.Sprite(new THREE.SpriteMaterial({map:pmap,transparent:true,alphaTest:0.5,depthTest:true}));
+      psp.center.set(0.5,0);let pa=0.6;if(pmap.image&&pmap.image.width)pa=pmap.image.width/pmap.image.height;
+      const pH=Hs*(king?0.50:0.46),pW=pH*pa;psp.scale.set(pW,pH,1);
+      psp.position.set(0,Hs*(king?0.47:0.47),0.01);g.add(psp);
+      t.charSpr=psp;t.charW=pW;t.charH=pH;t.charBaseY=psp.position.y;t.charAnim=true;t.phase=(t.x*1.7+t.y*0.9)%6.283;
+    }
+    g.position.set(wx(t.x),0,wz(t.y));t.mesh=g;t.base=null;dynGroup&&dynGroup.add(g);return;
+  }
+  // ----- TOUR COMPLÈTE EN IMAGE (perso intégré, statique) : repli -----
+  if(TEXR[fullKey]){
+    const Rs=ws(t.r);
+    const sh=new THREE.Mesh(new THREE.CircleGeometry(Rs*1.2,18),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:0.28}));sh.rotation.x=-Math.PI/2;sh.position.y=0.015;g.add(sh);
+    const map=TEX[fullKey];const spr=new THREE.Sprite(new THREE.SpriteMaterial({map,transparent:true,alphaTest:0.5,depthTest:true}));
+    spr.center.set(0.5,0);
+    const im=map.image;let asp=1;if(im&&im.width&&im.height)asp=im.width/im.height;
+    const Hs=ws(t.r)*(king?5.5:5.2);spr.scale.set(Hs*asp,Hs,1);spr.position.y=0.02;g.add(spr);
+    g.position.set(wx(t.x),0,wz(t.y));t.mesh=g;t.base=null;dynGroup&&dynGroup.add(g);return;
+  }
+  // ----- TOUR EN PIERRE 3D (repli si pas d'image) : pierre grise dominante, accents d'équipe -----
   const R=ws(t.r), sz=R*1.4, wallH=king?1.95:1.5;
   const stoneL=new THREE.MeshStandardMaterial({color:'#c6bda9',roughness:0.95});   // pierre claire
   const stoneM=new THREE.MeshStandardMaterial({color:'#a89e8b',roughness:0.95});   // pierre moyenne
@@ -1017,38 +1062,44 @@ function addTowerMesh(t){
   else if(king){
     // ----- repli géométrique : reine blonde (nous) / roi brun barbu (adversaire) -----
     const isQueen=(t.side==='me');
+    const cg=new THREE.Group();g.add(cg);t.charGrp=cg;t.charKind='king';t.aphase=(t.x*0.013+t.y*0.017)%6.283;
     const hairCol=isQueen?'#ffd24a':'#5a3a22';              // blond reine / brun roi
     const hairM=new THREE.MeshStandardMaterial({color:hairCol,roughness:0.85});
-    const kb=new THREE.Mesh(new THREE.CylinderGeometry(R*0.58,R*0.9,wallH*0.95,20),robeM);kb.position.y=wallH+0.5;kb.castShadow=true;g.add(kb);
-    const belt=new THREE.Mesh(new THREE.CylinderGeometry(R*0.76,R*0.8,wallH*0.16,20),goldM);belt.position.y=wallH+0.5-wallH*0.32;g.add(belt);
-    for(const sx of [-1,1]){const arm=new THREE.Mesh(new THREE.CylinderGeometry(R*0.16,R*0.14,wallH*0.6,10),robeM);arm.position.set(sx*R*0.72,wallH+0.55,0);arm.rotation.z=sx*0.34;arm.castShadow=true;g.add(arm);
-      const hand=new THREE.Mesh(new THREE.SphereGeometry(R*0.16,10,8),skinM);hand.position.set(sx*R*0.92,wallH+0.3,0);g.add(hand);}
-    const kh=new THREE.Mesh(new THREE.SphereGeometry(R*0.56,18,14),skinM);const hY=wallH+0.5+wallH*0.64;kh.position.y=hY;kh.castShadow=true;g.add(kh);
-    const eye=new THREE.MeshBasicMaterial({color:0x222222});for(const ex of [-1,1]){const e=new THREE.Mesh(new THREE.SphereGeometry(R*0.08,8,8),eye);e.position.set(ex*R*0.2,hY+wallH*0.08,dir*R*0.5);g.add(e);}
+    const kb=new THREE.Mesh(new THREE.CylinderGeometry(R*0.58,R*0.9,wallH*0.95,20),robeM);kb.position.y=wallH+0.5;kb.castShadow=true;cg.add(kb);
+    const belt=new THREE.Mesh(new THREE.CylinderGeometry(R*0.76,R*0.8,wallH*0.16,20),goldM);belt.position.y=wallH+0.5-wallH*0.32;cg.add(belt);
+    t.kingArms=[];
+    for(const sx of [-1,1]){const arm=new THREE.Group();arm.position.set(sx*R*0.62,wallH+0.78,0);cg.add(arm);t.kingArms.push({m:arm,sx});
+      const seg=new THREE.Mesh(new THREE.CylinderGeometry(R*0.16,R*0.14,wallH*0.6,10),robeM);seg.position.set(sx*R*0.1,-wallH*0.23,0);seg.rotation.z=sx*0.34;seg.castShadow=true;arm.add(seg);
+      const hand=new THREE.Mesh(new THREE.SphereGeometry(R*0.16,10,8),skinM);hand.position.set(sx*R*0.3,-wallH*0.48,0);arm.add(hand);}
+    const kh=new THREE.Mesh(new THREE.SphereGeometry(R*0.56,18,14),skinM);const hY=wallH+0.5+wallH*0.64;kh.position.y=hY;kh.castShadow=true;cg.add(kh);
+    const eye=new THREE.MeshBasicMaterial({color:0x222222});for(const ex of [-1,1]){const e=new THREE.Mesh(new THREE.SphereGeometry(R*0.08,8,8),eye);e.position.set(ex*R*0.2,hY+wallH*0.08,dir*R*0.5);cg.add(e);}
     if(isQueen){
       // cheveux blonds : calotte + 2 mèches latérales tombantes + lèvres roses
-      const cap=new THREE.Mesh(new THREE.SphereGeometry(R*0.62,16,12),hairM);cap.scale.set(1,0.92,1);cap.position.set(0,hY+R*0.14,-dir*R*0.1);cap.castShadow=true;g.add(cap);
-      for(const sx of [-1,1]){const lock=new THREE.Mesh(new THREE.CylinderGeometry(R*0.17,R*0.12,R*0.8,10),hairM);lock.position.set(sx*R*0.5,hY-R*0.28,-dir*R*0.04);lock.castShadow=true;g.add(lock);}
-      const lips=new THREE.Mesh(new THREE.SphereGeometry(R*0.1,10,8),new THREE.MeshStandardMaterial({color:'#e0556b',roughness:0.5}));lips.scale.set(1.4,0.55,0.6);lips.position.set(0,hY-R*0.22,dir*R*0.5);g.add(lips);
+      const cap=new THREE.Mesh(new THREE.SphereGeometry(R*0.62,16,12),hairM);cap.scale.set(1,0.92,1);cap.position.set(0,hY+R*0.14,-dir*R*0.1);cap.castShadow=true;cg.add(cap);
+      for(const sx of [-1,1]){const lock=new THREE.Mesh(new THREE.CylinderGeometry(R*0.17,R*0.12,R*0.8,10),hairM);lock.position.set(sx*R*0.5,hY-R*0.28,-dir*R*0.04);lock.castShadow=true;cg.add(lock);}
+      const lips=new THREE.Mesh(new THREE.SphereGeometry(R*0.1,10,8),new THREE.MeshStandardMaterial({color:'#e0556b',roughness:0.5}));lips.scale.set(1.4,0.55,0.6);lips.position.set(0,hY-R*0.22,dir*R*0.5);cg.add(lips);
     } else {
       // barbe + cheveux bruns
-      const beard=new THREE.Mesh(new THREE.SphereGeometry(R*0.46,14,12),hairM);beard.scale.set(1,0.82,0.62);beard.position.set(0,hY-R*0.2,dir*R*0.26);beard.castShadow=true;g.add(beard);
-      const cap=new THREE.Mesh(new THREE.SphereGeometry(R*0.52,14,12),hairM);cap.scale.set(1,0.7,1);cap.position.set(0,hY+R*0.2,-dir*R*0.12);cap.castShadow=true;g.add(cap);
+      const beard=new THREE.Mesh(new THREE.SphereGeometry(R*0.46,14,12),hairM);beard.scale.set(1,0.82,0.62);beard.position.set(0,hY-R*0.2,dir*R*0.26);beard.castShadow=true;cg.add(beard);
+      const cap=new THREE.Mesh(new THREE.SphereGeometry(R*0.52,14,12),hairM);cap.scale.set(1,0.7,1);cap.position.set(0,hY+R*0.2,-dir*R*0.12);cap.castShadow=true;cg.add(cap);
     }
     const ringC=hY+R*0.5;
-    const kc=new THREE.Mesh(new THREE.CylinderGeometry(R*0.6,R*0.5,0.2,16),goldM);kc.position.y=ringC;kc.castShadow=true;g.add(kc);
-    for(let a2=0;a2<6;a2++){const an=a2/6*Math.PI*2;const pt=new THREE.Mesh(new THREE.ConeGeometry(0.085,0.24,6),goldM);pt.position.set(Math.cos(an)*R*0.5,ringC+0.18,Math.sin(an)*R*0.5);pt.castShadow=true;g.add(pt);}
-    const gem=new THREE.Mesh(new THREE.SphereGeometry(R*0.11,10,8),new THREE.MeshStandardMaterial({color:isQueen?'#ff4d9d':'#ff4d6d',roughness:0.25,metalness:0.4}));gem.position.set(0,ringC+0.04,dir*R*0.5);g.add(gem);
+    const kc=new THREE.Mesh(new THREE.CylinderGeometry(R*0.6,R*0.5,0.2,16),goldM);kc.position.y=ringC;kc.castShadow=true;cg.add(kc);
+    for(let a2=0;a2<6;a2++){const an=a2/6*Math.PI*2;const pt=new THREE.Mesh(new THREE.ConeGeometry(0.085,0.24,6),goldM);pt.position.set(Math.cos(an)*R*0.5,ringC+0.18,Math.sin(an)*R*0.5);pt.castShadow=true;cg.add(pt);}
+    const gem=new THREE.Mesh(new THREE.SphereGeometry(R*0.11,10,8),new THREE.MeshStandardMaterial({color:isQueen?'#ff4d9d':'#ff4d6d',roughness:0.25,metalness:0.4}));gem.position.set(0,ringC+0.04,dir*R*0.5);cg.add(gem);
   } else {
-    // ----- ARCHÈRE : tunique + cheveux + bras tendus + arc vertical + flèche -----
-    const ab=new THREE.Mesh(new THREE.CylinderGeometry(R*0.4,R*0.56,wallH*0.78,16),robeM);ab.position.y=wallH+0.4;ab.castShadow=true;g.add(ab);
-    const ah=new THREE.Mesh(new THREE.SphereGeometry(R*0.42,16,12),skinM);ah.position.y=wallH+0.4+wallH*0.56;ah.castShadow=true;g.add(ah);
+    // ----- ARCHÈRE : tunique + cheveux + bras tendus + arc vertical + flèche (animée : vise & tire) -----
+    const cg=new THREE.Group();g.add(cg);t.charGrp=cg;t.charKind='archer';t.aphase=(t.x*0.013+t.y*0.017)%6.283;t.adir=dir;
+    const ab=new THREE.Mesh(new THREE.CylinderGeometry(R*0.4,R*0.56,wallH*0.78,16),robeM);ab.position.y=wallH+0.4;ab.castShadow=true;cg.add(ab);
+    const ah=new THREE.Mesh(new THREE.SphereGeometry(R*0.42,16,12),skinM);ah.position.y=wallH+0.4+wallH*0.56;ah.castShadow=true;cg.add(ah);
     const hairM=new THREE.MeshStandardMaterial({color:t.side==='foe'?'#5a3a22':'#ffd24a',roughness:0.9});
-    const hair=new THREE.Mesh(new THREE.SphereGeometry(R*0.46,14,12),hairM);hair.scale.set(1,0.95,1);hair.position.set(0,wallH+0.4+wallH*0.62,-dir*R*0.12);hair.castShadow=true;g.add(hair);
-    const eye=new THREE.MeshBasicMaterial({color:0x222222});for(const ex of [-1,1]){const e=new THREE.Mesh(new THREE.SphereGeometry(R*0.06,8,8),eye);e.position.set(ex*R*0.15,wallH+0.4+wallH*0.56,dir*R*0.4);g.add(e);}
-    for(const sx of [-1,1]){const arm=new THREE.Mesh(new THREE.CylinderGeometry(R*0.11,R*0.11,wallH*0.5,8),robeM);arm.position.set(sx*R*0.4,wallH+0.5,dir*R*0.24);arm.rotation.x=dir*0.7;arm.castShadow=true;g.add(arm);}
-    const bow=new THREE.Mesh(new THREE.TorusGeometry(R*0.5,0.05,8,20,Math.PI*1.3),darkM);bow.position.set(0,wallH+0.6,dir*R*0.64);bow.rotation.z=dir>0?-Math.PI/2:Math.PI/2;bow.castShadow=true;g.add(bow);
-    const arrow=new THREE.Mesh(new THREE.CylinderGeometry(0.022,0.022,R*1.05,5),new THREE.MeshStandardMaterial({color:'#caa23a',roughness:0.6}));arrow.rotation.x=Math.PI/2;arrow.position.set(0,wallH+0.6,dir*R*0.64);g.add(arrow);
+    const hair=new THREE.Mesh(new THREE.SphereGeometry(R*0.46,14,12),hairM);hair.scale.set(1,0.95,1);hair.position.set(0,wallH+0.4+wallH*0.62,-dir*R*0.12);hair.castShadow=true;cg.add(hair);
+    const eye=new THREE.MeshBasicMaterial({color:0x222222});for(const ex of [-1,1]){const e=new THREE.Mesh(new THREE.SphereGeometry(R*0.06,8,8),eye);e.position.set(ex*R*0.15,wallH+0.4+wallH*0.56,dir*R*0.4);cg.add(e);}
+    // bras avant (tient l'arc, fixe) + bras arrière (tire la corde, animé)
+    const frontArm=new THREE.Mesh(new THREE.CylinderGeometry(R*0.11,R*0.11,wallH*0.5,8),robeM);frontArm.position.set(-R*0.4,wallH+0.5,dir*R*0.24);frontArm.rotation.x=dir*0.7;frontArm.castShadow=true;cg.add(frontArm);
+    const drawArm=new THREE.Mesh(new THREE.CylinderGeometry(R*0.11,R*0.11,wallH*0.5,8),robeM);drawArm.position.set(R*0.4,wallH+0.5,dir*R*0.24);drawArm.rotation.x=dir*0.7;drawArm.castShadow=true;cg.add(drawArm);t.archDrawArm=drawArm;
+    const bow=new THREE.Mesh(new THREE.TorusGeometry(R*0.5,0.05,8,20,Math.PI*1.3),darkM);bow.position.set(0,wallH+0.6,dir*R*0.64);bow.rotation.z=dir>0?-Math.PI/2:Math.PI/2;bow.castShadow=true;cg.add(bow);
+    const arrow=new THREE.Mesh(new THREE.CylinderGeometry(0.022,0.022,R*1.05,5),new THREE.MeshStandardMaterial({color:'#caa23a',roughness:0.6}));arrow.rotation.x=Math.PI/2;arrow.position.set(0,wallH+0.6,dir*R*0.64);cg.add(arrow);t.archArrow=arrow;t.archArrowZ=dir*R*0.64;t.archR=R;
   }
   // ----- EMBLÈME COURONNE doré 3D à l'avant de la base (côté rivière) -----
   const badge=new THREE.Mesh(new THREE.BoxGeometry(R*0.9,R*0.7,0.12),teamM);badge.position.set(0,wallH*0.45,dir*(sz+0.06));g.add(badge);
@@ -1061,7 +1112,7 @@ function setTowerRubble(t){if(!t.mesh)return;t.mesh.clear();
   const R=ws(t.r);const rub=new THREE.Mesh(new THREE.CylinderGeometry(R*1.1,R*1.2,0.5,8),new THREE.MeshStandardMaterial({color:'#7d766c',roughness:1,flatShading:false}));rub.position.y=0.25;rub.castShadow=true;t.mesh.add(rub);}
 // ----- meshes des unités -----
 function addUnitMesh(u){
-  const g=new THREE.Group();const tm=TEAM[u.side];const R=ws(u.vr||u.r)*1.7;   // taille selon attributs + plus gros sur la map
+  const g=new THREE.Group();const tm=TEAM[u.side];const R=ws(u.vr||u.r)*1.35;   // taille selon attributs (proche de l'origine)
   // anneau d'équipe au sol
   const ring=new THREE.Mesh(new THREE.RingGeometry(R*0.7,R*0.95,20),new THREE.MeshBasicMaterial({color:tm.main,transparent:true,opacity:0.7,side:THREE.DoubleSide}));
   ring.rotation.x=-Math.PI/2;ring.position.y=0.02;g.add(ring);
@@ -1074,7 +1125,7 @@ function addUnitMesh(u){
     spr.center.set(0.5,0);
     // respecte les proportions réelles de la découpe (les sprites ne sont pas carrés)
     const img=map.image;let aspect=0.62;if(img&&img.width&&img.height)aspect=(img.width/(sheet?sheet.frames:1))/img.height;
-    const Hs=ws(u.vr||u.r)*5.4,Ws=Hs*aspect;spr.scale.set(Ws,Hs,1);spr.position.y=(u.flying?0.7:0)+0.02;g.add(spr);u.spr=spr;u.sprW=Ws;u.sprH=Hs;u.phase=(u.x*12.9898+u.y*7.233)%6.283;
+    const Hs=ws(u.vr||u.r)*4.4,Ws=Hs*aspect;spr.scale.set(Ws,Hs,1);spr.position.y=(u.flying?0.7:0)+0.02;g.add(spr);u.spr=spr;u.sprW=Ws;u.sprH=Hs;u.phase=(u.x*12.9898+u.y*7.233)%6.283;
     g.position.set(wx(u.x),0,wz(u.y));u.mesh=g;u.ring=ring;dynGroup.add(g);return;
   }
   const c=u.card||CARDS[u.kind]||{};const fly=u.flying?0.65:0;
@@ -1154,7 +1205,37 @@ function syncScene(dt){
     }
     u.mesh.visible=!(u.deploy>0&&Math.floor(u.deploy*12)%2===0);
   }
-  for(const t of towers){if(t.mesh&&t.base){t.base.material.emissive=THREEC(t.hit>0?'#ffffff':'#000000');t.base.material.emissiveIntensity=t.hit>0?t.hit*2:0;}}
+  for(const t of towers){if(t.mesh&&t.base){t.base.material.emissive=THREEC(t.hit>0?'#ffffff':'#000000');t.base.material.emissiveIntensity=t.hit>0?t.hit*2:0;}
+    // ----- personnages des tours vivants (reine/roi respirent & balancent, archères visent & décochent) -----
+    const cg=t.charGrp;
+    if(cg&&cg.parent&&t.hp>0){const ph=t.aphase||0,tt=ANIMT;
+      if(t.charKind==='king'){
+        cg.position.y=Math.sin(tt*1.8+ph)*0.05;
+        cg.rotation.z=Math.sin(tt*1.2+ph)*0.05;
+        cg.rotation.y=Math.sin(tt*0.6+ph)*0.18;
+        if(t.kingArms)for(const a of t.kingArms)a.m.rotation.z=Math.sin(tt*1.8+ph+(a.sx>0?0:Math.PI))*0.12;
+      } else if(t.charKind==='archer'){
+        const cyc=(tt*0.9+ph)%2.2;let draw=0;          // cycle de tir ~2,2 s
+        if(cyc<1.4)draw=cyc/1.4; else if(cyc<1.55)draw=1-(cyc-1.4)/0.15;
+        const R=t.archR||0.3,d=t.adir||1;
+        if(t.archArrow)t.archArrow.position.z=t.archArrowZ-d*draw*R*0.9;
+        if(t.archDrawArm)t.archDrawArm.position.z=d*R*0.24-d*draw*R*0.5;
+        cg.position.y=Math.sin(tt*2.0+ph)*0.04;
+        cg.rotation.z=Math.sin(tt*1.3+ph)*0.04;
+      }
+    }
+    // perso de tour en SPRITE (reine/roi/archère image) : respiration + punch au tir + flash
+    const cs=t.charSpr;
+    if(cs&&t.charAnim&&t.hp>0){
+      if(t.swing>0)t.swing-=dt;
+      const ph=t.phase||0,tt=ANIMT;
+      let sy=1+Math.sin(tt*2.6+ph)*0.03,sx=1-Math.sin(tt*2.6+ph)*0.02,lift=Math.abs(Math.sin(tt*1.3+ph))*0.02;
+      if(t.swing>0){const p=Math.sin(Math.min(1,t.swing/0.2)*Math.PI);sy*=1-p*0.09;sx*=1+p*0.13;lift+=p*0.06;}
+      cs.material.rotation=Math.sin(tt*1.1+ph)*0.04;
+      cs.scale.x=t.charW*sx;cs.scale.y=t.charH*sy;cs.position.y=t.charBaseY+lift;
+      const col=cs.material.color;if(t.hit>0){const f=Math.min(1,t.hit/0.15);col.setRGB(1,1-0.4*f,1-0.6*f);}else col.setRGB(1,1,1);
+    }
+  }
   // anneau d'aperçu
   if(dragLogic&&selCard>=0&&!CARDS[hand[selCard]].spell){const valid=canDeploy(selCard,dragLogic.x,dragLogic.y),s=snap(dragLogic.x,dragLogic.y);
     previewMesh.visible=true;previewMesh.position.set(wx(s.x),0.05,wz(s.y));previewMesh.material.color=THREEC(valid?'#5cd685':'#ff5c5c');}
@@ -1181,7 +1262,7 @@ function resize(){
   if(renderer){
     renderer.setSize(cw,ch,false);
     camera.aspect=aspect;
-    const D=41.7, fitH=11.5;                      // largeur visible = fitH -> le plateau remplit toujours la largeur
+    const D=41.7, fitH=12.2;                      // largeur visible = fitH -> le plateau remplit toujours la largeur
     camera.fov=2*Math.atan((fitH/2)/(D*aspect))*180/Math.PI;
     camera.updateProjectionMatrix();
   }
@@ -1258,8 +1339,8 @@ function drawHUD(){
     crownIcon(cbx,cby-badge*0.34,15,'#ffd24a','#b9791a');
     uic.textAlign='center';crText(''+lvl,cbx,cby+badge*0.86,9,'#fff','rgba(0,0,0,.55)',2.4);}
   // barres de vie unités
-  for(const u of units){if(u.deploy>0)continue;const s=worldToScreen(u.x,u.y,(u.flying?1.6:1.1)+ws(u.vr||u.r)*1.7*2);if(!s.vis)continue;
-    const bw=Math.max(16,ws(u.vr||u.r)*52),bx=s.x-bw/2,by=s.y;
+  for(const u of units){if(u.deploy>0)continue;const s=worldToScreen(u.x,u.y,(u.flying?1.6:1.1)+ws(u.vr||u.r)*1.35*2);if(!s.vis)continue;
+    const bw=Math.max(16,ws(u.vr||u.r)*44),bx=s.x-bw/2,by=s.y;
     uic.fillStyle='#16161a';uic.fillRect(bx-1,by-1,bw+2,5);uic.fillStyle='#3a3a40';uic.fillRect(bx,by,bw,3);
     uic.fillStyle=TEAM[u.side].hp;uic.fillRect(bx,by,bw*Math.max(0,u.hp/u.max),3);
     if(u.shield>0&&u.shieldMax>0){uic.fillStyle='#7fe3ff';uic.fillRect(bx,by-2.5,bw*Math.max(0,u.shield/u.shieldMax),2);} // 🛡️ jauge de bouclier
@@ -1685,7 +1766,7 @@ const HINTS=[
 ];
 function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.add('hidden'));if(id)document.getElementById(id).classList.remove('hidden');}
 
-function startSplash(){show('splash');setTimeout(startLoading,1700);}
+function startBrand(){show('brand');setTimeout(startLoading,2100);}
 function startLoading(){
   show('loading');
   const fill=document.getElementById('loadfill'),hint=document.getElementById('loadhint');
@@ -1741,12 +1822,18 @@ if(location.search.indexOf('play')>=0){beginBattle();intro=0.01;}   // auto-star
 else if(location.search.indexOf('cards')>=0){showLobby();switchTab('panelCards',document.querySelector('.tab[data-panel="panelCards"]'));}
 else if(location.search.indexOf('tab=')>=0){const p=location.search.split('tab=')[1].split('&')[0];showLobby();switchTab(p,document.querySelector('.tab[data-panel="'+p+'"]'));}
 else if(location.search.indexOf('over')>=0){beginBattle();intro=0;const ft=towers.filter(t=>t.side==='foe'&&t.role==='princess');if(ft[0])ft[0].hp=0,ft[0].boomed=true;document.getElementById('rivalName').textContent='Trainer Earl';endGame('win');}
-else{startSplash();}
+else{startBrand();}
 </script>
 <script>
-// PWA: enregistre le service worker pour le mode hors-ligne / écran d'accueil.
+// PWA: service worker + AUTO-UPDATE (l'app installée se recharge seule quand une nouvelle version sort).
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
+  let hadController = !!navigator.serviceWorker.controller;   // vrai = l'app était déjà contrôlée -> une MAJ vient d'arriver
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(hadController){ hadController=false; location.reload(); }
+  });
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').then(reg=>{ reg.update(); }).catch(()=>{});
+  });
 }
 </script>
 </body>
