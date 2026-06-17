@@ -263,6 +263,50 @@
   .btn-sm{font-size:clamp(16px,4.5vw,20px);padding:12px 28px;background:linear-gradient(180deg,#5a9bf0,#1740a0);color:#fff;border-color:#6ea6ee;
     box-shadow:0 0 0 3px #0f2e6b,inset 0 3px 0 rgba(255,255,255,.4),inset 0 -5px 0 rgba(10,34,86,.5),0 8px 0 #0a2256,0 14px 18px rgba(0,0,0,.5);text-shadow:0 2px 0 rgba(0,0,0,.3);}
   .btn-sm:active{transform:translateY(6px);box-shadow:0 0 0 3px #0f2e6b,inset 0 3px 0 rgba(255,255,255,.4),0 2px 0 #0a2256;}
+
+  /* ===================== RESPONSIVE / SAFE-AREA (encoches, Dynamic Island, barre home) ===================== */
+  :root{
+    --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+    --sal:env(safe-area-inset-left,0px); --sar:env(safe-area-inset-right,0px);
+  }
+  /* La topbar/tabbar du lobby ne passent plus sous l'encoche ni la barre d'accueil */
+  .topbar{padding-top:calc(10px + var(--sat));padding-left:calc(12px + var(--sal));padding-right:calc(12px + var(--sar));}
+  .gear{top:calc(10px + var(--sat));right:calc(10px + var(--sar));}
+  .tabbar{padding-bottom:calc(6px + var(--sab));padding-left:calc(4px + var(--sal));padding-right:calc(4px + var(--sar));}
+
+  /* Écrans centrés : défilables si plus hauts que l'écran + marges qui évitent les bords sûrs */
+  .overlay{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+    padding-top:calc(24px + var(--sat));padding-bottom:calc(24px + var(--sab));
+    padding-left:calc(24px + var(--sal));padding-right:calc(24px + var(--sar));}
+  .overlay.lobby{padding:0;}                 /* le lobby gère ses marges via topbar/tabbar */
+  #loading{padding-bottom:calc(60px + var(--sab));}
+  /* Spacers flexibles : centrent le contenu quand il tient, basculent en défilement depuis le haut sinon
+     (exclut le lobby en flex-start et le loading en flex-end) */
+  .overlay:not(.lobby):not(#loading)::before,
+  .overlay:not(.lobby):not(#loading)::after{content:"";flex:1 0 0;min-height:0;}
+
+  /* Petits écrans en hauteur (iPhone SE, mini…) : on resserre le lobby pour éviter le scroll */
+  @media (max-height:680px){
+    .arena-art{min-height:64px;}
+    .arena-diorama{width:min(58%,210px);}
+    .cr-banner{margin:10px auto 6px;}
+    .chest{width:54px;height:56px;}
+    .chest-ico img{width:36px;height:36px;}
+    .battle-btn{padding:13px 46px;}
+  }
+  /* Écrans très étroits (SE 1ʳᵉ gén / petits Android) : on évite les débordements horizontaux */
+  @media (max-width:340px){
+    .card-grid{gap:6px;}
+    .cur{min-width:64px;font-size:13px;padding:4px 8px;}
+    .tab{font-size:18px;}
+    .tab-ico{width:26px;height:26px;}
+    .topbar{gap:4px;}
+  }
+  /* Très grands écrans (Pro Max, tablettes) : on borne la largeur de jeu pour garder le format mobile */
+  @media (min-width:760px){
+    .overlay:not(.lobby){max-width:100%;}
+    .topbar,.tabbar,.panel,.trophybar{margin-left:auto;margin-right:auto;}
+  }
 </style>
 </head>
 <body>
