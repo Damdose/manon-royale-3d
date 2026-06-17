@@ -44,6 +44,9 @@ const ASSETS_LIST={
   tab_clan:{type:'icon',prompt:"a mobile game tab icon: a heraldic clan shield with crossed swords, bold simple glossy 3D, blue and gold."},
   tab_events:{type:'icon',prompt:"a mobile game tab icon: a silver sword over a banner, bold simple glossy 3D."},
   arena:{type:'icon',prompt:"a floating 3D Clash Royale style arena board diorama seen from a high angle, two grassy lanes with a central blue river and two wooden bridges, small stone towers, decorative rocks and trees around the edge, sitting on a dark rounded base like a game widget, glossy stylized."},
+  quilt_blue:{type:'bg',prompt:BG+"Seamless quilted diamond pattern background, soft padded tufted 3D diamonds (like quilted leather), deep royal BLUE, subtle highlight and shadow on each diamond, smooth glossy, even lighting, full vertical mobile UI background, perfectly tileable, no characters."},
+  quilt_green:{type:'bg',prompt:BG+"Seamless quilted diamond pattern background, soft padded tufted 3D diamonds (like quilted leather), rich GREEN, subtle highlight and shadow on each diamond, smooth glossy, even lighting, full vertical mobile UI background, perfectly tileable, no characters."},
+  quilt_purple:{type:'bg',prompt:BG+"Seamless quilted diamond pattern background, soft padded tufted 3D diamonds (like quilted leather), deep PURPLE, subtle highlight and shadow on each diamond, smooth glossy, even lighting, full vertical mobile UI background, perfectly tileable, no characters."},
   gear:{type:'icon',prompt:"a mobile game settings gear cog icon, metallic, bold simple glossy 3D."},
 };
 
