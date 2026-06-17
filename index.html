@@ -873,7 +873,7 @@ function initThree(){
   const IS_MOBILE=(typeof matchMedia==='function'&&matchMedia('(pointer:coarse)').matches)||/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||'');
   const LOW=IS_MOBILE&&((navigator.hardwareConcurrency||4)<=4||Math.min(window.innerWidth,window.innerHeight)<420);
   renderer=new THREE.WebGLRenderer({canvas:glcanvas,antialias:!IS_MOBILE,powerPreference:'high-performance'});
-  renderer.setPixelRatio(Math.min(IS_MOBILE?1.6:2,window.devicePixelRatio||1));   // cap DPR sur mobile (perf)
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, LOW?1.5:2.75));   // rendu quasi-natif (net) ; on bride seulement les appareils modestes
   if(THREE.sRGBEncoding!==undefined)renderer.outputEncoding=THREE.sRGBEncoding;   // couleurs correctes (sinon ça jaunit/désature)
   renderer.shadowMap.enabled=!LOW;renderer.shadowMap.type=LOW?THREE.BasicShadowMap:THREE.PCFSoftShadowMap; // ombres désactivées sur appareil modeste
   // PAS de tone mapping (ACES désature -> délavé). Couleurs sRGB directes et saturées.
@@ -1169,7 +1169,7 @@ function worldToScreen(x,y,h){const v=new THREE.Vector3(wx(x),h||0,wz(y));v.proj
 let uic,VW,VH,DPR;
 const MAXA=0.60;    // ratio l/h max : au-delà (paysage/PC) on borne pour garder tout le plateau visible
 function resize(){
-  const winW=window.innerWidth, winH=window.innerHeight; DPR=Math.min(2,window.devicePixelRatio||1);
+  const winW=window.innerWidth, winH=window.innerHeight; DPR=Math.min(2.75,window.devicePixelRatio||1);
   // Le jeu remplit TOUT l'écran visible (même surface que le menu) -> plein écran, pas de bande latérale.
   let cw=winW, ch=winH, left=0, top=0, aspect=cw/ch;
   if(aspect>MAXA){ cw=Math.round(ch*MAXA); left=Math.round((winW-cw)/2); aspect=MAXA; }   // écran trop large : on centre
