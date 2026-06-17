@@ -13,7 +13,7 @@ const ICON="Clash Royale game icon by Supercell, single object, 3D stylized glos
 
 // type: 'bg' (fond plein 9:16) ou 'icon' (objet centré 1:1)
 const ASSETS_LIST={
-  bg_lobby:{type:'bg',prompt:BG+"Home screen background: a colorful fantasy battle arena seen from afar with a castle and a king tower, grassy field, blue sky with soft clouds, festive banners, vertical mobile wallpaper."},
+  bg_lobby:{type:'bg',prompt:BG+"Home screen background EXACTLY like the Clash Royale main menu wallpaper: a flat subtle diamond lattice grid texture, thin softly embossed diagonal lines crossing to form a DENSE grid of MANY SMALL even diamonds (about 14 diamonds across the width, small tiles), medium royal blue. A large bright radial glow of light cyan-blue in the center makes the middle clearly brighter, smoothly fading to a darker navy-blue at the edges and corners (soft vignette). Clean, flat, calm, very subtle relief, NOT puffy, NOT leather, NOT a couch, no thick padding. Full vertical mobile UI wallpaper, no characters, no objects, no scene, no text."},
   bg_shop:{type:'bg',prompt:BG+"Shop screen background: a cozy medieval marketplace with wooden stalls and shelves, warm interior, vertical mobile wallpaper."},
   bg_clan:{type:'bg',prompt:BG+"Clan screen background: the interior of a grand stone clan castle hall with banners and torches, vertical mobile wallpaper."},
   bg_victory:{type:'bg',prompt:BG+"Victory screen background: triumphant golden sky with confetti and light rays over an arena, celebratory, vertical mobile wallpaper."},

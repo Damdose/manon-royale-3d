@@ -25,7 +25,7 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
   html,body{height:100%;overflow:hidden;background:#0a1736;font-family:'Lilita One',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     overscroll-behavior:none;touch-action:none;position:fixed;width:100%;-webkit-text-size-adjust:100%;}
-  #wrap{position:relative;width:100vw;height:100dvh;height:100vh;overflow:hidden;background:#0a1736;touch-action:none;}
+  #wrap{position:relative;width:100vw;height:100dvh;height:var(--app-h,100dvh);overflow:hidden;background:#0a1736;touch-action:none;}
   #gl,#ui{position:absolute;display:block;touch-action:none;}
   #ui{touch-action:none;}
   .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff7e6;
@@ -101,10 +101,7 @@
   .chest-ico img{width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));}
   .chest-t{font-family:-apple-system,sans-serif;font-size:9px;color:#fff;margin-top:3px;}
   /* fonds losange CSS (couleur uniforme, pas de vignette qui assombrit le bas) */
-  #lobby.lobby{background:
-    repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 2px,transparent 2px 30px),
-    repeating-linear-gradient(-45deg,rgba(0,0,0,.08) 0 2px,transparent 2px 30px),
-    #2a5fb0;}
+  #lobby.lobby{background:url('assets/ui_bg_lobby.png') center/cover no-repeat,#2a5fb0;}
   #panelShop{background:
     repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 2px,transparent 2px 30px),
     repeating-linear-gradient(-45deg,rgba(0,0,0,.08) 0 2px,transparent 2px 30px),
@@ -542,6 +539,17 @@ function king(side){return towers.find(t=>t.side===side&&t.role==='king');}
 function crowns(side){return towers.filter(t=>t.side===side&&t.hp<=0).length;}
 
 // ===================== DÉPLOIEMENT =====================
+// ===== TAILLE VISUELLE selon les attributs (PV/rôle) — n'affecte PAS les collisions (r reste pour le gameplay) =====
+function visR(c){
+  if(c.building) return Math.min(22, 14 + (c.hp||300)/300*2.4);        // bâtiments imposants
+  const hp=c.hp||100, cnt=c.count||1;
+  let s = 10 + Math.pow(hp,0.5)*0.40;          // PV -> taille : 70≈13, 380≈18, 760≈21, 1350≈25, 2000≈27
+  if(c.range>=70) s -= 1.5;                      // tireurs/“glass cannon” un peu plus fins
+  if(cnt>=4) s *= 0.88;                          // essaims compactés
+  if(cnt>=5) s *= 0.92;
+  if(c.invis) s += 1.5;                          // l’assassin reste bien lisible
+  return Math.max(11, Math.min(27, s));
+}
 function spawnTroop(side,c,x,y){const n=c.count||1;const M=lvlMult(c,side);
   for(let i=0;i<n;i++){const ox=(n>1)?(i-(n-1)/2)*16:0,oy=(n>1)?(i%2)*9:0;
     const u={side,kind:c.kind,color:c.color,card:c,x:x+ox,y:y+oy,r:c.r,hp:c.hp*M,max:c.hp*M,dmg:(c.dmg||0)*M,range:c.range||16,atk:c.atk||1,cd:0,
@@ -549,7 +557,7 @@ function spawnTroop(side,c,x,y){const n=c.count||1;const M=lvlMult(c,side);
       pump:c.kind==='pump',pumpRate:c.pumpRate||2.6,pumpCd:c.pumpRate||3,charge:!!c.charge,chargeT:0,deathSpawn:c.deathSpawn||null,rage:0,deploy:1,stun:0,hit:0,walk:0,target:null,
       invis:!!c.invis,freeze:c.freeze||0,heal:(c.heal||0)*M,healR:c.healR||0,healCd:1,deathDmg:c.deathDmg||null,
       spawner:c.spawner||null,spawnCd:(c.spawner?c.spawner.interval:0),slow:0,pullT:0,pullX:0,pullY:0,poison:0,poisonDps:0,
-      shield:(c.shield||0)*M,shieldMax:(c.shield||0)*M,ramp:c.ramp||null,rampHits:0,lastTgt:null};
+      shield:(c.shield||0)*M,shieldMax:(c.shield||0)*M,ramp:c.ramp||null,rampHits:0,lastTgt:null,vr:visR(c)};
     units.push(u); addUnitMesh(u);}
 }
 function castSpell(x,y,c,side){const foe=side==='foe'?'me':'foe';const M=lvlMult(c,side);
@@ -721,7 +729,7 @@ function groundTexture(){
   const TW=1280,TH=Math.round(TW*AB/W),c=document.createElement('canvas');c.width=TW;c.height=TH;const x=c.getContext('2d');
   const S=TW/W,px=(v)=>v*S;
   // ===== GAZON peint =====
-  x.fillStyle='#6cb539';x.fillRect(0,0,TW,TH);
+  x.fillStyle='#72ab46';x.fillRect(0,0,TW,TH);
   const T=TILE;                       // damier subtil aligné sur la grille de jeu
   for(let gy=0;gy<AB;gy+=T)for(let gx=0;gx<W;gx+=T){const alt=(Math.round(gx/T)+Math.round(gy/T))&1;x.fillStyle=alt?'rgba(255,255,255,.06)':'rgba(20,70,10,.07)';x.fillRect(px(gx),px(gy),px(T)+1,px(T)+1);}
   // taches peintes DOUCES (radial, pas de bord net -> aspect peint)
@@ -961,48 +969,50 @@ function addTowerMesh(t){
     spr.center.set(0.5,0);const Hs=ws(t.r)*(king?9:7.5);spr.scale.set(Hs*0.82,Hs,1);spr.position.y=0.02;g.add(spr);
     g.position.set(wx(t.x),0,wz(t.y));t.mesh=g;t.base=null;dynGroup&&dynGroup.add(g);return;
   }
-  // ----- FORT carré BAS et LARGE (façon CR) -----
-  const R=ws(t.r), sz=R*1.5, wallH=king?1.0:0.78;
-  const stoneL=new THREE.MeshStandardMaterial({color:'#a39d90',roughness:0.95});   // pierre grise chaude (CR)
-  const stoneD=new THREE.MeshStandardMaterial({color:'#7a7468',roughness:0.95});
-  const teamM=new THREE.MeshStandardMaterial({color:tm.main,roughness:0.55});
+  // ----- TOUR EN PIERRE (façon Clash Royale) : pierre grise dominante, accents d'équipe -----
+  const R=ws(t.r), sz=R*1.4, wallH=king?1.95:1.5;
+  const stoneL=new THREE.MeshStandardMaterial({color:'#c6bda9',roughness:0.95});   // pierre claire
+  const stoneM=new THREE.MeshStandardMaterial({color:'#a89e8b',roughness:0.95});   // pierre moyenne
+  const stoneD=new THREE.MeshStandardMaterial({color:'#6f6757',roughness:0.95});   // joints / ombre
+  const teamM=new THREE.MeshStandardMaterial({color:tm.main,roughness:0.5});
+  const teamDk=new THREE.MeshStandardMaterial({color:t.side==='foe'?'#9e241f':'#1b4f9e',roughness:0.5});
   const goldM=new THREE.MeshStandardMaterial({color:'#ffce3a',metalness:0.5,roughness:0.3});
   const darkM=new THREE.MeshStandardMaterial({color:'#3a3340',roughness:0.6});
   const skinM=new THREE.MeshStandardMaterial({color:'#f3cda4',roughness:0.85});
-  const robeCol=t.side==='foe'?'#d23b3b':'#2f74da';                 // robe/tunique couleur équipe vive
+  const robeCol=t.side==='foe'?'#d23b3b':'#2f74da';
   const robeM=new THREE.MeshStandardMaterial({color:robeCol,roughness:0.6});
   const dir=t.side==='foe'?1:-1;
-  // socle large + corps bas
-  const trim=new THREE.Mesh(new THREE.BoxGeometry(sz*2+0.26,0.26,sz*2+0.26),stoneD);trim.position.y=0.13;trim.castShadow=true;trim.receiveShadow=true;g.add(trim);
-  const base=new THREE.Mesh(new THREE.BoxGeometry(sz*2,wallH,sz*2),stoneL);base.position.y=wallH/2+0.03;base.castShadow=true;base.receiveShadow=true;g.add(base);
-  const bandM=new THREE.Mesh(new THREE.BoxGeometry(sz*2+0.05,0.1,sz*2+0.05),stoneD);bandM.position.y=wallH*0.5;g.add(bandM);
-  // plateforme creuse où se tient le perso
-  const yard=new THREE.Mesh(new THREE.BoxGeometry(sz*1.4,0.18,sz*1.4),stoneD);yard.position.y=wallH+0.03;g.add(yard);
-  // petits créneaux discrets (2 par bord)
-  const cb=sz*0.32, ch=wallH*0.2;
-  for(const s of [-1,1])for(const o of [-0.62,0.62]){
-    const a=new THREE.Mesh(new THREE.BoxGeometry(cb,ch,cb),stoneL);a.position.set(s*sz,wallH+ch/2,o*sz);a.castShadow=true;g.add(a);
-    const b=new THREE.Mesh(new THREE.BoxGeometry(cb,ch,cb),stoneL);b.position.set(o*sz,wallH+ch/2,s*sz);b.castShadow=true;g.add(b);
-  }
-  // ----- ÉQUERRES D'ANGLE PLATES (signature CR) : L épais collé aux coins, couleur équipe vive -----
-  const brCol=t.side==='foe'?'#ff2e63':'#2f8fe0';
-  const brM=new THREE.MeshStandardMaterial({color:brCol,roughness:0.4});
-  const bt=sz*0.3, barm=sz*1.0, bh=wallH*0.92, by=bh/2+0.03, bo=sz+bt*0.18;
+  // fondation débordante (pierre foncée)
+  const trim=new THREE.Mesh(new THREE.BoxGeometry(sz*2+0.42,0.34,sz*2+0.42),stoneD);trim.position.y=0.17;trim.castShadow=true;trim.receiveShadow=true;g.add(trim);
+  // corps principal
+  const base=new THREE.Mesh(new THREE.BoxGeometry(sz*2,wallH,sz*2),stoneL);base.position.y=wallH/2+0.1;base.castShadow=true;base.receiveShadow=true;g.add(base);
+  // joints de maçonnerie (bandes fines foncées)
+  for(const fy of [0.33,0.63]){const j=new THREE.Mesh(new THREE.BoxGeometry(sz*2+0.04,wallH*0.05,sz*2+0.04),stoneD);j.position.y=0.1+wallH*fy;g.add(j);}
+  // bandeau couleur équipe sous le rempart
+  const cband=new THREE.Mesh(new THREE.BoxGeometry(sz*2+0.1,wallH*0.15,sz*2+0.1),teamM);cband.position.y=0.1+wallH*0.9;g.add(cband);
+  // rebord du rempart + cour intérieure (le perso se tient dedans)
+  const topY=0.1+wallH;
+  const rim=new THREE.Mesh(new THREE.BoxGeometry(sz*1.98,wallH*0.1,sz*1.98),stoneM);rim.position.y=topY;g.add(rim);
+  const yard=new THREE.Mesh(new THREE.BoxGeometry(sz*1.5,0.12,sz*1.5),stoneD);yard.position.y=topY+0.04;g.add(yard);
+  // créneaux (merlons) tout autour du rempart
+  const mN=king?4:3, mW=sz*0.27, mH=wallH*0.3, edge=sz-mW*0.5;
+  for(let i=0;i<mN;i++){const p=(mN===1?0:(i/(mN-1))*2-1)*edge;
+    for(const c of [[p,sz],[p,-sz],[sz,p],[-sz,p]]){
+      const m=new THREE.Mesh(new THREE.BoxGeometry(mW,mH,mW),stoneL);m.position.set(c[0],topY+mH/2,c[1]);m.castShadow=true;g.add(m);}}
+  // toits pointus couleur équipe aux 4 coins (signature CR)
   for(const sx of [-1,1])for(const sZ of [-1,1]){
-    const ax=new THREE.Mesh(new THREE.BoxGeometry(barm,bh,bt),brM);ax.position.set(sx*(sz-barm/2+bt*0.18),by,sZ*bo);ax.castShadow=true;g.add(ax);
-    const az=new THREE.Mesh(new THREE.BoxGeometry(bt,bh,barm),brM);az.position.set(sx*bo,by,sZ*(sz-barm/2+bt*0.18));az.castShadow=true;g.add(az);
-  }
-  // marches/échelle en bois sur la face avant (côté rivière) — détail CR
+    const roof=new THREE.Mesh(new THREE.ConeGeometry(mW*1.0,wallH*0.5,4),teamDk);roof.rotation.y=Math.PI/4;roof.position.set(sx*sz,topY+mH+wallH*0.18,sZ*sz);roof.castShadow=true;g.add(roof);}
+  // échelle bois sur la face avant (côté rivière)
   const woodM=new THREE.MeshStandardMaterial({color:'#9c6a32',roughness:1});
-  for(const sx of [-1,1]){const rail=new THREE.Mesh(new THREE.BoxGeometry(0.08,wallH*0.92,0.08),woodM);rail.position.set(sx*sz*0.34,wallH*0.48,dir*(sz+0.04));rail.castShadow=true;g.add(rail);}
-  for(let i=0;i<3;i++){const rung=new THREE.Mesh(new THREE.BoxGeometry(sz*0.72,0.07,0.1),woodM);rung.position.set(0,wallH*0.2+i*wallH*0.3,dir*(sz+0.05));g.add(rung);}
+  for(const sx of [-1,1]){const rail=new THREE.Mesh(new THREE.BoxGeometry(0.09,wallH*0.9,0.09),woodM);rail.position.set(sx*sz*0.32,0.1+wallH*0.45,dir*(sz+0.05));rail.castShadow=true;g.add(rail);}
+  for(let i=0;i<4;i++){const rung=new THREE.Mesh(new THREE.BoxGeometry(sz*0.64,0.07,0.1),woodM);rung.position.set(0,0.1+wallH*0.12+i*wallH*0.23,dir*(sz+0.06));g.add(rung);}
   const charKey='towerchar_cut_'+t.role+'_'+(t.side==='me'?'blue':'red');
   if(TEXR[charKey]){
     // ----- personnage en style carte (sprite) posé sur le fort 3D -----
     const map=TEX[charKey];const spr=new THREE.Sprite(new THREE.SpriteMaterial({map,transparent:true,alphaTest:0.5,depthTest:true}));
     spr.center.set(0.5,0);
     const im=map.image;let asp=0.6;if(im&&im.width&&im.height)asp=im.width/im.height;
-    const Hs=king?2.7:2.2;spr.scale.set(Hs*asp,Hs,1);spr.position.set(0,wallH+0.06,0);g.add(spr);t.charSpr=spr;
+    const Hs=king?2.7:2.2;spr.scale.set(Hs*asp,Hs,1);spr.position.set(0,topY+0.05,0);g.add(spr);t.charSpr=spr;
   }
   else if(king){
     // ----- repli géométrique : reine blonde (nous) / roi brun barbu (adversaire) -----
@@ -1051,7 +1061,7 @@ function setTowerRubble(t){if(!t.mesh)return;t.mesh.clear();
   const R=ws(t.r);const rub=new THREE.Mesh(new THREE.CylinderGeometry(R*1.1,R*1.2,0.5,8),new THREE.MeshStandardMaterial({color:'#7d766c',roughness:1,flatShading:false}));rub.position.y=0.25;rub.castShadow=true;t.mesh.add(rub);}
 // ----- meshes des unités -----
 function addUnitMesh(u){
-  const g=new THREE.Group();const tm=TEAM[u.side];const R=ws(u.r)*1.5;
+  const g=new THREE.Group();const tm=TEAM[u.side];const R=ws(u.vr||u.r)*1.7;   // taille selon attributs + plus gros sur la map
   // anneau d'équipe au sol
   const ring=new THREE.Mesh(new THREE.RingGeometry(R*0.7,R*0.95,20),new THREE.MeshBasicMaterial({color:tm.main,transparent:true,opacity:0.7,side:THREE.DoubleSide}));
   ring.rotation.x=-Math.PI/2;ring.position.y=0.02;g.add(ring);
@@ -1064,7 +1074,7 @@ function addUnitMesh(u){
     spr.center.set(0.5,0);
     // respecte les proportions réelles de la découpe (les sprites ne sont pas carrés)
     const img=map.image;let aspect=0.62;if(img&&img.width&&img.height)aspect=(img.width/(sheet?sheet.frames:1))/img.height;
-    const Hs=ws(u.r)*4.8,Ws=Hs*aspect;spr.scale.set(Ws,Hs,1);spr.position.y=(u.flying?0.7:0)+0.02;g.add(spr);u.spr=spr;u.sprW=Ws;u.sprH=Hs;u.phase=(u.x*12.9898+u.y*7.233)%6.283;
+    const Hs=ws(u.vr||u.r)*5.4,Ws=Hs*aspect;spr.scale.set(Ws,Hs,1);spr.position.y=(u.flying?0.7:0)+0.02;g.add(spr);u.spr=spr;u.sprW=Ws;u.sprH=Hs;u.phase=(u.x*12.9898+u.y*7.233)%6.283;
     g.position.set(wx(u.x),0,wz(u.y));u.mesh=g;u.ring=ring;dynGroup.add(g);return;
   }
   const c=u.card||CARDS[u.kind]||{};const fly=u.flying?0.65:0;
@@ -1157,26 +1167,29 @@ function worldToScreen(x,y,h){const v=new THREE.Vector3(wx(x),h||0,wz(y));v.proj
 
 // ===================== OVERLAY 2D (HUD) =====================
 let uic,VW,VH,DPR;
-const RATIO=0.52;   // largeur/hauteur d'un téléphone (format mobile fixe)
+const MAXA=0.60;    // ratio l/h max : au-delà (paysage/PC) on borne pour garder tout le plateau visible
 function resize(){
   const winW=window.innerWidth, winH=window.innerHeight; DPR=Math.min(2,window.devicePixelRatio||1);
-  // cadre portrait centré dans la fenêtre (le jeu reste mobile quelle que soit la forme)
-  let cw,ch;
-  if(winW/winH > RATIO){ ch=winH; cw=Math.round(ch*RATIO); } else { cw=winW; ch=Math.round(cw/RATIO); }
-  const left=Math.round((winW-cw)/2), top=Math.round((winH-ch)/2);
+  // Le jeu remplit TOUT l'écran visible (même surface que le menu) -> plein écran, pas de bande latérale.
+  let cw=winW, ch=winH, left=0, top=0, aspect=cw/ch;
+  if(aspect>MAXA){ cw=Math.round(ch*MAXA); left=Math.round((winW-cw)/2); aspect=MAXA; }   // écran trop large : on centre
   VW=cw; VH=ch;
+  // hauteur réellement visible -> partagée avec le DOM (menu) pour que rien ne passe sous les barres Safari
+  document.documentElement.style.setProperty('--app-h', winH+'px');
   const uiEl=document.getElementById('ui');
   for(const el of [glcanvas,uiEl]){ el.style.left=left+'px'; el.style.top=top+'px'; el.style.width=cw+'px'; el.style.height=ch+'px'; }
   if(renderer){
     renderer.setSize(cw,ch,false);
-    camera.aspect=RATIO;
-    const D=41.7, fitH=11.5;                      // zoom proche du vrai CR : les tours remplissent l'arène
-    camera.fov=2*Math.atan((fitH/2)/(D*RATIO))*180/Math.PI;
+    camera.aspect=aspect;
+    const D=41.7, fitH=11.5;                      // largeur visible = fitH -> le plateau remplit toujours la largeur
+    camera.fov=2*Math.atan((fitH/2)/(D*aspect))*180/Math.PI;
     camera.updateProjectionMatrix();
   }
   uiEl.width=cw*DPR; uiEl.height=ch*DPR; uic=uiEl.getContext('2d'); uic.setTransform(DPR,0,0,DPR,0,0);
 }
 window.addEventListener('resize',resize);
+window.addEventListener('orientationchange',resize);
+if(window.visualViewport)window.visualViewport.addEventListener('resize',resize);
 function rr(x,y,w,h,r){uic.beginPath();uic.moveTo(x+r,y);uic.arcTo(x+w,y,x+w,y+h,r);uic.arcTo(x+w,y+h,x,y+h,r);uic.arcTo(x,y+h,x,y,r);uic.arcTo(x,y,x+w,y,r);uic.closePath();}
 // image de carte (object-fit: cover) si dispo, sinon null
 function cardImg(key){const im=IMG['card_'+key];return (im&&im.complete&&im.naturalWidth)?im:null;}
@@ -1245,8 +1258,8 @@ function drawHUD(){
     crownIcon(cbx,cby-badge*0.34,15,'#ffd24a','#b9791a');
     uic.textAlign='center';crText(''+lvl,cbx,cby+badge*0.86,9,'#fff','rgba(0,0,0,.55)',2.4);}
   // barres de vie unités
-  for(const u of units){if(u.deploy>0)continue;const s=worldToScreen(u.x,u.y,(u.flying?1.6:1.1)+ws(u.r)*1.5*2);if(!s.vis)continue;
-    const bw=Math.max(16,ws(u.r)*60),bx=s.x-bw/2,by=s.y;
+  for(const u of units){if(u.deploy>0)continue;const s=worldToScreen(u.x,u.y,(u.flying?1.6:1.1)+ws(u.vr||u.r)*1.7*2);if(!s.vis)continue;
+    const bw=Math.max(16,ws(u.vr||u.r)*52),bx=s.x-bw/2,by=s.y;
     uic.fillStyle='#16161a';uic.fillRect(bx-1,by-1,bw+2,5);uic.fillStyle='#3a3a40';uic.fillRect(bx,by,bw,3);
     uic.fillStyle=TEAM[u.side].hp;uic.fillRect(bx,by,bw*Math.max(0,u.hp/u.max),3);
     if(u.shield>0&&u.shieldMax>0){uic.fillStyle='#7fe3ff';uic.fillRect(bx,by-2.5,bw*Math.max(0,u.shield/u.shieldMax),2);} // 🛡️ jauge de bouclier
