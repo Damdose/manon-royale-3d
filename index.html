@@ -24,11 +24,12 @@
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
   @font-face{font-family:'Supercell Magic';src:url('assets/SupercellMagic.ttf') format('truetype');font-weight:normal;font-style:normal;font-display:swap;size-adjust:82%;}
-  html,body{height:100%;overflow:hidden;background:#0a1736;font-family:'Supercell Magic','Lilita One',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-    overscroll-behavior:none;touch-action:none;position:fixed;width:100%;-webkit-text-size-adjust:100%;}
-  /* position:fixed + inset:0 = le navigateur remplit l'écran RÉEL lui-même (parfait en mode app installée
-     comme en navigateur), sans dépendre de 100vh/dvh (buggés en standalone iOS). */
-  #wrap{position:fixed;inset:0;overflow:hidden;background:#0a1736;touch-action:none;}
+  /* ⚠️ height:100vh (PAS 100% : casse viewport-fit=cover/black-translucent ; PAS 100dvh : buggé au démarrage à froid).
+     Réf. guide jeux PWA iPhone. */
+  html,body{height:100vh;overflow:hidden;background:#0a1736;font-family:'Supercell Magic','Lilita One',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    overscroll-behavior:none;touch-action:none;position:fixed;width:100vw;-webkit-text-size-adjust:100%;}
+  /* conteneur plein écran : largeur/hauteur EXPLICITES (100vw/100vh), pas inset:0 ni dvh. */
+  #wrap{position:fixed;top:0;left:0;width:100vw;height:100vh;overflow:hidden;background:#0a1736;touch-action:none;}
   #gl,#ui{position:absolute;display:block;touch-action:none;}
   #ui{touch-action:none;}
   .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff7e6;
@@ -551,8 +552,8 @@
 const W=480;
 const COLS=18, ROWS=32, TILE=W/COLS;            // tuile carrée (≈26,7 px)
 const AB=ROWS*TILE, RIVER=AB/2;                 // terrain au ratio réel 18:32 (≈0,56)
-const LANE=[W*0.194, W*0.806];                  // ponts & lanes : colonnes ~3,5 et 14,5
-const ROW_KING=AB*0.10, ROW_PRINCESS=AB*0.168; // alignées sur les dalles de l'arène (assets/arena.png)
+const LANE=[W*0.200, W*0.800];                  // ponts & lanes : alignés sur les dalles de l'arène
+const ROW_KING=AB*0.125, ROW_PRINCESS=AB*0.218; // dalles roi/princesse mesurées sur assets/arena.png
 function snap(x,y){return {x:(Math.floor(x/TILE)+0.5)*TILE, y:(Math.floor(y/TILE)+0.5)*TILE};}
 
 // ===================== CARTES =====================
@@ -1069,8 +1070,9 @@ function addTowerMesh(t){
   }
   const sd=(t.side==='me'?'blue':'red');
   const castleKey='towercastle_cut_'+t.role+'_'+sd, pKey='towerchar_bust_'+t.role+'_'+sd, fullKey='towerfull_'+t.role+'_'+sd;
-  // ----- CHÂTEAU VIDE (image) + PERSO ANIMÉ posé dessus : prioritaire -----
-  if(TEXR[castleKey]){
+  // ----- CHÂTEAU VIDE (image) + PERSO ANIMÉ posé dessus -----
+  const USE_SEPARATE=false;   // false = tour complète towerfull (perso intégré, placement parfait) ; true = château+buste séparés (animé)
+  if(USE_SEPARATE&&TEXR[castleKey]){
     // placement validé en composition PIL (compose_towers.py) : f=bas du buste depuis le HAUT, s=hauteur buste/château
     const TCFG={king_blue:{f:0.52,s:0.42},king_red:{f:0.55,s:0.40},princess_blue:{f:0.55,s:0.40},princess_red:{f:0.55,s:0.40}};
     const cf=TCFG[t.role+'_'+sd]||{f:0.55,s:0.40};
@@ -1377,6 +1379,19 @@ window.addEventListener('pageshow',resize);   // retour depuis l'arrière-plan (
 if(window.visualViewport){window.visualViewport.addEventListener('resize',resize);window.visualViewport.addEventListener('scroll',resize);}
 // iOS standalone : la hauteur peut se stabiliser un instant après le lancement -> on re-mesure plusieurs fois
 [60,150,300,500,900,1500,2500].forEach(ms=>setTimeout(()=>{try{resize();}catch(e){}},ms));
+// Astuce documentée (guide jeux PWA iPhone) : en app installée, iOS calcule mal le viewport/safe-area au démarrage à froid.
+// On bascule viewport-fit cover->auto->cover pour FORCER le recalcul, puis on re-mesure.
+(function forceViewportRecalc(){
+  var standalone = (window.matchMedia&&matchMedia('(display-mode:standalone)').matches)||window.navigator.standalone;
+  if(!standalone)return;
+  var meta=document.querySelector('meta[name="viewport"]'); if(!meta)return;
+  var orig=meta.getAttribute('content');
+  function pulse(){
+    meta.setAttribute('content', orig.replace('viewport-fit=cover','viewport-fit=auto'));
+    requestAnimationFrame(function(){ meta.setAttribute('content', orig); requestAnimationFrame(function(){ try{resize();}catch(e){} }); });
+  }
+  pulse(); setTimeout(pulse,400); setTimeout(pulse,1200);
+})();
 function rr(x,y,w,h,r){uic.beginPath();uic.moveTo(x+r,y);uic.arcTo(x+w,y,x+w,y+h,r);uic.arcTo(x+w,y+h,x,y+h,r);uic.arcTo(x,y+h,x,y,r);uic.arcTo(x,y,x+w,y,r);uic.closePath();}
 // image de carte (object-fit: cover) si dispo, sinon null
 function cardImg(key){const im=IMG['card_'+key];return (im&&im.complete&&im.naturalWidth)?im:null;}
@@ -2011,7 +2026,7 @@ if('serviceWorker' in navigator){
 <script>
 // Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
 (function(){
-  var BUILD='v13';
+  var BUILD='v14';
   // Badge de version tapotable (coin bas-droit). Un appui ouvre/ferme le diagnostic — marche aussi en app installée.
   var tag=document.createElement('div');
   tag.textContent=BUILD;
