@@ -2011,22 +2011,25 @@ if('serviceWorker' in navigator){
 <script>
 // Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
 (function(){
-  var BUILD='v12';
+  var BUILD='v13';
+  // Badge de version tapotable (coin bas-droit). Un appui ouvre/ferme le diagnostic — marche aussi en app installée.
   var tag=document.createElement('div');
   tag.textContent=BUILD;
-  tag.style.cssText='position:fixed;z-index:99998;right:calc(5px + env(safe-area-inset-right));bottom:calc(3px + env(safe-area-inset-bottom));font:10px/1 monospace;color:rgba(255,255,255,.45);pointer-events:none;';
+  tag.style.cssText='position:fixed;z-index:99999;right:calc(2px + env(safe-area-inset-right));bottom:calc(2px + env(safe-area-inset-bottom));padding:8px 10px;font:11px/1 monospace;color:rgba(255,255,255,.5);pointer-events:auto;cursor:pointer;';
   document.body.appendChild(tag);
-  if(location.search.indexOf('debug')>=0){
-    var probe=document.createElement('div');
-    probe.style.cssText='position:fixed;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);visibility:hidden;';
-    document.body.appendChild(probe);
-    var cs=getComputedStyle(probe);
-    var box=document.createElement('div');
-    box.style.cssText='position:fixed;z-index:99999;left:50%;top:46%;transform:translate(-50%,-50%);background:rgba(0,0,0,.88);color:#0f0;font:13px/1.7 monospace;padding:16px 18px;border-radius:12px;white-space:pre;text-align:left;';
-    function upd(){var vv=window.visualViewport;var w=document.getElementById('wrap').getBoundingClientRect();
-      box.textContent='BUILD '+BUILD+'\nscreen '+screen.width+'x'+screen.height+'\ninner  '+window.innerWidth+'x'+window.innerHeight+'\nvisVP  '+(vv?Math.round(vv.width)+'x'+Math.round(vv.height):'-')+'\nwrap   '+Math.round(w.width)+'x'+Math.round(w.height)+'\nDPR    '+window.devicePixelRatio+'\nsafe   T'+cs.paddingTop+' B'+cs.paddingBottom+'\n       L'+cs.paddingLeft+' R'+cs.paddingRight+'\nstandalone '+(matchMedia('(display-mode:standalone)').matches||!!navigator.standalone);}
-    upd();document.body.appendChild(box);addEventListener('resize',upd);if(window.visualViewport)visualViewport.addEventListener('resize',upd);
-  }
+  var probe=document.createElement('div');
+  probe.style.cssText='position:fixed;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);visibility:hidden;';
+  document.body.appendChild(probe);
+  var cs=getComputedStyle(probe), box=null;
+  function upd(){if(!box)return;var vv=window.visualViewport;var w=document.getElementById('wrap').getBoundingClientRect();
+    box.textContent='BUILD '+BUILD+'\nscreen '+screen.width+'x'+screen.height+'\ninner  '+window.innerWidth+'x'+window.innerHeight+'\nvisVP  '+(vv?Math.round(vv.width)+'x'+Math.round(vv.height):'-')+'\nwrap   '+Math.round(w.width)+'x'+Math.round(w.height)+'\nDPR    '+window.devicePixelRatio+'\nsafe   T'+cs.paddingTop+' B'+cs.paddingBottom+'\n       L'+cs.paddingLeft+' R'+cs.paddingRight+'\nstandalone '+(matchMedia('(display-mode:standalone)').matches||!!navigator.standalone);}
+  function toggle(){if(box){box.remove();box=null;return;}
+    box=document.createElement('div');
+    box.style.cssText='position:fixed;z-index:99999;left:50%;top:46%;transform:translate(-50%,-50%);background:rgba(0,0,0,.9);color:#0f0;font:14px/1.8 monospace;padding:18px 20px;border-radius:12px;white-space:pre;text-align:left;';
+    document.body.appendChild(box);upd();}
+  tag.addEventListener('click',toggle);
+  if(location.search.indexOf('debug')>=0)toggle();
+  addEventListener('resize',upd);if(window.visualViewport)visualViewport.addEventListener('resize',upd);
 })();
 </script>
 </body>
