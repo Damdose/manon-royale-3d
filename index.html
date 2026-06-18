@@ -968,6 +968,8 @@ function loadAssets(){
   // bustes (tête+torse) des persos de tour -> se posent dans le rempart
   for(const r of ['king','princess'])for(const s of ['blue','red'])loadTex('towerchar_bust_'+r+'_'+s,'assets/towerchar_bust_'+r+'_'+s+'.png',()=>rebuildTowers());
   loadTex('arena','assets/arena.png',t=>{t.anisotropy=4;groundMesh.material.map=t;groundMesh.material.needsUpdate=true;});
+  // décor de bordure (arbres + rochers) en art détouré -> reconstruit dès qu'une texture arrive
+  for(const k of ['tree1','tree2','tree3','tree4','rock1','rock2'])loadTex('decor_'+k,'assets/decor_'+k+'.png',()=>renderDecor());
   loadTex('bg','assets/background.png',t=>{scene.background=t;scene.fog=null;});
   for(const k of CARD_KEYS)loadImg('card_'+k,'assets/card_'+k+'.png');
 }
@@ -1034,33 +1036,58 @@ function makeStadium(){
     for(let i=-3;i<=3;i++){const post=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.7,0.16),woodD);post.position.set(i*(FW*0.5/6),0.35,z);post.castShadow=true;scene.add(post);}
   }
 }
+let decorGroup,decorSpots;
 function makeTrees(){
+  decorGroup=new THREE.Group();scene.add(decorGroup);
+  // emplacements calculés UNE fois (stables) -> rendu en sprites art si dispos, sinon géométrie
+  decorSpots=[];
+  const treeVars=['tree1','tree2','tree3','tree4'],rockVars=['rock1','rock2'];
+  const pick=a=>a[(Math.random()*a.length)|0];
+  const add=(X,Z,treeP)=>{const isTree=Math.random()<treeP;decorSpots.push({x:X,z:Z,tree:isTree,v:isTree?pick(treeVars):pick(rockVars),s:isTree?0.85+Math.random()*0.7:0.55+Math.random()*0.7,rot:(Math.random()-0.5)*0.3});};
+  // forêt DENSE qui borde les deux côtés longs (façon CR)
+  for(let side of [-1,1]){
+    for(let row=0;row<3;row++){const baseX=side*(FW/2+1.0+row*1.4);
+      for(let z=-FD/2-1.5;z<=FD/2+1.5;z+=1.1+Math.random()*0.5){
+        add(baseX+(Math.random()-0.5)*0.8, z+(Math.random()-0.5)*0.6, 0.85);
+      }}
+  }
+  // bouchons d'arbres derrière les Rois (haut & bas) : repoussés vers les coins, JAMAIS devant la tour-roi du centre
+  for(let zside of [-1,1])for(let i=0;i<10;i++){
+    const sx=Math.random()<0.5?-1:1, X=sx*(2.6+Math.random()*5.0), Z=zside*(FD/2+2.4+Math.random()*3.2);
+    add(X,Z,0.8);
+  }
+  renderDecor();
+}
+function renderDecor(){
+  if(!decorGroup||!decorSpots)return;
+  while(decorGroup.children.length)decorGroup.remove(decorGroup.children[0]);
   const trunkM=new THREE.MeshStandardMaterial({color:'#5e3f1f',roughness:1});
   const leafM=new THREE.MeshStandardMaterial({color:'#3f8a30',roughness:0.9});
   const leafM2=new THREE.MeshStandardMaterial({color:'#347528',roughness:0.9});
-  const capM=new THREE.MeshStandardMaterial({color:'#5aa845',roughness:0.9});   // reflet vert clair côté lumière
+  const capM=new THREE.MeshStandardMaterial({color:'#5aa845',roughness:0.9});
   const rockM=new THREE.MeshStandardMaterial({color:'#8f949a',roughness:1});
-  // arbre PROPRE : tronc + canopée arrondie unique + petit reflet (pas de grappe de boules)
-  function tree(X,Z){const g=new THREE.Group();const lm=Math.random()<0.5?leafM:leafM2;
-    const tr=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.24,0.6,8),trunkM);tr.position.y=0.3;
-    const canopy=new THREE.Mesh(new THREE.SphereGeometry(0.95,16,13),lm);canopy.position.y=1.3;canopy.scale.set(1,0.92,1);
-    const cap=new THREE.Mesh(new THREE.SphereGeometry(0.58,14,11),capM);cap.position.set(-0.34,1.72,-0.24);
-    g.add(tr,canopy,cap);g.children.forEach(m=>m.castShadow=true);g.position.set(X,0,Z);const s=0.85+Math.random()*0.7;g.scale.set(s,s,s);g.rotation.y=Math.random()*6;scene.add(g);}
-  function rock(X,Z){const rk=new THREE.Mesh(new THREE.DodecahedronGeometry(0.4),rockM);rk.position.set(X,0.2,Z);rk.castShadow=true;rk.rotation.set(Math.random(),Math.random()*6,Math.random());const s=0.55+Math.random()*0.7;rk.scale.set(s,s*0.8,s);scene.add(rk);}
-  // ----- forêt DENSE qui borde directement les deux côtés longs (façon CR) -----
-  for(let side of [-1,1]){
-    for(let row=0;row<3;row++){const baseX=side*(FW/2+0.7+row*1.4);
-      for(let z=-FD/2-1.5;z<=FD/2+1.5;z+=1.1+Math.random()*0.5){
-        const X=baseX+(Math.random()-0.5)*0.8, Z=z+(Math.random()-0.5)*0.6;
-        if(Math.random()<0.85)tree(X,Z); else rock(X,Z);
-      }}
-  }
-  // bouchons d'arbres derrière les Rois (haut & bas)
-  for(let zside of [-1,1])for(let i=0;i<14;i++){
-    const X=(Math.random()-0.5)*(FW+3), Z=zside*(FD/2+1.2+Math.random()*3);
-    if(Math.random()<0.8)tree(X,Z); else rock(X,Z);
+  for(const sp of decorSpots){
+    const key='decor_'+sp.v;
+    if(TEXR[key]){   // ----- sprite art détouré (debout, façon billboard CR) -----
+      const map=TEX[key];const spr=new THREE.Sprite(new THREE.SpriteMaterial({map,transparent:true,alphaTest:0.5,depthTest:true}));
+      spr.center.set(0.5,0);let asp=1;if(map.image&&map.image.width)asp=map.image.width/map.image.height;
+      const H=(sp.tree?2.2:1.05)*sp.s;spr.scale.set(H*asp,H,1);spr.position.set(sp.x,0.02,sp.z);decorGroup.add(spr);
+    } else if(sp.tree){   // ----- repli géométrique : arbre arrondi -----
+      const g=new THREE.Group();const lm=(sp.v==='tree2')?leafM2:leafM;
+      const tr=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.24,0.6,8),trunkM);tr.position.y=0.3;
+      const canopy=new THREE.Mesh(new THREE.SphereGeometry(0.95,16,13),lm);canopy.position.y=1.3;canopy.scale.set(1,0.92,1);
+      const cap=new THREE.Mesh(new THREE.SphereGeometry(0.58,14,11),capM);cap.position.set(-0.34,1.72,-0.24);
+      g.add(tr,canopy,cap);g.children.forEach(m=>m.castShadow=true);g.position.set(sp.x,0,sp.z);g.scale.setScalar(sp.s);g.rotation.y=sp.rot*6;decorGroup.add(g);
+    } else {   // ----- repli géométrique : rocher -----
+      const rk=new THREE.Mesh(new THREE.DodecahedronGeometry(0.4),rockM);rk.position.set(sp.x,0.2,sp.z);rk.castShadow=true;rk.rotation.set(sp.rot,sp.rot*6,sp.rot);rk.scale.set(sp.s,sp.s*0.8,sp.s);decorGroup.add(rk);
+    }
   }
 }
+// ===== MODE ÉDITION DES PERSOS DE TOUR (?tune) : place chaque perso à la souris =====
+const TUNE=location.search.indexOf('tune')>=0;
+let tuneOverrides={}; try{tuneOverrides=JSON.parse(localStorage.getItem('towerTune')||'{}');}catch(e){}
+function tuneKeyOf(t){return t.role+'_'+(t.side==='me'?'blue':'red');}
+function saveTune(){try{localStorage.setItem('towerTune',JSON.stringify(tuneOverrides));}catch(e){}}
 // ----- meshes des tours -----
 function addTowerMesh(t){
   const g=new THREE.Group();const tm=TEAM[t.side];const king=t.role==='king';
@@ -1076,10 +1103,10 @@ function addTowerMesh(t){
   const sd=(t.side==='me'?'blue':'red');
   const castleKey='towercastle_cut_'+t.role+'_'+sd, pKey='towerchar_bust_'+t.role+'_'+sd, fullKey='towerfull_'+t.role+'_'+sd;
   // ----- CHÂTEAU VIDE (image) + PERSO ANIMÉ posé dessus -----
-  const USE_SEPARATE=false;   // false = tour complète towerfull (perso intégré, placement parfait) ; true = château+buste séparés (animé)
+  const USE_SEPARATE=true;   // true = château vide + buste ANIMÉ (perso bouge + tirs partent de lui) ; false = towerfull figé
   if(USE_SEPARATE&&TEXR[castleKey]){
     // placement validé en composition PIL (compose_towers.py) : f=bas du buste depuis le HAUT, s=hauteur buste/château
-    const TCFG={king_blue:{f:0.52,s:0.42},king_red:{f:0.55,s:0.40},princess_blue:{f:0.55,s:0.40},princess_red:{f:0.55,s:0.40}};
+    const TCFG={king_blue:{f:0.27,s:0.42},king_red:{f:0.27,s:0.40},princess_blue:{f:0.29,s:0.40},princess_red:{f:0.29,s:0.40}};
     const cf=TCFG[t.role+'_'+sd]||{f:0.55,s:0.40};
     // château ENTIER posé au sol (center.y=0 => le bas de l'image = au sol). depthTest:false => jamais coupé par le terrain.
     const cmap=TEX[castleKey],csp=new THREE.Sprite(new THREE.SpriteMaterial({map:cmap,transparent:true,alphaTest:0.5,depthTest:false}));
@@ -1090,11 +1117,15 @@ function addTowerMesh(t){
     if(TEXR[pKey]){
       const pmap=TEX[pKey],psp=new THREE.Sprite(new THREE.SpriteMaterial({map:pmap,transparent:true,alphaTest:0.5,depthTest:false}));
       psp.center.set(0.5,0);let pa=0.7;if(pmap.image&&pmap.image.width)pa=pmap.image.width/pmap.image.height;
-      const pH=Hs*cf.s,pW=pH*pa;psp.scale.set(pW,pH,1);
-      psp.position.set(0,0.02+Hs*(1-cf.f),0.0);psp.renderOrder=2;g.add(psp);
-      t.charSpr=psp;t.charW=pW;t.charH=pH;t.charBaseY=psp.position.y;t.charAnim=true;t.phase=(t.x*1.7+t.y*0.9)%6.283;
+      // réglages perso (par défaut TCFG, surclassés par le mode édition ?tune sauvegardé)
+      const ov=tuneOverrides[t.role+'_'+sd]||{};
+      const scM=ov.sc||1, pH=Hs*cf.s*scM, pW=pH*pa;
+      const posY=(ov.posY!=null)?ov.posY:0.02+Hs*(1-cf.f), posX=(ov.posX!=null)?ov.posX:0;
+      psp.scale.set(pW,pH,1);psp.position.set(posX,posY,0.0);psp.renderOrder=2;g.add(psp);
+      t.charSpr=psp;t.charW=pW;t.charH=pH;t.charBaseY=posY;t.charAnim=true;t.phase=(t.x*1.7+t.y*0.9)%6.283;
+      t.shootH=posY+pH*0.45;   // les tirs partent du buste (poitrine/arc)
     }
-    t.vy=t.y+t.r*0.85;   // pose la base large de la tour sur la dalle peinte de l'arène ; la barre de PV suit via t.vy
+    t.vy=t.y+t.r*1.0;   // avance la tour pour couvrir la dalle de terre (façon CR) ; la barre de PV suit via t.vy
     g.position.set(wx(t.x),0,wz(t.vy));t.mesh=g;t.base=null;dynGroup&&dynGroup.add(g);return;
   }
   // ----- TOUR COMPLÈTE EN IMAGE (perso intégré, statique) : repli -----
@@ -1383,20 +1414,25 @@ function applyInsets(){
   s.setProperty('--sal',measureInset('left')+'px');
   s.setProperty('--sar',measureInset('right')+'px');
 }
-// Mesure 100vh réel en px (en app installée iOS = TOUT l'écran, y compris sous la barre d'état — contrairement à innerHeight).
-function measure100vh(){
+// Mesure la hauteur réellement remplie par une propriété CSS donnée.
+function measureCSS(extra){
   const el=document.createElement('div');
-  el.style.cssText='position:fixed;top:0;left:0;width:0;height:100vh;visibility:hidden;pointer-events:none;';
+  el.style.cssText='visibility:hidden;pointer-events:none;'+extra;
   document.body.appendChild(el); const h=Math.round(el.getBoundingClientRect().height); el.remove(); return h;
 }
+function measure100vh(){return measureCSS('position:fixed;top:0;left:0;width:0;height:100vh;');}
+function measureFixedVP(){return measureCSS('position:fixed;top:0;left:0;right:0;bottom:0;');}  // hauteur RÉELLE d'un plein écran fixe
 function isStandalone(){return (window.matchMedia&&matchMedia('(display-mode:standalone)').matches)||!!window.navigator.standalone;}
+window.__diag={};
 function resize(){
   DPR=Math.min(2.75,window.devicePixelRatio||1);
   applyInsets();   // ré-applique les marges d'encoche/barre home à chaque mesure (corrige le env()=0 au lancement)
-  // APP INSTALLÉE -> 100vh (plein écran réel 852, sous la barre d'état, PAS de bordure en bas).
+  // APP INSTALLÉE -> on remplit le viewport fixe RÉEL (tout l'écran fillable : ni bordure, ni débordement).
   // NAVIGATEUR    -> visualViewport.height (zone visible entre les barres Safari).
   const vv=window.visualViewport;
-  const appH = isStandalone() ? measure100vh() : Math.round((vv&&vv.height)||window.innerHeight);
+  const fvp=measureFixedVP();
+  window.__diag={fvp:fvp,vh:measure100vh(),scr:screen.height,vv:vv?Math.round(vv.height):0,inner:window.innerHeight};
+  const appH = isStandalone() ? fvp : Math.round((vv&&vv.height)||window.innerHeight);
   document.documentElement.style.setProperty('--app-h', appH+'px');
   const wrap=document.getElementById('wrap'), rect=wrap.getBoundingClientRect();
   const winW=Math.round(rect.width)||window.innerWidth, winH=Math.round(rect.height)||appH;
@@ -1493,6 +1529,21 @@ function drawWorldFx(){
       const a=p<0.18?p/0.18:1-(p-0.18)/0.82;uic.globalAlpha=Math.max(0,a);uic.textAlign='center';uic.textBaseline='middle';
       uic.font=crFont(34+p*18);uic.fillText('👑',cs2.x,cs2.y);uic.textBaseline='alphabetic';uic.textAlign='left';uic.globalAlpha=1;}
   }
+}
+function drawTuneOverlay(){
+  uic.save();
+  // bandeau d'aide
+  uic.fillStyle='rgba(10,8,24,.82)';uic.fillRect(0,0,VW,52);
+  uic.fillStyle='#ffe79a';uic.font='600 13px -apple-system,system-ui,sans-serif';uic.textAlign='left';uic.textBaseline='middle';
+  uic.fillText('ÉDITION PERSOS — glisse un perso · molette = taille · flèches = précis (Maj = très fin) · C = copier',10,16);
+  uic.fillText(tuneSel?('Sélection : '+tuneKeyOf(tuneSel)):'Clique un perso pour le sélectionner',10,36);
+  // surbrillance du perso sélectionné
+  if(tuneSel&&tuneSel.charSpr){const s=worldToScreen(tuneSel.x,(tuneSel.vy!=null?tuneSel.vy:tuneSel.y),(tuneSel.charBaseY||1)+(tuneSel.charH||1)*0.4);
+    if(s.vis){uic.strokeStyle='#5cff9e';uic.lineWidth=2.5;uic.setLineDash([6,5]);uic.beginPath();uic.arc(s.x,s.y,34,0,7);uic.stroke();uic.setLineDash([]);
+      const o=tuneOverrides[tuneKeyOf(tuneSel)]||{};
+      uic.fillStyle='#cdeffd';uic.font='600 12px ui-monospace,monospace';uic.textAlign='center';
+      uic.fillText('y='+(o.posY!=null?o.posY:'-')+'  x='+(o.posX!=null?o.posX:'-')+'  sc='+(o.sc!=null?o.sc.toFixed(2):'1'),s.x,s.y+52);}}
+  uic.restore();uic.textAlign='left';uic.textBaseline='alphabetic';
 }
 function drawHUD(){
   uic.clearRect(0,0,VW,VH);
@@ -1700,6 +1751,33 @@ window.addEventListener('pointerup',e=>{
   dragLogic=null;
 });
 function offPos(e){const p=pointerLogic(e);if(!p)return null;return {x:p.x,y:p.y-26};}  // un peu au-dessus du doigt
+// ===================== MODE ÉDITION ?tune : glisser les persos de tour =====================
+let tuneSel=null,tuneDrag=null;
+function tunePick(e){if(!towers)return null;const r=glcanvas.getBoundingClientRect();const cx=e.clientX-r.left,cy=e.clientY-r.top;
+  let best=null,bd=80;for(const t of towers){if(!t.charSpr)continue;
+    const s=worldToScreen(t.x,(t.vy!=null?t.vy:t.y),(t.charBaseY||1)+(t.charH||1)*0.4);if(!s.vis)continue;
+    const d=Math.hypot(s.x-cx,s.y-cy);if(d<bd){bd=d;best=t;}}return best;}
+function tuneApply(t){const k=tuneKeyOf(t),sp=t.charSpr,o=tuneOverrides[k]||{};
+  o.posX=+sp.position.x.toFixed(3);o.posY=+sp.position.y.toFixed(3);if(t._sc)o.sc=+t._sc.toFixed(3);tuneOverrides[k]=o;t.charBaseY=sp.position.y;saveTune();}
+if(TUNE){
+  ui.addEventListener('pointerdown',e=>{const t=tunePick(e);if(!t)return;tuneSel=t;
+    tuneDrag={x:e.clientX,y:e.clientY,px:t.charSpr.position.x,py:t.charSpr.position.y};
+    e.stopImmediatePropagation();e.preventDefault();},{capture:true});
+  ui.addEventListener('pointermove',e=>{if(!tuneDrag||!tuneSel)return;const k=12.2/VW;
+    tuneSel.charSpr.position.x=tuneDrag.px+(e.clientX-tuneDrag.x)*k;
+    tuneSel.charSpr.position.y=tuneDrag.py-(e.clientY-tuneDrag.y)*k;tuneSel.charBaseY=tuneSel.charSpr.position.y;
+    e.stopImmediatePropagation();e.preventDefault();},{capture:true});
+  window.addEventListener('pointerup',e=>{if(!tuneDrag||!tuneSel)return;tuneDrag=null;tuneApply(tuneSel);e.stopImmediatePropagation();},{capture:true});
+  ui.addEventListener('wheel',e=>{if(!tuneSel)return;const f=Math.exp(-e.deltaY*0.0012);
+    tuneSel.charSpr.scale.x*=f;tuneSel.charSpr.scale.y*=f;tuneSel.charW*=f;tuneSel.charH*=f;tuneSel._sc=(tuneSel._sc||1)*f;
+    tuneApply(tuneSel);e.preventDefault();},{passive:false});
+  window.addEventListener('keydown',e=>{if(!tuneSel)return;const sp=tuneSel.charSpr,st=e.shiftKey?0.004:0.018;let h=true;
+    if(e.key==='ArrowUp')sp.position.y+=st;else if(e.key==='ArrowDown')sp.position.y-=st;
+    else if(e.key==='ArrowLeft')sp.position.x-=st;else if(e.key==='ArrowRight')sp.position.x+=st;
+    else if(e.key==='c'||e.key==='C'){const j=JSON.stringify(tuneOverrides);console.log('TUNE_OVERRIDES='+j);if(navigator.clipboard)navigator.clipboard.writeText(j);if(typeof toast==='function')toast('Valeurs copiées — colle-les à Claude');h=false;}
+    else h=false;
+    if(h){tuneSel.charBaseY=sp.position.y;tuneApply(tuneSel);e.preventDefault();}});
+}
 // ===================== GARDES-FOUS MOBILE (zoom, scroll, menu) =====================
 // empêche le pincement-zoom iOS et le double-tap-zoom
 document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});
@@ -1719,6 +1797,7 @@ function loop(now){const dt=Math.min(0.05,(now-last)/1000);last=now;
   if(state==='play')update(dt);
   if(scene){syncScene(dt);renderer.render(scene,camera);}
   if(state==='play'||state==='over')drawHUD();
+  if(TUNE&&uic)drawTuneOverlay();
   else if(uic)uic.clearRect(0,0,VW,VH);
   requestAnimationFrame(loop);}
 
@@ -2051,7 +2130,7 @@ if(document.fonts&&document.fonts.load){document.fonts.load("16px 'Supercell Mag
 initThree();
 reset();state='menu';
 last=performance.now();requestAnimationFrame(loop);
-if(location.search.indexOf('play')>=0){beginBattle();intro=0.01;}   // auto-start pour test/capture
+if(location.search.indexOf('play')>=0||location.search.indexOf('tune')>=0){beginBattle();intro=0.01;}   // auto-start pour test/capture/édition
 else if(location.search.indexOf('cards')>=0){showLobby();switchTab('panelCards',document.querySelector('.tab[data-panel="panelCards"]'));}
 else if(location.search.indexOf('tab=')>=0){const p=location.search.split('tab=')[1].split('&')[0];showLobby();switchTab(p,document.querySelector('.tab[data-panel="'+p+'"]'));}
 else if(location.search.indexOf('over')>=0){beginBattle();intro=0;const ft=towers.filter(t=>t.side==='foe'&&t.role==='princess');if(ft[0])ft[0].hp=0,ft[0].boomed=true;document.getElementById('rivalName').textContent='Trainer Earl';endGame('win');}
@@ -2072,14 +2151,15 @@ if('serviceWorker' in navigator){
 <script>
 // Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
 (function(){
-  var BUILD='v17';
-  // Badge tapotable (coin bas-droit) qui affiche EN PERMANENCE les métriques clés -> toute capture me révèle la cause.
+  var BUILD='v18';
+  // Badge tapotable (coin bas-gauche) qui affiche EN PERMANENCE toutes les mesures -> une capture me révèle la bonne valeur.
   var tag=document.createElement('div');
-  tag.style.cssText='position:fixed;z-index:99999;left:calc(3px + env(safe-area-inset-left));bottom:calc(3px + env(safe-area-inset-bottom));padding:5px 7px;font:9px/1.25 monospace;color:rgba(255,255,255,.55);background:rgba(0,0,0,.35);border-radius:5px;pointer-events:auto;cursor:pointer;white-space:pre;';
-  function badge(){var vv=window.visualViewport;var w=document.getElementById('wrap').getBoundingClientRect();
+  tag.style.cssText='position:fixed;z-index:99999;left:calc(3px + env(safe-area-inset-left));bottom:calc(3px + env(safe-area-inset-bottom));padding:5px 7px;font:9px/1.25 monospace;color:rgba(255,255,255,.6);background:rgba(0,0,0,.45);border-radius:5px;pointer-events:auto;cursor:pointer;white-space:pre;';
+  function badge(){var d=window.__diag||{};var w=document.getElementById('wrap').getBoundingClientRect();
     tag.textContent=BUILD+' '+(matchMedia('(display-mode:standalone)').matches||!!navigator.standalone?'APP':'WEB')
-      +'\ni'+window.innerWidth+'x'+window.innerHeight+' vv'+(vv?Math.round(vv.width)+'x'+Math.round(vv.height):'-')
-      +'\nw'+Math.round(w.width)+'x'+Math.round(w.height)+' sab'+getComputedStyle(document.documentElement).getPropertyValue('--sab').trim();}
+      +'  w'+Math.round(w.width)+'x'+Math.round(w.height)
+      +'\nfvp'+(d.fvp||0)+' 100vh'+(d.vh||0)+' scr'+(d.scr||0)
+      +'\ninner'+(d.inner||0)+' vv'+(d.vv||0)+' sab'+getComputedStyle(document.documentElement).getPropertyValue('--sab').trim();}
   badge();document.body.appendChild(tag);
   addEventListener('resize',badge);if(window.visualViewport)visualViewport.addEventListener('resize',badge);
   setInterval(badge,800);

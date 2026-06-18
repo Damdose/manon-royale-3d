@@ -81,6 +81,14 @@ if __name__ == '__main__':
         for k in keys:
             if detour_pair('towerbuild_%s.png' % k, 'towerfull_%s.png' % k): ok+=1
         print('Terminé : %d/%d' % (ok, len(keys)))
+    elif '--decor' in args:
+        DECOR_KEYS = ['tree1','tree2','tree3','tree4','rock1','rock2']
+        keys = [a for a in args if a != '--decor'] or DECOR_KEYS
+        print('Détourage IA de %d décor(s) -> %s' % (len(keys), ASSETS))
+        ok=0
+        for k in keys:
+            if detour_pair('decorart_%s.png' % k, 'decor_%s.png' % k): ok+=1
+        print('Terminé : %d/%d' % (ok, len(keys)))
     elif '--towerchars' in args:
         keys = [a for a in args if a != '--towerchars'] or TOWERCHAR_KEYS
         print('Détourage IA de %d perso(s) de tour -> %s' % (len(keys), ASSETS))
