@@ -1088,6 +1088,8 @@ const TUNE=location.search.indexOf('tune')>=0;
 let tuneOverrides={}; try{tuneOverrides=JSON.parse(localStorage.getItem('towerTune')||'{}');}catch(e){}
 function tuneKeyOf(t){return t.role+'_'+(t.side==='me'?'blue':'red');}
 function saveTune(){try{localStorage.setItem('towerTune',JSON.stringify(tuneOverrides));}catch(e){}}
+// auto-réparation : l'ancien bug faisait dériver posY très haut -> on jette les posY hors plage saine (garde posX/sc valides)
+(function(){let dirty=false;for(const k in tuneOverrides){const o=tuneOverrides[k];if(o&&o.posY!=null&&(o.posY>5||o.posY<-1)){delete o.posY;dirty=true;}}if(dirty)saveTune();})();
 // ----- meshes des tours -----
 function addTowerMesh(t){
   const g=new THREE.Group();const tm=TEAM[t.side];const king=t.role==='king';
@@ -1235,8 +1237,7 @@ function addTowerMesh(t){
   g.scale.setScalar(king?0.76:0.72);   // tours plus petites (proportions CR : princesse ~13%, roi ~16% de la largeur)
   g.position.set(wx(t.x),0,wz(t.y));t.mesh=g;t.base=base;dynGroup&&dynGroup.add(g);if(!dynGroup)scene.add(g);
 }
-function setTowerRubble(t){if(!t.mesh)return;t.mesh.clear();
-  const R=ws(t.r);const rub=new THREE.Mesh(new THREE.CylinderGeometry(R*1.1,R*1.2,0.5,8),new THREE.MeshStandardMaterial({color:'#7d766c',roughness:1,flatShading:false}));rub.position.y=0.25;rub.castShadow=true;t.mesh.add(rub);}
+function setTowerRubble(t){if(!t.mesh)return;t.mesh.clear();}   // château mort : on vide la tour, aucune dalle grise au sol
 // ----- meshes des unités -----
 function addUnitMesh(u){
   const g=new THREE.Group();const tm=TEAM[u.side];const R=ws(u.vr||u.r)*1.35;   // taille selon attributs (proche de l'origine)
@@ -1532,17 +1533,25 @@ function drawWorldFx(){
 }
 function drawTuneOverlay(){
   uic.save();
-  // bandeau d'aide
-  uic.fillStyle='rgba(10,8,24,.82)';uic.fillRect(0,0,VW,52);
-  uic.fillStyle='#ffe79a';uic.font='600 13px -apple-system,system-ui,sans-serif';uic.textAlign='left';uic.textBaseline='middle';
-  uic.fillText('ÉDITION PERSOS — glisse un perso · molette = taille · flèches = précis (Maj = très fin) · C = copier',10,16);
-  uic.fillText(tuneSel?('Sélection : '+tuneKeyOf(tuneSel)):'Clique un perso pour le sélectionner',10,36);
+  // bandeau titre
+  uic.fillStyle='rgba(10,8,24,.86)';uic.fillRect(0,0,VW,54);
+  uic.fillStyle='#ffe79a';uic.font='700 14px -apple-system,system-ui,sans-serif';uic.textAlign='left';uic.textBaseline='middle';
+  uic.fillText('ÉDITION : choisis une tour (◀ ▶) puis bouge le perso avec les flèches',10,15);
+  uic.fillStyle='#cdeffd';uic.font='600 13px -apple-system,system-ui,sans-serif';
+  uic.fillText(tuneSel?('▶ '+tuneKeyOf(tuneSel)):'(aucune tour sélectionnée — touche ◀ ou clique un perso)',10,38);
+  // boutons
+  uic.textAlign='center';uic.textBaseline='middle';
+  for(const b of tuneButtons()){
+    const hot=(b.id==='copy');
+    uic.fillStyle=hot?'rgba(70,170,90,.92)':'rgba(40,50,80,.92)';
+    uic.strokeStyle='rgba(255,255,255,.55)';uic.lineWidth=2;
+    if(uic.roundRect){uic.beginPath();uic.roundRect(b.x,b.y,b.w,b.h,9);uic.fill();uic.stroke();}else{uic.fillRect(b.x,b.y,b.w,b.h);uic.strokeRect(b.x,b.y,b.w,b.h);}
+    uic.fillStyle='#fff';uic.font='700 16px -apple-system,system-ui,sans-serif';
+    uic.fillText(b.label,b.x+b.w/2,b.y+b.h/2+1);
+  }
   // surbrillance du perso sélectionné
   if(tuneSel&&tuneSel.charSpr){const s=worldToScreen(tuneSel.x,(tuneSel.vy!=null?tuneSel.vy:tuneSel.y),(tuneSel.charBaseY||1)+(tuneSel.charH||1)*0.4);
-    if(s.vis){uic.strokeStyle='#5cff9e';uic.lineWidth=2.5;uic.setLineDash([6,5]);uic.beginPath();uic.arc(s.x,s.y,34,0,7);uic.stroke();uic.setLineDash([]);
-      const o=tuneOverrides[tuneKeyOf(tuneSel)]||{};
-      uic.fillStyle='#cdeffd';uic.font='600 12px ui-monospace,monospace';uic.textAlign='center';
-      uic.fillText('y='+(o.posY!=null?o.posY:'-')+'  x='+(o.posX!=null?o.posX:'-')+'  sc='+(o.sc!=null?o.sc.toFixed(2):'1'),s.x,s.y+52);}}
+    if(s.vis){uic.strokeStyle='#5cff9e';uic.lineWidth=2.5;uic.setLineDash([6,5]);uic.beginPath();uic.arc(s.x,s.y,34,0,7);uic.stroke();uic.setLineDash([]);}}
   uic.restore();uic.textAlign='left';uic.textBaseline='alphabetic';
 }
 function drawHUD(){
@@ -1751,32 +1760,53 @@ window.addEventListener('pointerup',e=>{
   dragLogic=null;
 });
 function offPos(e){const p=pointerLogic(e);if(!p)return null;return {x:p.x,y:p.y-26};}  // un peu au-dessus du doigt
-// ===================== MODE ÉDITION ?tune : glisser les persos de tour =====================
+// ===================== MODE ÉDITION ?tune : boutons + glisser pour placer les persos =====================
 let tuneSel=null,tuneDrag=null;
-function tunePick(e){if(!towers)return null;const r=glcanvas.getBoundingClientRect();const cx=e.clientX-r.left,cy=e.clientY-r.top;
-  let best=null,bd=80;for(const t of towers){if(!t.charSpr)continue;
-    const s=worldToScreen(t.x,(t.vy!=null?t.vy:t.y),(t.charBaseY||1)+(t.charH||1)*0.4);if(!s.vis)continue;
+function tuneListTowers(){return towers?towers.filter(t=>t.charSpr):[];}
+function tunePick(e){const L=tuneListTowers();if(!L.length)return null;const r=glcanvas.getBoundingClientRect();const cx=e.clientX-r.left,cy=e.clientY-r.top;
+  let best=null,bd=80;for(const t of L){const s=worldToScreen(t.x,(t.vy!=null?t.vy:t.y),(t.charBaseY||1)+(t.charH||1)*0.4);if(!s.vis)continue;
     const d=Math.hypot(s.x-cx,s.y-cy);if(d<bd){bd=d;best=t;}}return best;}
-function tuneApply(t){const k=tuneKeyOf(t),sp=t.charSpr,o=tuneOverrides[k]||{};
-  o.posX=+sp.position.x.toFixed(3);o.posY=+sp.position.y.toFixed(3);if(t._sc)o.sc=+t._sc.toFixed(3);tuneOverrides[k]=o;t.charBaseY=sp.position.y;saveTune();}
+// IMPORTANT : la position Y de base est t.charBaseY (la respiration ajoute un "lift" volatil à chaque frame).
+// On ne lit/écrit JAMAIS sp.position.y ici, sinon le lift s'accumule et le perso dérive vers le haut.
+function tuneApply(t){const k=tuneKeyOf(t),o=tuneOverrides[k]||{};
+  o.posX=+t.charSpr.position.x.toFixed(3);o.posY=+t.charBaseY.toFixed(3);if(t._sc)o.sc=+t._sc.toFixed(3);tuneOverrides[k]=o;saveTune();}
+// disposition des boutons (sert au dessin ET aux clics)
+function tuneButtons(){const bw=Math.max(54,Math.min(76,VW*0.135)),bh=46,g=7,y1=58,y2=y1+bh+g;
+  const B=[];let x=8;const row=(items,y)=>{x=8;for(const it of items){B.push({id:it[0],label:it[1],x,y,w:it[2]||bw,h:bh});x+=(it[2]||bw)+g;}};
+  row([['prev','◀ tour'],['next','tour ▶'],['reset','↺ Reset'],['copy','✓ Copier',bw*1.25]],y1);
+  row([['left','←'],['right','→'],['up','↑'],['down','↓'],['smaller','– taille',bw*1.2],['bigger','+ taille',bw*1.2]],y2);
+  return B;}
+function tuneAction(id){const L=tuneListTowers();if(!L.length)return;
+  if(!tuneSel||!L.includes(tuneSel))tuneSel=L[0];let i=L.indexOf(tuneSel);
+  if(id==='prev'){tuneSel=L[(i-1+L.length)%L.length];return;}
+  if(id==='next'){tuneSel=L[(i+1)%L.length];return;}
+  if(id==='copy'){const j=JSON.stringify(tuneOverrides);console.log('TUNE_OVERRIDES='+j);if(navigator.clipboard)navigator.clipboard.writeText(j);if(typeof toast==='function')toast('Valeurs copiées ✓ — colle-les à Claude');return;}
+  if(id==='reset'){tuneOverrides={};saveTune();tuneSel=null;if(typeof rebuildTowers==='function')rebuildTowers();if(typeof toast==='function')toast('Positions réinitialisées');return;}
+  const sp=tuneSel.charSpr,st=0.04;
+  if(id==='up')tuneSel.charBaseY+=st;else if(id==='down')tuneSel.charBaseY-=st;
+  else if(id==='left')sp.position.x-=st;else if(id==='right')sp.position.x+=st;
+  else if(id==='bigger'){const f=1.05;sp.scale.x*=f;sp.scale.y*=f;tuneSel.charW*=f;tuneSel.charH*=f;tuneSel._sc=(tuneSel._sc||1)*f;}
+  else if(id==='smaller'){const f=1/1.05;sp.scale.x*=f;sp.scale.y*=f;tuneSel.charW*=f;tuneSel.charH*=f;tuneSel._sc=(tuneSel._sc||1)*f;}
+  tuneApply(tuneSel);}
 if(TUNE){
-  ui.addEventListener('pointerdown',e=>{const t=tunePick(e);if(!t)return;tuneSel=t;
-    tuneDrag={x:e.clientX,y:e.clientY,px:t.charSpr.position.x,py:t.charSpr.position.y};
+  ui.addEventListener('pointerdown',e=>{const r=glcanvas.getBoundingClientRect();const cx=e.clientX-r.left,cy=e.clientY-r.top;
+    for(const b of tuneButtons())if(cx>=b.x&&cx<=b.x+b.w&&cy>=b.y&&cy<=b.y+b.h){tuneAction(b.id);e.stopImmediatePropagation();e.preventDefault();return;}
+    const t=tunePick(e);if(!t)return;tuneSel=t;tuneDrag={x:e.clientX,y:e.clientY,px:t.charSpr.position.x,py:t.charBaseY};
     e.stopImmediatePropagation();e.preventDefault();},{capture:true});
   ui.addEventListener('pointermove',e=>{if(!tuneDrag||!tuneSel)return;const k=12.2/VW;
     tuneSel.charSpr.position.x=tuneDrag.px+(e.clientX-tuneDrag.x)*k;
-    tuneSel.charSpr.position.y=tuneDrag.py-(e.clientY-tuneDrag.y)*k;tuneSel.charBaseY=tuneSel.charSpr.position.y;
+    tuneSel.charBaseY=tuneDrag.py-(e.clientY-tuneDrag.y)*k;
     e.stopImmediatePropagation();e.preventDefault();},{capture:true});
   window.addEventListener('pointerup',e=>{if(!tuneDrag||!tuneSel)return;tuneDrag=null;tuneApply(tuneSel);e.stopImmediatePropagation();},{capture:true});
   ui.addEventListener('wheel',e=>{if(!tuneSel)return;const f=Math.exp(-e.deltaY*0.0012);
     tuneSel.charSpr.scale.x*=f;tuneSel.charSpr.scale.y*=f;tuneSel.charW*=f;tuneSel.charH*=f;tuneSel._sc=(tuneSel._sc||1)*f;
     tuneApply(tuneSel);e.preventDefault();},{passive:false});
   window.addEventListener('keydown',e=>{if(!tuneSel)return;const sp=tuneSel.charSpr,st=e.shiftKey?0.004:0.018;let h=true;
-    if(e.key==='ArrowUp')sp.position.y+=st;else if(e.key==='ArrowDown')sp.position.y-=st;
+    if(e.key==='ArrowUp')tuneSel.charBaseY+=st;else if(e.key==='ArrowDown')tuneSel.charBaseY-=st;
     else if(e.key==='ArrowLeft')sp.position.x-=st;else if(e.key==='ArrowRight')sp.position.x+=st;
-    else if(e.key==='c'||e.key==='C'){const j=JSON.stringify(tuneOverrides);console.log('TUNE_OVERRIDES='+j);if(navigator.clipboard)navigator.clipboard.writeText(j);if(typeof toast==='function')toast('Valeurs copiées — colle-les à Claude');h=false;}
+    else if(e.key==='c'||e.key==='C')tuneAction('copy'),h=false;
     else h=false;
-    if(h){tuneSel.charBaseY=sp.position.y;tuneApply(tuneSel);e.preventDefault();}});
+    if(h){tuneApply(tuneSel);e.preventDefault();}});
 }
 // ===================== GARDES-FOUS MOBILE (zoom, scroll, menu) =====================
 // empêche le pincement-zoom iOS et le double-tap-zoom
@@ -1796,8 +1826,7 @@ window.addEventListener('orientationchange',()=>setTimeout(resize,250));
 function loop(now){const dt=Math.min(0.05,(now-last)/1000);last=now;
   if(state==='play')update(dt);
   if(scene){syncScene(dt);renderer.render(scene,camera);}
-  if(state==='play'||state==='over')drawHUD();
-  if(TUNE&&uic)drawTuneOverlay();
+  if(state==='play'||state==='over'){drawHUD();if(TUNE&&uic)drawTuneOverlay();}
   else if(uic)uic.clearRect(0,0,VW,VH);
   requestAnimationFrame(loop);}
 
@@ -2151,7 +2180,7 @@ if('serviceWorker' in navigator){
 <script>
 // Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
 (function(){
-  var BUILD='v20';
+  var BUILD='v23';
   // Badge tapotable (coin bas-gauche) qui affiche EN PERMANENCE toutes les mesures -> une capture me révèle la bonne valeur.
   var tag=document.createElement('div');
   tag.style.cssText='position:fixed;z-index:99999;left:calc(3px + env(safe-area-inset-left));bottom:calc(3px + env(safe-area-inset-bottom));padding:5px 7px;font:9px/1.25 monospace;color:rgba(255,255,255,.6);background:rgba(0,0,0,.45);border-radius:5px;pointer-events:auto;cursor:pointer;white-space:pre;';
