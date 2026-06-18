@@ -23,9 +23,12 @@
     --cr-purple:#c645d6; --cr-ink:#241433;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
-  html,body{height:100%;overflow:hidden;background:#0a1736;font-family:'Lilita One',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  @font-face{font-family:'Supercell Magic';src:url('assets/SupercellMagic.ttf') format('truetype');font-weight:normal;font-style:normal;font-display:swap;size-adjust:82%;}
+  html,body{height:100%;overflow:hidden;background:#0a1736;font-family:'Supercell Magic','Lilita One',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     overscroll-behavior:none;touch-action:none;position:fixed;width:100%;-webkit-text-size-adjust:100%;}
-  #wrap{position:relative;width:100vw;height:100dvh;height:var(--app-h,100dvh);overflow:hidden;background:#0a1736;touch-action:none;}
+  /* position:fixed + inset:0 = le navigateur remplit l'écran RÉEL lui-même (parfait en mode app installée
+     comme en navigateur), sans dépendre de 100vh/dvh (buggés en standalone iOS). */
+  #wrap{position:fixed;inset:0;overflow:hidden;background:#0a1736;touch-action:none;}
   #gl,#ui{position:absolute;display:block;touch-action:none;}
   #ui{touch-action:none;}
   .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff7e6;
@@ -34,14 +37,14 @@
   /* Texte doré à gros contour brun + ombre portée, façon titres CR */
   h1{font-size:clamp(30px,8vw,58px);margin-bottom:12px;color:var(--cr-gold);letter-spacing:1px;line-height:1.05;
     text-shadow:3px 0 0 #5a3408,-3px 0 0 #5a3408,0 3px 0 #5a3408,0 -3px 0 #5a3408,2px 2px 0 #5a3408,-2px 2px 0 #5a3408,2px -2px 0 #5a3408,-2px -2px 0 #5a3408,0 7px 0 #2b1804,0 9px 12px rgba(0,0,0,.55);}
-  .sub{font-size:clamp(14px,3.4vw,18px);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:600;opacity:.96;margin-bottom:22px;max-width:460px;line-height:1.55;text-shadow:0 2px 4px rgba(0,0,0,.5);}
+  .sub{font-size:clamp(14px,3.4vw,18px);font-family:'Supercell Magic','Lilita One',sans-serif;font-weight:600;opacity:.96;margin-bottom:22px;max-width:460px;line-height:1.55;text-shadow:0 2px 4px rgba(0,0,0,.5);}
   /* Bouton doré biseauté CR */
-  .btn{background:linear-gradient(180deg,var(--cr-gold-l) 0%,var(--cr-gold) 45%,var(--cr-gold-d) 100%);color:#5a3408;font-family:'Lilita One',sans-serif;font-size:clamp(20px,5vw,28px);font-weight:400;padding:14px 46px;border-radius:18px;cursor:pointer;
+  .btn{background:linear-gradient(180deg,var(--cr-gold-l) 0%,var(--cr-gold) 45%,var(--cr-gold-d) 100%);color:#5a3408;font-family:'Supercell Magic','Lilita One',sans-serif;font-size:clamp(20px,5vw,28px);font-weight:400;padding:14px 46px;border-radius:18px;cursor:pointer;
     border:3px solid #fff3c4;box-shadow:0 0 0 3px var(--cr-gold-d),inset 0 3px 0 rgba(255,255,255,.55),inset 0 -5px 0 rgba(140,90,10,.45),0 8px 0 #8a5e10,0 14px 18px rgba(0,0,0,.5);
     text-shadow:0 2px 0 rgba(255,255,255,.4);letter-spacing:1px;}
   .btn:active{transform:translateY(6px);box-shadow:0 0 0 3px var(--cr-gold-d),inset 0 3px 0 rgba(255,255,255,.55),0 2px 0 #8a5e10;}
   .diff{margin-bottom:18px;font-size:15px;color:#dce9ff;text-shadow:0 2px 3px rgba(0,0,0,.5);}
-  .diffBtn{display:inline-block;margin:0 4px;padding:7px 16px;border-radius:12px;cursor:pointer;background:linear-gradient(180deg,var(--cr-blue-l),var(--cr-blue-d));border:2px solid #6ea6ee;color:#fff;font-weight:400;font-family:'Lilita One',sans-serif;
+  .diffBtn{display:inline-block;margin:0 4px;padding:7px 16px;border-radius:12px;cursor:pointer;background:linear-gradient(180deg,var(--cr-blue-l),var(--cr-blue-d));border:2px solid #6ea6ee;color:#fff;font-weight:400;font-family:'Supercell Magic','Lilita One',sans-serif;
     box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 3px 0 #0a2256;text-shadow:0 1px 2px rgba(0,0,0,.6);letter-spacing:.5px;}
   .diffBtn.sel{background:linear-gradient(180deg,var(--cr-gold-l),var(--cr-gold-d));border-color:#fff3c4;color:#5a3408;box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 3px 0 #8a5e10;text-shadow:0 1px 0 rgba(255,255,255,.4);}
   .big{font-size:clamp(30px,8vw,52px);margin:6px 0;color:var(--cr-gold);
@@ -51,7 +54,7 @@
   .scr{z-index:20;}
   /* 0) Brand : écran noir + logo blanc lumineux (façon Supercell) */
   #brand{background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.18),rgba(255,255,255,0) 40%),#000;}
-  .brand-logo{position:relative;font-family:'Lilita One',sans-serif;color:#fff;text-align:center;
+  .brand-logo{position:relative;font-family:'Supercell Magic','Lilita One',sans-serif;color:#fff;text-align:center;
     font-size:clamp(46px,15vw,88px);line-height:.84;letter-spacing:1px;text-shadow:0 0 30px rgba(255,255,255,.55);
     animation:brandin 1.2s ease-out both;}
   @keyframes brandin{0%{opacity:0;transform:scale(.92)}55%,100%{opacity:1;transform:scale(1)}}
@@ -60,7 +63,7 @@
     text-shadow:3px 0 0 #5a3408,-3px 0 0 #5a3408,0 3px 0 #5a3408,0 -3px 0 #5a3408,0 8px 0 #2b1804,0 12px 16px rgba(0,0,0,.55);}
   .loadbar{width:min(70vw,340px);height:20px;border-radius:12px;background:rgba(0,0,0,.4);border:2px solid #6ea6ee;overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,.5);}
   .loadfill{height:100%;width:0;border-radius:10px;background:linear-gradient(180deg,#ffe79a,#ffce3a 50%,#c8881a);transition:width .18s linear;box-shadow:inset 0 2px 0 rgba(255,255,255,.5);}
-  .loadhint{margin-top:18px;font-family:-apple-system,sans-serif;font-weight:600;font-size:13px;color:#dce9ff;max-width:300px;min-height:42px;line-height:1.5;text-shadow:0 2px 3px rgba(0,0,0,.5);}
+  .loadhint{margin-top:18px;font-family:'Supercell Magic','Lilita One',sans-serif;font-weight:600;font-size:13px;color:#dce9ff;max-width:300px;min-height:42px;line-height:1.5;text-shadow:0 2px 3px rgba(0,0,0,.5);}
   /* 3) Lobby */
   .lobby{justify-content:flex-start;padding:0;}
   .topbar{width:100%;max-width:520px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px 0;}
@@ -73,11 +76,11 @@
   .xpfill{height:100%;width:62%;background:linear-gradient(180deg,#8fe0f5,#23a3df);}
   .tb-mid{text-align:center;color:#fff;padding-top:3px;}
   .arena-name{font-size:15px;color:#ffe79a;text-shadow:0 2px 2px rgba(0,0,0,.5);}
-  .arena-sub{font-family:-apple-system,sans-serif;font-size:11px;opacity:.85;}
+  .arena-sub{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:11px;opacity:.85;}
   .tb-right{display:flex;flex-direction:column;gap:4px;}
-  .cur{font-family:'Lilita One',sans-serif;font-size:14px;padding:4px 11px;border-radius:13px;color:#fff;background:linear-gradient(180deg,#2c3650,#131b2e);border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 2px 3px rgba(0,0,0,.35);min-width:78px;display:flex;align-items:center;gap:5px;justify-content:flex-end;}
+  .cur{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:14px;padding:4px 11px;border-radius:13px;color:#fff;background:linear-gradient(180deg,#2c3650,#131b2e);border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 2px 3px rgba(0,0,0,.35);min-width:78px;display:flex;align-items:center;gap:5px;justify-content:flex-end;}
   /* bannière dorée de section (ribbon CR) */
-  .cr-banner{display:block;width:88%;max-width:420px;margin:16px auto 10px;text-align:center;font-family:'Lilita One',sans-serif;font-size:20px;color:#fff;
+  .cr-banner{display:block;width:88%;max-width:420px;margin:16px auto 10px;text-align:center;font-family:'Supercell Magic','Lilita One',sans-serif;font-size:20px;color:#fff;
     background:linear-gradient(180deg,#ffd84d,#e0a81c);border:2px solid #fff3c4;padding:7px 30px;letter-spacing:.5px;
     box-shadow:0 3px 0 #a9760f,inset 0 2px 0 rgba(255,255,255,.5);text-shadow:0 2px 0 rgba(140,90,10,.6);
     clip-path:polygon(3% 0,97% 0,100% 50%,97% 100%,3% 100%,0 50%);}
@@ -97,35 +100,37 @@
   .chest.empty{background:rgba(0,0,0,.28);border-style:dashed;border-color:rgba(255,255,255,.3);box-shadow:none;}
   .chest-ico{font-size:30px;line-height:1;}
   .chest-ico img{width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));}
-  .chest-t{font-family:-apple-system,sans-serif;font-size:9px;color:#fff;margin-top:3px;}
+  .chest-t{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:9px;color:#fff;margin-top:3px;}
   /* ===== En-tête lobby façon Clash Royale ===== */
   .cur-cards{min-width:96px;justify-content:flex-start;gap:6px;}
   .cur-cards .xpbar{flex:1;height:7px;margin:0;background:rgba(0,0,0,.45);border-radius:5px;overflow:hidden;border:1px solid rgba(255,255,255,.18);}
   .cur-cards .xpfill{height:100%;width:62%;display:block;background:linear-gradient(180deg,#8fe0f5,#23a3df);}
   .lobby-head{width:100%;max-width:520px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:10px 12px 0;}
-  .crown-banner{flex:0 0 56%;height:78px;border-radius:12px;overflow:hidden;position:relative;cursor:pointer;
-    background:linear-gradient(180deg,#e98b3a,#c25e1e);border:2px solid #ffcf8f;box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 3px 0 rgba(0,0,0,.3);}
-  .crown-banner .ph-img{width:100%;height:100%;object-fit:cover;display:block;}
-  .cb-trophy{position:absolute;left:8px;bottom:6px;display:flex;align-items:center;gap:4px;font-family:'Lilita One',sans-serif;font-size:15px;color:#fff;text-shadow:0 2px 2px rgba(0,0,0,.6);}
+  /* bannière couronne + Pass Royale + profil : uniquement sur l'écran principal (onglet Combat), pas les autres */
+  #lobby:not(.tab-panelBattle) .lobby-head,#lobby:not(.tab-panelBattle) .namebar{display:none;}
+  .crown-banner{flex:0 0 57%;position:relative;cursor:pointer;display:flex;align-items:center;}
+  .crown-banner .ph-img{width:100%;height:auto;display:block;filter:drop-shadow(0 3px 3px rgba(0,0,0,.35));}
+  .cb-trophy{position:absolute;left:8px;bottom:6px;display:flex;align-items:center;gap:4px;font-family:'Supercell Magic','Lilita One',sans-serif;font-size:15px;color:#fff;text-shadow:0 2px 2px rgba(0,0,0,.6);}
   .cb-trophy img{width:16px;height:16px;}
-  .head-right{flex:1;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
-  .head-btns{display:flex;gap:6px;}
+  .head-right{flex:1;display:flex;flex-direction:column;align-items:stretch;gap:6px;}
+  .head-btns{display:flex;gap:6px;justify-content:flex-end;}
   .sqbtn{width:40px;height:40px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;
     background:linear-gradient(180deg,#3a6fc4,#21478e);border:2px solid #6ea6ee;box-shadow:inset 0 2px 0 rgba(255,255,255,.25),0 3px 0 #16315f;}
   .sqbtn .ph-img{width:24px;height:24px;object-fit:contain;}
-  .passroyale{width:100%;height:34px;border-radius:10px;overflow:hidden;cursor:pointer;
-    background:linear-gradient(180deg,#ffd84d,#e0a81c);border:2px solid #fff3c4;box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 3px 0 #a9760f;}
-  .passroyale{position:relative;}
-  .passroyale .ph-img{width:100%;height:100%;object-fit:cover;display:block;}
-  .pr-txt{position:absolute;left:14%;top:50%;transform:translateY(-50%);font-family:'Lilita One',sans-serif;font-size:14px;color:#5a3408;text-shadow:0 1px 0 rgba(255,255,255,.5);pointer-events:none;}
+  .passroyale{width:100%;position:relative;cursor:pointer;}
+  .passroyale .ph-img{width:100%;height:auto;display:block;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3));}
+  .pr-txt{position:absolute;left:40%;top:9%;transform:translateX(-50%);font-family:'Supercell Magic','Lilita One',sans-serif;font-size:12px;color:#5a3408;text-shadow:0 1px 0 rgba(255,255,255,.5);pointer-events:none;white-space:nowrap;}
   .passroyale.ph .pr-txt{display:none;}
   .namebar{width:100%;max-width:520px;display:flex;align-items:center;gap:10px;padding:8px 14px 0;}
   .nb-txt{display:flex;flex-direction:column;text-align:left;line-height:1.15;}
-  .nb-txt b{font-family:'Lilita One',sans-serif;font-size:18px;color:#fff;text-shadow:0 2px 2px rgba(0,0,0,.5);}
-  .nb-clan{font-family:-apple-system,sans-serif;font-size:11px;color:#bcd0f2;}
+  .nb-txt b{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:18px;color:#fff;text-shadow:0 2px 2px rgba(0,0,0,.5);}
+  .nb-clan{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:11px;color:#bcd0f2;}
+  .namebar .nb-txt{flex:1;}
+  .nb-trophy{display:flex;align-items:center;gap:5px;font-family:'Supercell Magic','Lilita One',sans-serif;font-size:19px;color:#ffe79a;text-shadow:0 2px 2px rgba(0,0,0,.6);cursor:pointer;}
+  .nb-trophy img{width:20px;height:20px;object-fit:contain;}
   .arena-label{text-align:center;margin-top:4px;}
-  .arena-label b{font-family:'Lilita One',sans-serif;font-size:15px;color:#ffe79a;text-shadow:0 2px 2px rgba(0,0,0,.5);}
-  .arena-label span{display:block;font-family:-apple-system,sans-serif;font-size:11px;color:#cfe0ff;opacity:.85;}
+  .arena-label b{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:15px;color:#ffe79a;text-shadow:0 2px 2px rgba(0,0,0,.5);}
+  .arena-label span{display:block;font-family:'Supercell Magic','Lilita One',sans-serif;font-size:11px;color:#cfe0ff;opacity:.85;}
   /* barre Battle : carte | bouton | ticket */
   .battle-row{display:flex;align-items:stretch;gap:8px;width:90%;max-width:430px;margin:8px 0 12px;}
   .battle-row .battle-btn{flex:1;animation:bpulse 1.4s ease-in-out infinite;border-radius:14px;padding:14px 0;}
@@ -136,7 +141,7 @@
   .ph-slot.ph{background:rgba(255,255,255,.06);border:2px dashed rgba(255,255,255,.4);}
   .ph-slot.ph .ph-img{display:none;}
   .ph-slot.ph::after{content:attr(data-ph);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    font-family:-apple-system,sans-serif;font-size:11px;color:rgba(255,255,255,.75);text-align:center;padding:2px;line-height:1.1;}
+    font-family:'Supercell Magic','Lilita One',sans-serif;font-size:11px;color:rgba(255,255,255,.75);text-align:center;padding:2px;line-height:1.1;}
   /* fonds losange CSS (couleur uniforme, pas de vignette qui assombrit le bas) */
   #lobby.lobby{background:url('assets/ui_bg_lobby.png') center/cover no-repeat,#2a5fb0;}
   /* le fond de chaque onglet remplit tout le lobby (topbar comprise), pas seulement le panneau */
@@ -158,7 +163,7 @@
   .avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
   .f-av img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
   #loading{background:linear-gradient(rgba(8,18,46,.30),rgba(8,18,46,.72)),url('assets/ui_splash.png') center/cover no-repeat,#0c1f55;justify-content:center;}
-  .tab span{display:block;font-family:-apple-system,sans-serif;font-size:9px;margin-top:1px;}
+  .tab span{display:block;font-family:'Supercell Magic','Lilita One',sans-serif;font-size:9px;margin-top:1px;}
   .tab:not(.sel) span{display:none;}
   .tab.sel{opacity:1;color:#fff;border-left-color:transparent;box-shadow:none;
     background:linear-gradient(180deg,#5470a4 0%,#3a5181 60%,#2e4068 100%);
@@ -167,7 +172,7 @@
   .tab.sel .tab-ico{transform:scale(1.55) translateY(-1px);}
   .tab.sel span{color:#fff;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.5);}
   .tab.sel::before,.tab.sel::after{position:absolute;top:46%;transform:translateY(-50%);
-    font-family:-apple-system,sans-serif;font-size:26px;font-weight:700;line-height:1;color:#e6eeff;
+    font-family:'Supercell Magic','Lilita One',sans-serif;font-size:26px;font-weight:700;line-height:1;color:#e6eeff;
     text-shadow:0 1px 2px rgba(0,0,0,.5);pointer-events:none;}
   .tab.sel::before{content:'‹';left:-9px;}
   .tab.sel::after{content:'›';right:-9px;}
@@ -182,22 +187,22 @@
   @keyframes vsup{from{transform:translateY(101%)}to{transform:none}}
   .vs-arena img{width:min(70%,290px);max-height:32vh;object-fit:contain;filter:drop-shadow(0 10px 16px rgba(0,0,0,.45));}
   .vs-half.me .vs-arena img{transform:scaleX(-1);}
-  .vs-pname{font-family:'Lilita One',sans-serif;font-size:clamp(28px,8vw,42px);color:#fff;letter-spacing:.5px;
+  .vs-pname{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:clamp(28px,8vw,42px);color:#fff;letter-spacing:.5px;
     text-shadow:2.5px 0 0 #181818,-2.5px 0 0 #181818,0 2.5px 0 #181818,0 -2.5px 0 #181818,2px 2px 0 #181818,-2px 2px 0 #181818,0 5px 7px rgba(0,0,0,.5);}
-  .vs-ptr{display:flex;align-items:center;gap:5px;font-family:'Lilita One',sans-serif;font-size:22px;color:#ffe066;text-shadow:0 2px 2px rgba(0,0,0,.55);}
+  .vs-ptr{display:flex;align-items:center;gap:5px;font-family:'Supercell Magic','Lilita One',sans-serif;font-size:22px;color:#ffe066;text-shadow:0 2px 2px rgba(0,0,0,.55);}
   .vs-ptr img{width:22px;height:22px;object-fit:contain;vertical-align:-3px;}
   .vs-badge{position:absolute;top:50%;left:50%;width:104px;height:116px;z-index:6;
     background:linear-gradient(180deg,#ffe98a,#e0a81c);clip-path:polygon(50% 0,100% 27%,100% 73%,50% 100%,0 73%,0 27%);
     display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5));animation:vsbadge .5s .25s both cubic-bezier(.2,1.5,.4,1);}
   .vs-badge::before{content:"";position:absolute;inset:7px;background:linear-gradient(180deg,#4aa6ff,#1f63d8);clip-path:polygon(50% 0,100% 27%,100% 73%,50% 100%,0 73%,0 27%);}
-  .vs-badge span{position:relative;z-index:2;font-family:'Lilita One',sans-serif;font-style:italic;font-size:38px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.4);}
+  .vs-badge span{position:relative;z-index:2;font-family:'Supercell Magic','Lilita One',sans-serif;font-style:italic;font-size:38px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.4);}
   @keyframes vsbadge{0%{transform:translate(-50%,-50%) scale(0) rotate(-30deg);opacity:0}100%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1}}
-  .match-status{position:absolute;left:0;right:0;bottom:calc(22px + var(--sab));text-align:center;font-family:'Lilita One',sans-serif;font-size:18px;color:#fff;text-shadow:0 2px 3px rgba(0,0,0,.6);z-index:6;}
+  .match-status{position:absolute;left:0;right:0;bottom:calc(22px + var(--sab));text-align:center;font-family:'Supercell Magic','Lilita One',sans-serif;font-size:18px;color:#fff;text-shadow:0 2px 3px rgba(0,0,0,.6);z-index:6;}
   /* ===== Panneaux du lobby (Combat / Cartes / Boutique) ===== */
   .panel{flex:1 1 auto;width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center;overflow-y:auto;padding:4px 10px 24px;}
   .panel-title{font-size:22px;color:#ffe79a;margin:8px 0 2px;text-shadow:0 2px 2px rgba(0,0,0,.5);}
-  .panel-sub{font-family:-apple-system,sans-serif;font-size:11px;color:#cfe0ff;opacity:.85;margin-bottom:12px;text-align:center;}
-  .chest-label{font-family:-apple-system,sans-serif;font-size:10px;color:#cfe0ff;opacity:.8;margin-top:8px;}
+  .panel-sub{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:11px;color:#cfe0ff;opacity:.85;margin-bottom:12px;text-align:center;}
+  .chest-label{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:10px;color:#cfe0ff;opacity:.8;margin-top:8px;}
   .chest{cursor:pointer;}
   .chest:not(.empty):active{transform:translateY(3px);}
   /* collection de cartes */
@@ -206,19 +211,19 @@
   .ci-frame{position:relative;width:100%;aspect-ratio:3/4;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:30px;
     border:2px solid #fff7c4;box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 3px 0 rgba(0,0,0,.35);overflow:hidden;}
   .ci-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;}
-  .ci-name{font-family:'Lilita One',sans-serif;font-size:13px;color:#ffe79a;text-shadow:1px 1px 0 #3a2614,0 1px 2px rgba(0,0,0,.6);text-align:center;line-height:1.1;margin-top:2px;}
+  .ci-name{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:13px;color:#ffe79a;text-shadow:1px 1px 0 #3a2614,0 1px 2px rgba(0,0,0,.6);text-align:center;line-height:1.1;margin-top:2px;}
   .ci-cost{position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;background:#a126c4;border:1px solid #fff;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;z-index:3;}
-  .ci-lvl{font-family:-apple-system,sans-serif;font-size:10px;font-weight:700;color:#ffe79a;}
-  .ci-abil{font-family:-apple-system,sans-serif;font-size:9px;font-weight:700;color:#1a1030;background:linear-gradient(180deg,#ffe49a,#f0b63a);border-radius:7px;padding:1px 5px;margin-top:2px;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,.4);}
+  .ci-lvl{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:10px;font-weight:700;color:#ffe79a;}
+  .ci-abil{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:9px;font-weight:700;color:#1a1030;background:linear-gradient(180deg,#ffe49a,#f0b63a);border-radius:7px;padding:1px 5px;margin-top:2px;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,.4);}
   .ci-bar{width:100%;height:6px;background:rgba(0,0,0,.45);border-radius:4px;overflow:hidden;}
   .ci-fill{height:100%;background:linear-gradient(180deg,#8fe0f5,#23a3df);}
-  .ci-count{font-family:-apple-system,sans-serif;font-size:9px;color:#dce9ff;}
-  .ci-up{font-family:'Lilita One',sans-serif;font-size:10px;color:#1a3a12;background:linear-gradient(180deg,#9be86a,#46a02a);border:1px solid #d6ffb0;border-radius:7px;padding:2px 7px;cursor:pointer;box-shadow:0 2px 0 #2c6a18;}
+  .ci-count{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:9px;color:#dce9ff;}
+  .ci-up{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:10px;color:#1a3a12;background:linear-gradient(180deg,#9be86a,#46a02a);border:1px solid #d6ffb0;border-radius:7px;padding:2px 7px;cursor:pointer;box-shadow:0 2px 0 #2c6a18;}
   .ci-up.off{background:#52525c;border-color:#6a6a74;color:#b8b8c0;box-shadow:0 2px 0 #2e2e36;cursor:default;}
   /* boutique */
   .shop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;}
   .shop-item{background:linear-gradient(180deg,#cfe0f6,#9fbfe6);border:2px solid #e8f1ff;border-radius:12px;padding:8px 5px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 4px 0 rgba(40,70,120,.45);}
-  .si-amt{font-family:'Lilita One',sans-serif;font-size:18px;color:#f4c20a;text-shadow:1px 1px 0 #5a3408,-1px 1px 0 #5a3408,1px -1px 0 #5a3408,-1px -1px 0 #5a3408;line-height:1;}
+  .si-amt{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:18px;color:#f4c20a;text-shadow:1px 1px 0 #5a3408,-1px 1px 0 #5a3408,1px -1px 0 #5a3408,-1px -1px 0 #5a3408;line-height:1;}
   .si-amt.gem{color:#34d24a;text-shadow:1px 1px 0 #134a18,-1px 1px 0 #134a18,1px -1px 0 #134a18,-1px -1px 0 #134a18;}
   .shop-item:active{transform:translateY(3px);}
   .si-ico{font-size:46px;line-height:1;flex:1 1 auto;min-height:88px;display:flex;align-items:center;justify-content:center;width:100%;}
@@ -226,15 +231,15 @@
   .cur-ic{width:15px;height:15px;object-fit:contain;vertical-align:-2px;}
   .reward-ico img{width:120px;height:120px;object-fit:contain;}
   .reward-chip .rc-ico img{width:34px;height:34px;object-fit:contain;}
-  .si-name{font-family:'Lilita One',sans-serif;font-size:11px;color:#1c3a66;text-align:center;line-height:1.05;}
-  .si-price{font-family:'Lilita One',sans-serif;font-size:14px;color:#5a3408;background:linear-gradient(180deg,#ffe79a,#ffce3a);border:1px solid #fff3c4;border-radius:9px;padding:2px 12px;box-shadow:0 2px 0 #8a5e10;}
+  .si-name{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:11px;color:#1c3a66;text-align:center;line-height:1.05;}
+  .si-price{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:14px;color:#5a3408;background:linear-gradient(180deg,#ffe79a,#ffce3a);border:1px solid #fff3c4;border-radius:9px;padding:2px 12px;box-shadow:0 2px 0 #8a5e10;}
   /* récompense / coffre */
   .reward-ico{font-size:clamp(80px,26vw,140px);filter:drop-shadow(0 10px 14px rgba(0,0,0,.5));animation:chestpop .6s ease, bobv 2.4s ease-in-out .6s infinite;}
   @keyframes chestpop{0%{transform:scale(0) rotate(-20deg)}60%{transform:scale(1.2) rotate(8deg)}100%{transform:scale(1) rotate(0)}}
   .reward-list{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:18px 0 24px;max-width:360px;}
   .reward-chip{display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(0,0,0,.32);border:2px solid #ffe79a;border-radius:12px;padding:8px 12px;min-width:60px;animation:pop .4s ease backwards;}
   .reward-chip .rc-ico{font-size:34px;}
-  .reward-chip .rc-txt{font-family:'Lilita One',sans-serif;font-size:14px;color:#ffe79a;}
+  .reward-chip .rc-txt{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:14px;color:#ffe79a;}
   /* toast */
   #toast{position:absolute;left:50%;top:30%;transform:translateX(-50%);z-index:40;background:rgba(20,12,34,.92);border:2px solid #caa23a;color:#ffe79a;
     font-size:15px;padding:10px 20px;border-radius:14px;pointer-events:none;opacity:0;transition:opacity .25s;box-shadow:0 6px 18px rgba(0,0,0,.5);}
@@ -249,8 +254,8 @@
   .deck-slot{position:relative;aspect-ratio:3/4;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;
     border:2px solid #6ea6ee;box-shadow:inset 0 2px 0 rgba(255,255,255,.3),0 3px 0 rgba(0,0,0,.35);}
   .deck-slot.sel{border-color:#ffce3a;box-shadow:0 0 0 3px #ffce3a,inset 0 2px 0 rgba(255,255,255,.3);}
-  .deck-slot .ds-lvl{position:absolute;bottom:1px;right:2px;font-family:-apple-system,sans-serif;font-size:9px;font-weight:700;color:#ffe79a;text-shadow:0 1px 2px #000;}
-  .deck-avg{font-family:-apple-system,sans-serif;font-size:12px;color:#cfe0ff;margin-top:8px;}
+  .deck-slot .ds-lvl{position:absolute;bottom:1px;right:2px;font-family:'Supercell Magic','Lilita One',sans-serif;font-size:9px;font-weight:700;color:#ffe79a;text-shadow:0 1px 2px #000;}
+  .deck-avg{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:12px;color:#cfe0ff;margin-top:8px;}
   .card-item .ci-frame{cursor:pointer;}
   .ci-frame.indeck{outline:3px solid #5cd685;outline-offset:-1px;}
   /* clan */
@@ -261,7 +266,7 @@
   .clan-mem .cm-av{font-size:22px;width:38px;height:38px;border-radius:10px;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25);border:2px solid #ffe79a;flex:0 0 auto;}
   .clan-mem .cm-av img{width:100%;height:100%;object-fit:cover;}
   .clan-mem .cm-name{flex:1;text-align:left;font-size:14px;color:#fff;}
-  .clan-mem .cm-role{font-family:-apple-system,sans-serif;font-size:10px;color:#9fb4d8;}
+  .clan-mem .cm-role{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:10px;color:#9fb4d8;}
   .clan-mem .cm-tr{font-size:13px;color:#ffe79a;}
   /* quêtes */
   .evt-btn{background:linear-gradient(180deg,#c645d6,#7d1f8f);border-color:#f0a8ff;box-shadow:0 0 0 3px #5a1068,inset 0 3px 0 rgba(255,255,255,.4),0 8px 0 #4a0d56,0 14px 18px rgba(0,0,0,.5);color:#fff;margin-bottom:14px;}
@@ -273,8 +278,8 @@
   .quest .q-txt{font-size:13px;color:#fff;}
   .quest .q-bar{height:7px;background:rgba(0,0,0,.5);border-radius:4px;overflow:hidden;margin-top:4px;}
   .quest .q-fill{height:100%;background:linear-gradient(180deg,#8fe0f5,#23a3df);}
-  .quest .q-rew{font-family:-apple-system,sans-serif;font-size:10px;color:#ffe79a;margin-top:3px;}
-  .q-claim{font-family:'Lilita One',sans-serif;font-size:12px;padding:6px 10px;border-radius:9px;border:1px solid #d6ffb0;cursor:pointer;
+  .quest .q-rew{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:10px;color:#ffe79a;margin-top:3px;}
+  .q-claim{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:12px;padding:6px 10px;border-radius:9px;border:1px solid #d6ffb0;cursor:pointer;
     background:linear-gradient(180deg,#9be86a,#46a02a);color:#1a3a12;box-shadow:0 2px 0 #2c6a18;}
   .q-claim.off{background:#52525c;border-color:#6a6a74;color:#b8b8c0;box-shadow:0 2px 0 #2e2e36;cursor:default;}
   .q-claim.done{background:#2a6a2a;color:#bfe;border-color:#2a6a2a;box-shadow:none;}
@@ -284,11 +289,11 @@
   .stat-grid{display:grid;grid-template-columns:repeat(2,minmax(120px,1fr));gap:10px;margin:18px 0 24px;width:100%;max-width:360px;}
   .stat{background:rgba(0,0,0,.3);border:2px solid #6ea6ee;border-radius:12px;padding:10px;}
   .stat .s-val{font-size:24px;color:#ffe79a;}
-  .stat .s-lbl{font-family:-apple-system,sans-serif;font-size:11px;color:#cfe0ff;}
+  .stat .s-lbl{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:11px;color:#cfe0ff;}
   /* paramètres */
   .set-row{display:flex;align-items:center;justify-content:space-between;gap:16px;width:min(86vw,320px);background:rgba(0,0,0,.3);border:2px solid #6ea6ee;border-radius:12px;padding:12px 16px;margin:6px 0;color:#fff;font-size:16px;}
-  .set-ver{font-family:-apple-system,sans-serif;font-size:12px;color:#9fb4d8;}
-  .toggle{font-family:'Lilita One',sans-serif;font-size:14px;padding:6px 16px;border-radius:10px;border:2px solid #d6ffb0;cursor:pointer;background:linear-gradient(180deg,#9be86a,#46a02a);color:#1a3a12;box-shadow:0 2px 0 #2c6a18;}
+  .set-ver{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:12px;color:#9fb4d8;}
+  .toggle{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:14px;padding:6px 16px;border-radius:10px;border:2px solid #d6ffb0;cursor:pointer;background:linear-gradient(180deg,#9be86a,#46a02a);color:#1a3a12;box-shadow:0 2px 0 #2c6a18;}
   .toggle.off{background:#52525c;border-color:#6a6a74;color:#d8d8e0;box-shadow:0 2px 0 #2e2e36;}
   .danger{background:linear-gradient(180deg,#ff7a6a,#c0291a)!important;border-color:#ffc0b6!important;color:#fff!important;box-shadow:0 0 0 3px #7a1206,inset 0 3px 0 rgba(255,255,255,.3),0 6px 0 #6a0f06!important;margin-top:18px;}
   .back-btn{margin-top:16px;}
@@ -303,12 +308,12 @@
   /* boutons écran de fin */
   .over-btns{display:flex;gap:14px;margin-top:10px;}
   /* écran de victoire façon CR */
-  .vs-banner{width:90%;max-width:380px;text-align:center;color:#fff;font-family:'Lilita One',sans-serif;padding:8px 10px;border-radius:10px;margin:3px 0;box-shadow:0 4px 0 rgba(0,0,0,.35),inset 0 2px 0 rgba(255,255,255,.3);}
+  .vs-banner{width:90%;max-width:380px;text-align:center;color:#fff;font-family:'Supercell Magic','Lilita One',sans-serif;padding:8px 10px;border-radius:10px;margin:3px 0;box-shadow:0 4px 0 rgba(0,0,0,.35),inset 0 2px 0 rgba(255,255,255,.3);}
   .vs-banner b{font-size:22px;display:block;text-shadow:0 2px 2px rgba(0,0,0,.5);}
   .vs-banner small{font-size:12px;opacity:.9;}
   .vs-banner.foe{background:linear-gradient(180deg,#e8537a,#c0285a);} .vs-banner.foe small{color:#ffd0dd;}
   .vs-banner.me{background:linear-gradient(180deg,#3a86e0,#1f5bb0);} .vs-banner.me small{color:#bcdcff;}
-  .vs-label{font-family:'Lilita One',sans-serif;font-size:34px;color:#7fe0ff;text-shadow:2px 2px 0 #143a6a,-2px 2px 0 #143a6a,2px -2px 0 #143a6a,-2px -2px 0 #143a6a,0 4px 0 #0a2348;margin:6px 0;}
+  .vs-label{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:34px;color:#7fe0ff;text-shadow:2px 2px 0 #143a6a,-2px 2px 0 #143a6a,2px -2px 0 #143a6a,-2px -2px 0 #143a6a,0 4px 0 #0a2348;margin:6px 0;}
   .crowns-row{display:flex;gap:14px;margin:6px 0;}
   .crown-slot{width:54px;height:54px;border-radius:14px;background:rgba(0,0,0,.3);border:2px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;}
   .crown-slot img{width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));}
@@ -392,9 +397,8 @@
 
     <!-- Bandeau couronne (trophy road) + boutons + Pass Royale -->
     <div class="lobby-head">
-      <div class="crown-banner ph-slot" id="trophyBtn" data-ph="ui_crownbanner">
+      <div class="crown-banner ph-slot" id="roadBtn" data-ph="ui_crownbanner">
         <img class="ph-img" src="assets/ui_crownbanner.png" alt="" onerror="this.parentNode.classList.add('ph')">
-        <span class="cb-trophy"><img src="assets/ui_trophy.png" onerror="this.outerHTML='🏆'"> <b id="trophyVal">0</b></span>
       </div>
       <div class="head-right">
         <div class="head-btns">
@@ -410,6 +414,7 @@
     <div class="namebar">
       <div class="avatar" id="profileBtn"><img src="assets/ui_avatar.png" onerror="this.replaceWith('👑')"></div>
       <div class="nb-txt"><b>manondidier</b><span class="nb-clan">No Clan</span></div>
+      <div class="nb-trophy" id="trophyBtn"><img src="assets/ui_trophy.png" onerror="this.outerHTML='🏆'"> <b id="trophyVal">0</b></div>
     </div>
 
     <!-- PANNEAU COMBAT -->
@@ -419,7 +424,7 @@
       <div class="chests" id="chestRow"></div>
       <div class="battle-row">
         <div class="battle-side ph-slot" data-ph="Carte"><img class="ph-img" src="assets/ui_battlecard.png" onerror="this.parentNode.classList.add('ph')"></div>
-        <button class="btn battle-btn" id="battleBtn">Bataille</button>
+        <button class="btn battle-btn" id="battleBtn">Combat</button>
         <div class="battle-side ph-slot" id="ticketBtn" data-ph="ui_ticket"><img class="ph-img" src="assets/ui_ticket.png" onerror="this.parentNode.classList.add('ph')"></div>
       </div>
     </div>
@@ -1053,19 +1058,23 @@ function addTowerMesh(t){
   const castleKey='towercastle_cut_'+t.role+'_'+sd, pKey='towerchar_bust_'+t.role+'_'+sd, fullKey='towerfull_'+t.role+'_'+sd;
   // ----- CHÂTEAU VIDE (image) + PERSO ANIMÉ posé dessus : prioritaire -----
   if(TEXR[castleKey]){
-    const cmap=TEX[castleKey],csp=new THREE.Sprite(new THREE.SpriteMaterial({map:cmap,transparent:true,alphaTest:0.5,depthTest:true}));
+    // placement validé en composition PIL (compose_towers.py) : f=bas du buste depuis le HAUT, s=hauteur buste/château
+    const TCFG={king_blue:{f:0.52,s:0.42},king_red:{f:0.55,s:0.40},princess_blue:{f:0.55,s:0.40},princess_red:{f:0.55,s:0.40}};
+    const cf=TCFG[t.role+'_'+sd]||{f:0.55,s:0.40};
+    // château ENTIER posé au sol (center.y=0 => le bas de l'image = au sol). depthTest:false => jamais coupé par le terrain.
+    const cmap=TEX[castleKey],csp=new THREE.Sprite(new THREE.SpriteMaterial({map:cmap,transparent:true,alphaTest:0.5,depthTest:false}));
     csp.center.set(0.5,0);let ca=1;if(cmap.image&&cmap.image.width)ca=cmap.image.width/cmap.image.height;
-    const Hs=ws(t.r)*(king?4.0:4.0);
-    csp.scale.set(Hs*ca,Hs,1);csp.position.y=0.02;g.add(csp);
-    // buste animé posé DANS le rempart (devant le château, bien dimensionné)
+    const Hs=ws(t.r)*4.2;
+    csp.scale.set(Hs*ca,Hs,1);csp.position.y=0.02;csp.renderOrder=1;g.add(csp);
+    // perso posé exactement dans le rempart (même position que la compo image : bas du buste à cf.f depuis le haut)
     if(TEXR[pKey]){
       const pmap=TEX[pKey],psp=new THREE.Sprite(new THREE.SpriteMaterial({map:pmap,transparent:true,alphaTest:0.5,depthTest:false}));
       psp.center.set(0.5,0);let pa=0.7;if(pmap.image&&pmap.image.width)pa=pmap.image.width/pmap.image.height;
-      const pH=Hs*(king?0.42:0.40),pW=pH*pa;psp.scale.set(pW,pH,1);
-      const py=king?0.60:0.62;psp.position.set(0,Hs*py,0.0);psp.renderOrder=2;g.add(psp);
+      const pH=Hs*cf.s,pW=pH*pa;psp.scale.set(pW,pH,1);
+      psp.position.set(0,0.02+Hs*(1-cf.f),0.0);psp.renderOrder=2;g.add(psp);
       t.charSpr=psp;t.charW=pW;t.charH=pH;t.charBaseY=psp.position.y;t.charAnim=true;t.phase=(t.x*1.7+t.y*0.9)%6.283;
     }
-    t.vy=t.y+t.r*0.95;   // décale le visuel vers le bas pour centrer la tour sur sa dalle (la barre de PV suit via t.vy)
+    t.vy=t.y+t.r*0.7;   // recentre la tour sur sa dalle (sinon sa masse paraît trop haute) ; la barre de PV suit via t.vy
     g.position.set(wx(t.x),0,wz(t.vy));t.mesh=g;t.base=null;dynGroup&&dynGroup.add(g);return;
   }
   // ----- TOUR COMPLÈTE EN IMAGE (perso intégré, statique) : repli -----
@@ -1268,8 +1277,9 @@ function syncScene(dt){
       u.mesh.position.y=u.moving?Math.abs(Math.sin((u.walk||0)*12))*0.08:0;
     }
     // ----- arrivée : la troupe tombe du ciel + grossit, puis atterrit en squash + poussière -----
-    if(u.deploy>0){u.mesh.visible=true;const d=Math.min(1,u.deploy);
-      u.mesh.position.y+=d*d*5.5;u.mesh.scale.setScalar(Math.max(0.2,1-d*0.55));u._fall=true;}
+    if(u.deploy>0){u.mesh.visible=true;const d=Math.min(1,u.deploy),dh=d*d*5.5;
+      if(u.spr)u.spr.position.y+=dh;else u.mesh.position.y+=dh;   // sprite : seul le perso tombe, l'ombre/anneau restent au sol
+      u.mesh.scale.setScalar(Math.max(0.2,1-d*0.55));u._fall=true;}
     else{u.mesh.visible=true;
       if(u._fall){u._fall=false;u.land=0.2;fx.push({type:'ring',x:u.x,y:u.y,r:34,t:.4,life:.4,color:TEAM[u.side].main});}
       if(u.land>0){u.land-=dt;const p=Math.sin(Math.min(1,u.land/0.2)*Math.PI);u.mesh.scale.set(1+p*0.28,Math.max(0.4,1-p*0.34),1+p*0.28);}
@@ -1328,12 +1338,10 @@ let uic,VW,VH,DPR;
 const MAXA=0.60;    // ratio l/h max : au-delà (paysage/PC) on borne pour garder tout le plateau visible
 function resize(){
   DPR=Math.min(2.75,window.devicePixelRatio||1);
-  // ⚠️ iOS app installée (standalone) : 100dvh/100vh sont BUGGÉS (souvent plus grands que l'écran réel,
-  // -> le bas est coupé). La seule mesure fiable du visible est visualViewport.height. On l'impose au DOM via --app-h.
-  const vv=window.visualViewport;
-  const winW=Math.round((vv&&vv.width)||window.innerWidth);
-  const winH=Math.round((vv&&vv.height)||window.innerHeight);
-  document.documentElement.style.setProperty('--app-h', winH+'px');
+  // #wrap est en position:fixed inset:0 -> le navigateur le fait remplir l'écran RÉEL (standalone comme navigateur).
+  // On mesure SA boîte réelle : aucune dépendance à 100vh/dvh/visualViewport (tous foireux en app installée iOS).
+  const wrap=document.getElementById('wrap'), rect=wrap.getBoundingClientRect();
+  const winW=Math.round(rect.width)||window.innerWidth, winH=Math.round(rect.height)||window.innerHeight;
   let cw=winW, ch=winH, left=0, top=0, aspect=cw/ch;
   if(aspect>MAXA){ cw=Math.round(ch*MAXA); left=Math.round((winW-cw)/2); aspect=MAXA; }   // écran trop large : on centre
   VW=cw; VH=ch;
@@ -1361,7 +1369,7 @@ function drawCover(im,x,y,w,h){const ir=im.naturalWidth/im.naturalHeight,tr=w/h;
   if(ir>tr){sh=im.naturalHeight;sw=sh*tr;sx=(im.naturalWidth-sw)/2;sy=0;}else{sw=im.naturalWidth;sh=sw/tr;sx=0;sy=(im.naturalHeight-sh)/2;}
   uic.drawImage(im,sx,sy,sw,sh,x,y,w,h);}
 // ----- typo CR : police chunky + texte à contour (comme Supercell Magic) -----
-const FONT="'Lilita One', sans-serif";
+const FONT="'Supercell Magic','Lilita One', sans-serif";
 function crFont(px){return px+"px "+FONT;}
 function crText(txt,x,y,px,fill,stroke,sw){uic.font=crFont(px);uic.lineJoin='round';uic.miterLimit=2;
   if(stroke!==null&&stroke!==undefined){uic.lineWidth=sw||Math.max(3,px*0.22);uic.strokeStyle=stroke;uic.strokeText(txt,x,y);}
@@ -1402,6 +1410,9 @@ function drawWorldFx(){
     else if(f.type==='ring'){const R=f.r*sc*(0.3+p*1.0);uic.globalAlpha=(1-p)*0.75;   // 💨 onde de poussière au sol (déploiement)
       uic.strokeStyle=f.color||'#ffe6a8';uic.lineWidth=(1-p)*3+1;uic.beginPath();
       if(uic.ellipse)uic.ellipse(s.x,s.y,R,R*0.5,0,0,7);else uic.arc(s.x,s.y,R,0,7);uic.stroke();uic.globalAlpha=1;}
+    else if(f.type==='debris'){const e=f.life-f.t,h=Math.max(0,f.vUp*e-4.9*e*e);   // 🧱 éclats projetés (arc balistique)
+      const d2=worldToScreen(f.x+f.dx*e,f.y+f.dy*e,h);if(!d2.vis)continue;
+      uic.globalAlpha=Math.min(1,f.t/0.2);uic.fillStyle=f.col||'#8a8079';uic.fillRect(d2.x-2,d2.y-2,4,4);uic.globalAlpha=1;}
     else if(f.type==='crownpop'){const cs2=worldToScreen(f.x,f.y,1.2+p*2.8);if(!cs2.vis)continue;   // 👑 couronne qui s'envole quand une tour tombe
       const a=p<0.18?p/0.18:1-(p-0.18)/0.82;uic.globalAlpha=Math.max(0,a);uic.textAlign='center';uic.textBaseline='middle';
       uic.font=crFont(34+p*18);uic.fillText('👑',cs2.x,cs2.y);uic.textBaseline='alphabetic';uic.textAlign='left';uic.globalAlpha=1;}
@@ -1410,6 +1421,16 @@ function drawWorldFx(){
 function drawHUD(){
   uic.clearRect(0,0,VW,VH);
   drawWorldFx();
+  // ----- télégraphe de sort : cercle de la zone d'effet pendant le drag (comme CR) -----
+  if(state==='play'&&dragLogic&&selCard>=0){const spc=CARDS[hand[selCard]];
+    if(spc&&spc.spell){const sp=worldToScreen(dragLogic.x,dragLogic.y,0.05),R=spc.radius*(VW/W),pu=0.5+0.5*Math.sin(ANIMT*6);
+      uic.save();uic.fillStyle=spc.color||'#ffd23f';uic.globalAlpha=0.15+pu*0.08;
+      uic.beginPath();uic.arc(sp.x,sp.y,R,0,7);uic.fill();
+      uic.globalAlpha=0.65+pu*0.2;uic.lineWidth=2.5;uic.strokeStyle=spc.color||'#ffd23f';uic.setLineDash([9,7]);
+      uic.beginPath();uic.arc(sp.x,sp.y,R,0,7);uic.stroke();uic.setLineDash([]);
+      uic.lineWidth=2;uic.beginPath();uic.moveTo(sp.x-8,sp.y);uic.lineTo(sp.x+8,sp.y);uic.moveTo(sp.x,sp.y-8);uic.lineTo(sp.x,sp.y+8);uic.stroke();   // croix de visée
+      uic.restore();uic.globalAlpha=1;}}
+  if(flash>0){uic.save();uic.globalAlpha=flash;uic.fillStyle='#fff';uic.fillRect(0,0,VW,VH);uic.restore();}   // flash blanc bref (chute de tour)
   // barres de vie tours
   for(const t of towers){const s=worldToScreen(t.x,(t.vy!=null?t.vy:t.y),(t.role==='king'?3.2:2.7));if(!s.vis)continue;
     const lvl=t.level||1,col=TEAM[t.side].hp,colD=TEAM[t.side].main,ratio=Math.max(0,t.hp/t.max);
@@ -1445,10 +1466,11 @@ function drawHUD(){
     const g=uic.createLinearGradient(0,yt,0,yb);g.addColorStop(0,'#fff');g.addColorStop(.4,col);g.addColorStop(1,colD);uic.fillStyle=g;
     uic.beginPath();uic.moveTo(x0,yb);uic.lineTo(x0,yt+h*0.28);uic.lineTo(x0+w*0.27,yt+h*0.5);uic.lineTo(cx,yt);uic.lineTo(x1-w*0.27,yt+h*0.5);uic.lineTo(x1,yt+h*0.28);uic.lineTo(x1,yb);uic.closePath();uic.fill();uic.stroke();
     uic.fillStyle=colD;uic.beginPath();uic.arc(cx,yt,w*0.08,0,7);uic.fill();uic.beginPath();uic.arc(x0,yt+h*0.28,w*0.07,0,7);uic.fill();uic.beginPath();uic.arc(x1,yt+h*0.28,w*0.07,0,7);uic.fill();}
-  function crownTally(cx,cyy,n,col,colD){
-    uic.save();uic.shadowColor='rgba(0,0,0,.45)';uic.shadowBlur=4;uic.shadowOffsetY=2;crownIcon(cx,cyy-3,30,col,colD);uic.restore();
+  function crownTally(cx,cyy,n,col,colD,pop){
+    const pk=pop>0?Math.sin(Math.min(1,pop/0.6)*Math.PI):0,ic=30*(1+pk*0.5);   // pop quand on gagne une couronne
+    uic.save();uic.shadowColor='rgba(0,0,0,.45)';uic.shadowBlur=4;uic.shadowOffsetY=2;crownIcon(cx,cyy-3,ic,col,colD);uic.restore();
     const py=cyy+11;uic.fillStyle='#160c1e';rr(cx-13,py,26,20,5);uic.fill();uic.lineWidth=2;uic.strokeStyle=colD;rr(cx-13,py,26,20,5);uic.stroke();
-    uic.textAlign='center';crText(''+n,cx,py+15,15,'#fff',colD,3);}
+    uic.textAlign='center';crText(''+n,cx,py+15,15*(1+pk*0.4),'#fff',colD,3);}
   // --- profil adverse (haut-gauche) : avatar + nom + trophées ---
   uic.save();uic.shadowColor='rgba(0,0,0,.4)';uic.shadowBlur=4;uic.shadowOffsetY=2;
   uic.fillStyle='#b23a8a';rr(8,9,34,34,8);uic.fill();uic.restore();
@@ -1462,11 +1484,12 @@ function drawHUD(){
   const tg=uic.createLinearGradient(0,8,0,48);tg.addColorStop(0,'#2a2038');tg.addColorStop(1,'#140c22');uic.fillStyle=tg;rr(tx,8,tw,42,8);uic.fill();uic.restore();
   uic.lineWidth=2;uic.strokeStyle='#caa23a';rr(tx,8,tw,42,8);uic.stroke();
   uic.textAlign='center';crText(overtime?'Prolongation':'Temps restant',tx+tw/2,22,9,'#cbb88f',null);
-  crText(m+':'+(sc<10?'0':'')+sc,tx+tw/2,44,19,timeLeft<20||overtime?'#ff8a8a':'#ffe79a','#150c22',3);
+  const lowT=timeLeft<20||overtime,tp=lowT?1+0.13*Math.sin(ANIMT*9):1;   // ⏱️ pulse de tension en fin de partie
+  crText(m+':'+(sc<10?'0':'')+sc,tx+tw/2,44,19*tp,lowT?'#ff8a8a':'#ffe79a','#150c22',3);
   // --- couronnes (bord droit, à hauteur de rivière) ---
   const ry=worldToScreen(W/2,RIVER,0).y,ccx=VW-24;
-  crownTally(ccx,Math.max(70,ry-32),crowns('foe'),'#e24b8a','#8a1f4f');
-  crownTally(ccx,ry+34,crowns('me'),'#2f8fda','#143e8c');
+  crownTally(ccx,Math.max(70,ry-32),crowns('foe'),'#e24b8a','#8a1f4f',crownPop.foe);
+  crownTally(ccx,ry+34,crowns('me'),'#2f8fda','#143e8c',crownPop.me);
   // révélation cartes adverses : VRAIE carte (image en grand + nom + coût), haut droite sous le minuteur
   for(let i=0;i<foePlayed.length;i++){const r=foePlayed[i],c=CARDS[r.key];
     const cw=50,chh=62,x=VW-cw-8,y=46+i*(chh+8);
@@ -1769,15 +1792,52 @@ function switchTab(panel,el){sfx('click');
 
 // ===================== SON (WebAudio synthétisé) =====================
 let actx;
+function _actx(){actx=actx||new(window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();return actx;}
+// un grain : oscillateur adouci par un passe-bas, attaque douce + décroissance exponentielle (≈ tap boisé CR)
+function tone(f,o){o=o||{};const a=_actx(),t=a.currentTime+(o.delay||0),dur=o.dur||0.09;
+  const osc=a.createOscillator(),g=a.createGain(),lp=a.createBiquadFilter();
+  osc.type=o.type||'sine';lp.type='lowpass';lp.frequency.value=o.cutoff||2800;lp.Q.value=o.q||0.7;
+  osc.frequency.setValueAtTime(f,t);
+  if(o.bend)osc.frequency.exponentialRampToValueAtTime(Math.max(40,f*o.bend),t+dur);
+  osc.connect(lp);lp.connect(g);g.connect(a.destination);
+  const peak=o.gain==null?0.11:o.gain;
+  g.gain.setValueAtTime(.0001,t);
+  g.gain.exponentialRampToValueAtTime(peak,t+(o.atk||0.006));
+  g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  osc.start(t);osc.stop(t+dur+0.03);}
 function sfx(type){if(!save||!save.sound)return;
-  try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();
-    const t=actx.currentTime,o=actx.createOscillator(),g=actx.createGain();o.connect(g);g.connect(actx.destination);
-    const P={click:[620,.06,'square'],deploy:[300,.12,'sawtooth'],up:[760,.18,'triangle'],chest:[440,.32,'sine'],win:[660,.45,'triangle'],lose:[200,.5,'sawtooth'],coin:[1040,.08,'square'],error:[140,.18,'square'],boom:[130,.5,'sawtooth']}[type]||[500,.07,'square'];
-    o.type=P[2];o.frequency.setValueAtTime(P[0],t);
-    if(type==='win')o.frequency.exponentialRampToValueAtTime(P[0]*2,t+P[1]);
-    if(type==='lose'||type==='boom')o.frequency.exponentialRampToValueAtTime(P[0]*.5,t+P[1]);
-    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.14,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+P[1]);
-    o.start(t);o.stop(t+P[1]+.03);}catch(e){}}
+  try{switch(type){
+    case 'click':                                   // tap boisé doux (boutons) — deux partiels qui décroissent vite
+      tone(900,{type:'sine',dur:0.085,bend:0.7,gain:0.10,cutoff:2400});
+      tone(1360,{type:'sine',dur:0.05,gain:0.045,cutoff:3200,delay:0.004});break;
+    case 'back': case 'cancel':                     // retour : "tok" plus grave
+      tone(520,{type:'sine',dur:0.10,bend:0.65,gain:0.10,cutoff:1700});break;
+    case 'up':                                      // amélioration : petite montée joyeuse
+      tone(660,{type:'triangle',dur:0.10,gain:0.10,cutoff:3000});
+      tone(990,{type:'triangle',dur:0.13,gain:0.085,cutoff:3600,delay:0.085});break;
+    case 'coin':                                    // pièces : "ting" clair et léger
+      tone(1180,{type:'triangle',dur:0.10,gain:0.075,cutoff:5200});
+      tone(1770,{type:'sine',dur:0.08,gain:0.045,cutoff:6500,delay:0.04});break;
+    case 'chest':                                   // coffre : petit arpège majeur
+      tone(523,{type:'triangle',dur:0.16,gain:0.09,cutoff:3800});
+      tone(659,{type:'triangle',dur:0.16,gain:0.09,cutoff:4000,delay:0.10});
+      tone(784,{type:'triangle',dur:0.28,gain:0.09,cutoff:4200,delay:0.20});break;
+    case 'deploy':                                  // pose de carte : "pock" doux et mat
+      tone(360,{type:'sine',dur:0.11,bend:0.55,gain:0.10,cutoff:1300});break;
+    case 'win':                                     // victoire : arpège ascendant chaleureux
+      tone(523,{type:'triangle',dur:0.18,gain:0.11,cutoff:4000});
+      tone(659,{type:'triangle',dur:0.18,gain:0.11,cutoff:4200,delay:0.13});
+      tone(880,{type:'triangle',dur:0.34,gain:0.11,cutoff:4400,delay:0.26});break;
+    case 'lose':                                    // défaite : descente douce
+      tone(330,{type:'sine',dur:0.42,bend:0.5,gain:0.10,cutoff:1100});break;
+    case 'boom':                                    // chute de tour : grondement filtré
+      tone(130,{type:'sawtooth',dur:0.5,bend:0.5,gain:0.12,cutoff:520});break;
+    case 'error':                                   // refus : "bip-bip" doux, pas agressif
+      tone(300,{type:'triangle',dur:0.10,bend:0.85,gain:0.07,cutoff:1500});
+      tone(240,{type:'triangle',dur:0.12,bend:0.85,gain:0.07,cutoff:1400,delay:0.10});break;
+    default:
+      tone(640,{type:'sine',dur:0.07,gain:0.08,cutoff:2600});
+  }}catch(e){}}
 
 // ===================== ÉDITION DU DECK =====================
 let selSlot=0;
@@ -1901,16 +1961,17 @@ document.querySelectorAll('.tabbar .tab').forEach(t=>t.onclick=()=>{
 document.getElementById('profileBtn').onclick=()=>{sfx('click');openProfile();};
 document.getElementById('gearBtn').onclick=()=>{sfx('click');openSettings();};
 document.getElementById('trophyBtn').onclick=()=>{sfx('click');openRoad();};
+document.getElementById('roadBtn').onclick=()=>{sfx('click');openRoad();};
 document.getElementById('goldBtn').onclick=()=>switchTab('panelShop',document.querySelector('.tab[data-panel="panelShop"]'));
 document.getElementById('gemBtn').onclick=()=>switchTab('panelShop',document.querySelector('.tab[data-panel="panelShop"]'));
 document.getElementById('donateBtn').onclick=()=>{const k=DECK[Math.floor(Math.random()*DECK.length)];save.cards[k]=(save.cards[k]||0)+3;persist();sfx('coin');toast('Le clan t\'offre 3× '+CARDS[k].name+' '+cardEmoji(k));};
 document.getElementById('clanChatBtn').onclick=()=>{const msgs=['Belle victoire ! 👑','Quelqu\'un a des Talons ?','GG les filles 💃','Defi de clan ce soir !','Trop stylé ce deck 🔥'];toast('💬 '+msgs[Math.floor(Math.random()*msgs.length)]);};
 document.getElementById('soundToggle').onclick=()=>{save.sound=!save.sound;persist();const t=document.getElementById('soundToggle');t.textContent=save.sound?'ON':'OFF';t.classList.toggle('off',!save.sound);sfx('click');};
 document.getElementById('resetBtn').onclick=()=>{if(confirm('Effacer toute ta progression ?')){localStorage.removeItem(SAVE_KEY);save=defaultSave();persist();sfx('error');showLobby();toast('Progression réinitialisée');}};
-document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{sfx('click');showLobby();});
+document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{sfx('back');showLobby();});
 
 // précharge la police CR pour le canvas (évite un flash en police système)
-if(document.fonts&&document.fonts.load){document.fonts.load("16px 'Lilita One'");document.fonts.load("italic 16px 'Lilita One'");}
+if(document.fonts&&document.fonts.load){document.fonts.load("16px 'Supercell Magic'");document.fonts.load("16px 'Lilita One'");}
 initThree();
 reset();state='menu';
 last=performance.now();requestAnimationFrame(loop);

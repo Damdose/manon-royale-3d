@@ -1,6 +1,6 @@
 // Service worker — Manon Royale 3D
 // Bump CACHE when you ship changes so clients pull the new version.
-const CACHE = 'manon-royale-v6';
+const CACHE = 'manon-royale-v9';
 
 // App shell precached on install so the game boots offline.
 const SHELL = [
@@ -11,6 +11,7 @@ const SHELL = [
   './assets/apple-touch-icon.png',
   './assets/icon-192.png',
   './assets/icon-512.png',
+  './assets/SupercellMagic.ttf',
 ];
 
 self.addEventListener('install', (e) => {
@@ -39,12 +40,23 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Everything else (assets, three.js, fonts): cache-first, fill cache on miss.
+  // Images d'assets (cartes, tours, persos…) : NETWORK-FIRST -> les MAJ s'affichent toujours,
+  // repli sur le cache si hors-ligne.
+  if (/\/assets\/.*\.(png|jpg|jpeg|webp)$/i.test(req.url)) {
+    e.respondWith(
+      fetch(req).then((res) => {
+        if (res && res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {}); }
+        return res;
+      }).catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  // Reste (three.js, fonts, manifest) : cache-first, remplit le cache au miss.
   e.respondWith(
     caches.match(req).then((hit) => {
       if (hit) return hit;
       return fetch(req).then((res) => {
-        // Cache same-origin and successful/opaque cross-origin responses.
         if (res && (res.ok || res.type === 'opaque')) {
           const copy = res.clone();
           caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
