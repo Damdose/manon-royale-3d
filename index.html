@@ -32,6 +32,8 @@
   /* hauteur pilotée en JS (--app-h = visualViewport.height) : plein écran en app installée, zone visible en navigateur.
      100dvh en repli avant que le JS tourne. */
   #wrap{position:fixed;top:0;left:0;width:100vw;height:100dvh;height:var(--app-h,100dvh);overflow:hidden;background:#0a1736;touch-action:none;}
+  /* App installée iOS : on utilise le MOT-CLÉ CSS 100vh (qu'iOS peint vraiment plein écran), pas une valeur px. */
+  #wrap.fs{height:100vh;}
   #gl,#ui{position:absolute;display:block;touch-action:none;}
   #ui{touch-action:none;}
   .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff7e6;
@@ -1432,9 +1434,11 @@ function resize(){
   //   (prouvé par diag réel iPhone : 100vh=852, fvp=793. fvp laissait 59px de vide en bas.)
   // NAVIGATEUR    -> visualViewport.height (zone visible entre les barres Safari).
   const vv=window.visualViewport;
-  const fvp=measureFixedVP(), vh=measure100vh();
+  const fvp=measureFixedVP(), vh=measure100vh(), sa=isStandalone();
   window.__diag={fvp:fvp,vh:vh,scr:screen.height,vv:vv?Math.round(vv.height):0,inner:window.innerHeight};
-  const appH = isStandalone() ? Math.max(vh,fvp) : Math.round((vv&&vv.height)||window.innerHeight);
+  // App installée : la classe .fs applique le MOT-CLÉ CSS 100vh (peint plein écran par iOS, pas de bande navy en bas).
+  const wrapEl=document.getElementById('wrap'); if(wrapEl)wrapEl.classList.toggle('fs', sa);
+  const appH = sa ? Math.max(vh,fvp) : Math.round((vv&&vv.height)||window.innerHeight);
   document.documentElement.style.setProperty('--app-h', appH+'px');
   const wrap=document.getElementById('wrap'), rect=wrap.getBoundingClientRect();
   const winW=Math.round(rect.width)||window.innerWidth, winH=Math.round(rect.height)||appH;
@@ -2181,7 +2185,7 @@ if('serviceWorker' in navigator){
 <script>
 // Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
 (function(){
-  var BUILD='v24';
+  var BUILD='v25';
   // Badge tapotable (coin bas-gauche) qui affiche EN PERMANENCE toutes les mesures -> une capture me révèle la bonne valeur.
   var tag=document.createElement('div');
   tag.style.cssText='position:fixed;z-index:99999;left:calc(3px + env(safe-area-inset-left));bottom:calc(3px + env(safe-area-inset-bottom));padding:5px 7px;font:9px/1.25 monospace;color:rgba(255,255,255,.6);background:rgba(0,0,0,.45);border-radius:5px;pointer-events:auto;cursor:pointer;white-space:pre;';
