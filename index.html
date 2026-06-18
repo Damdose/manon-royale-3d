@@ -25,7 +25,7 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
   html,body{height:100%;overflow:hidden;background:#0a1736;font-family:'Lilita One',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     overscroll-behavior:none;touch-action:none;position:fixed;width:100%;-webkit-text-size-adjust:100%;}
-  #wrap{position:relative;width:100vw;height:100vh;height:100dvh;overflow:hidden;background:#0a1736;touch-action:none;}
+  #wrap{position:relative;width:100vw;height:100dvh;height:var(--app-h,100dvh);overflow:hidden;background:#0a1736;touch-action:none;}
   #gl,#ui{position:absolute;display:block;touch-action:none;}
   #ui{touch-action:none;}
   .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff7e6;
@@ -63,7 +63,7 @@
   .loadhint{margin-top:18px;font-family:-apple-system,sans-serif;font-weight:600;font-size:13px;color:#dce9ff;max-width:300px;min-height:42px;line-height:1.5;text-shadow:0 2px 3px rgba(0,0,0,.5);}
   /* 3) Lobby */
   .lobby{justify-content:flex-start;padding:0;}
-  .topbar{width:100%;max-width:520px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:10px 12px 0;}
+  .topbar{width:100%;max-width:520px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px 0;}
   .tb-left{display:flex;gap:8px;align-items:center;}
   .avatar{width:46px;height:46px;border-radius:12px;background:#b23a8a;border:2px solid #ffe79a;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 3px 0 rgba(0,0,0,.3);}
   .tb-name{text-align:left;}
@@ -92,20 +92,60 @@
   .lobby-diff{margin:2px 0 8px;font-size:13px;}
   .battle-btn{font-size:clamp(24px,7vw,34px);padding:16px 56px;animation:bpulse 1.4s ease-in-out infinite;}
   @keyframes bpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-  .chests{display:flex;gap:8px;margin:14px 0 10px;}
-  .chest{width:62px;height:64px;border-radius:12px;background:linear-gradient(180deg,#3a86e0,#1740a0);border:2px solid #6ea6ee;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 2px 0 rgba(255,255,255,.25),0 4px 0 #0a2256;}
+  .chests{display:flex;gap:7px;margin:10px 0;justify-content:center;}
+  .chest{width:62px;height:64px;border-radius:12px;background:linear-gradient(180deg,#9a47d6,#5a1fa0);border:2px solid #c98bef;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 2px 0 rgba(255,255,255,.28),0 4px 0 #3a116b;}
   .chest.empty{background:rgba(0,0,0,.28);border-style:dashed;border-color:rgba(255,255,255,.3);box-shadow:none;}
   .chest-ico{font-size:30px;line-height:1;}
   .chest-ico img{width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));}
   .chest-t{font-family:-apple-system,sans-serif;font-size:9px;color:#fff;margin-top:3px;}
+  /* ===== En-tête lobby façon Clash Royale ===== */
+  .cur-cards{min-width:96px;justify-content:flex-start;gap:6px;}
+  .cur-cards .xpbar{flex:1;height:7px;margin:0;background:rgba(0,0,0,.45);border-radius:5px;overflow:hidden;border:1px solid rgba(255,255,255,.18);}
+  .cur-cards .xpfill{height:100%;width:62%;display:block;background:linear-gradient(180deg,#8fe0f5,#23a3df);}
+  .lobby-head{width:100%;max-width:520px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:10px 12px 0;}
+  .crown-banner{flex:0 0 56%;height:78px;border-radius:12px;overflow:hidden;position:relative;cursor:pointer;
+    background:linear-gradient(180deg,#e98b3a,#c25e1e);border:2px solid #ffcf8f;box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 3px 0 rgba(0,0,0,.3);}
+  .crown-banner .ph-img{width:100%;height:100%;object-fit:cover;display:block;}
+  .cb-trophy{position:absolute;left:8px;bottom:6px;display:flex;align-items:center;gap:4px;font-family:'Lilita One',sans-serif;font-size:15px;color:#fff;text-shadow:0 2px 2px rgba(0,0,0,.6);}
+  .cb-trophy img{width:16px;height:16px;}
+  .head-right{flex:1;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+  .head-btns{display:flex;gap:6px;}
+  .sqbtn{width:40px;height:40px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(180deg,#3a6fc4,#21478e);border:2px solid #6ea6ee;box-shadow:inset 0 2px 0 rgba(255,255,255,.25),0 3px 0 #16315f;}
+  .sqbtn .ph-img{width:24px;height:24px;object-fit:contain;}
+  .passroyale{width:100%;height:34px;border-radius:10px;overflow:hidden;cursor:pointer;
+    background:linear-gradient(180deg,#ffd84d,#e0a81c);border:2px solid #fff3c4;box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 3px 0 #a9760f;}
+  .passroyale{position:relative;}
+  .passroyale .ph-img{width:100%;height:100%;object-fit:cover;display:block;}
+  .pr-txt{position:absolute;left:14%;top:50%;transform:translateY(-50%);font-family:'Lilita One',sans-serif;font-size:14px;color:#5a3408;text-shadow:0 1px 0 rgba(255,255,255,.5);pointer-events:none;}
+  .passroyale.ph .pr-txt{display:none;}
+  .namebar{width:100%;max-width:520px;display:flex;align-items:center;gap:10px;padding:8px 14px 0;}
+  .nb-txt{display:flex;flex-direction:column;text-align:left;line-height:1.15;}
+  .nb-txt b{font-family:'Lilita One',sans-serif;font-size:18px;color:#fff;text-shadow:0 2px 2px rgba(0,0,0,.5);}
+  .nb-clan{font-family:-apple-system,sans-serif;font-size:11px;color:#bcd0f2;}
+  .arena-label{text-align:center;margin-top:4px;}
+  .arena-label b{font-family:'Lilita One',sans-serif;font-size:15px;color:#ffe79a;text-shadow:0 2px 2px rgba(0,0,0,.5);}
+  .arena-label span{display:block;font-family:-apple-system,sans-serif;font-size:11px;color:#cfe0ff;opacity:.85;}
+  /* barre Battle : carte | bouton | ticket */
+  .battle-row{display:flex;align-items:stretch;gap:8px;width:90%;max-width:430px;margin:8px 0 12px;}
+  .battle-row .battle-btn{flex:1;animation:bpulse 1.4s ease-in-out infinite;border-radius:14px;padding:14px 0;}
+  .battle-side{flex:0 0 84px;border-radius:14px;position:relative;cursor:pointer;overflow:hidden;
+    background:linear-gradient(180deg,#3a6fc4,#21478e);border:2px solid #6ea6ee;box-shadow:inset 0 2px 0 rgba(255,255,255,.25),0 4px 0 #16315f;}
+  .battle-side .ph-img{width:100%;height:100%;object-fit:cover;display:block;}
+  /* placeholders d'images à développer */
+  .ph-slot.ph{background:rgba(255,255,255,.06);border:2px dashed rgba(255,255,255,.4);}
+  .ph-slot.ph .ph-img{display:none;}
+  .ph-slot.ph::after{content:attr(data-ph);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:-apple-system,sans-serif;font-size:11px;color:rgba(255,255,255,.75);text-align:center;padding:2px;line-height:1.1;}
   /* fonds losange CSS (couleur uniforme, pas de vignette qui assombrit le bas) */
   #lobby.lobby{background:url('assets/ui_bg_lobby.png') center/cover no-repeat,#2a5fb0;}
-  #panelCards{background:url('assets/ui_bg_cards.png') center/cover no-repeat,#2a5fb0;border-radius:0;}
-  #panelShop{background:
+  /* le fond de chaque onglet remplit tout le lobby (topbar comprise), pas seulement le panneau */
+  #lobby.lobby.tab-panelCards{background:url('assets/ui_bg_cards.png') center/cover no-repeat,#2a5fb0;}
+  #lobby.lobby.tab-panelShop{background:
     repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 2px,transparent 2px 30px),
     repeating-linear-gradient(-45deg,rgba(0,0,0,.08) 0 2px,transparent 2px 30px),
     #357d33;}
-  #panelClan{background:
+  #lobby.lobby.tab-panelClan{background:
     repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 2px,transparent 2px 30px),
     repeating-linear-gradient(-45deg,rgba(0,0,0,.08) 0 2px,transparent 2px 30px),
     #5238a0;}
@@ -117,7 +157,7 @@
   .tab-ico{width:36px;height:36px;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.45));transition:transform .16s ease;transform-origin:bottom center;}
   .avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
   .f-av img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
-  #loading{background:linear-gradient(rgba(8,18,46,.30),rgba(8,18,46,.72)),url('assets/ui_splash.png') center/cover no-repeat,#0c1f55;justify-content:flex-end;padding-bottom:60px;}
+  #loading{background:linear-gradient(rgba(8,18,46,.30),rgba(8,18,46,.72)),url('assets/ui_splash.png') center/cover no-repeat,#0c1f55;justify-content:center;}
   .tab span{display:block;font-family:-apple-system,sans-serif;font-size:9px;margin-top:1px;}
   .tab:not(.sel) span{display:none;}
   .tab.sel{opacity:1;color:#fff;border-left-color:transparent;box-shadow:none;
@@ -132,20 +172,27 @@
   .tab.sel::before{content:'‹';left:-9px;}
   .tab.sel::after{content:'›';right:-9px;}
   /* 4) Matchmaking */
-  .match-vs{display:flex;align-items:center;gap:18px;margin-bottom:28px;}
-  .fighter{display:flex;flex-direction:column;align-items:center;gap:6px;animation:slidein .5s ease;}
-  .fighter.foe{animation:slideinr .5s ease;}
-  @keyframes slidein{from{transform:translateX(-60px);opacity:0}to{transform:none;opacity:1}}
-  @keyframes slideinr{from{transform:translateX(60px);opacity:0}to{transform:none;opacity:1}}
-  .f-av{width:84px;height:84px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:50px;border:3px solid #ffe79a;box-shadow:0 5px 0 rgba(0,0,0,.3);}
-  .fighter.me .f-av{background:#2f74da;} .fighter.foe .f-av{background:#e23b34;}
-  .f-name{font-size:18px;color:#fff;text-shadow:0 2px 2px rgba(0,0,0,.5);}
-  .f-tr{font-size:13px;color:#ffe79a;}
-  .vs{font-size:46px;color:#ff5c5c;text-shadow:2px 2px 0 #5a0808,-2px -2px 0 #fff,0 4px 10px rgba(0,0,0,.6);animation:vspop .6s ease;}
-  @keyframes vspop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
-  .match-status{font-size:20px;color:#ffe79a;text-shadow:0 2px 3px rgba(0,0,0,.5);margin-bottom:18px;min-height:26px;}
-  .spinner{width:42px;height:42px;border-radius:50%;border:5px solid rgba(255,255,255,.25);border-top-color:#ffce3a;animation:spin .8s linear infinite;}
-  @keyframes spin{to{transform:rotate(360deg)}}
+  /* ===== Écran VS (matchmaking façon Clash Royale) ===== */
+  #match{padding:0;justify-content:stretch;gap:0;}
+  #match::before,#match::after{display:none!important;}
+  .vs-half{flex:1 1 50%;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative;overflow:hidden;}
+  .vs-half.foe{background:radial-gradient(120% 130% at 50% 0%,#ff6b7e,#c0264a 75%,#8e1838);animation:vsdown .55s cubic-bezier(.2,.7,.3,1) both;}
+  .vs-half.me{background:radial-gradient(120% 130% at 50% 100%,#49a6ff,#1f51c8 75%,#143a93);animation:vsup .55s cubic-bezier(.2,.7,.3,1) both;}
+  @keyframes vsdown{from{transform:translateY(-101%)}to{transform:none}}
+  @keyframes vsup{from{transform:translateY(101%)}to{transform:none}}
+  .vs-arena img{width:min(70%,290px);max-height:32vh;object-fit:contain;filter:drop-shadow(0 10px 16px rgba(0,0,0,.45));}
+  .vs-half.me .vs-arena img{transform:scaleX(-1);}
+  .vs-pname{font-family:'Lilita One',sans-serif;font-size:clamp(28px,8vw,42px);color:#fff;letter-spacing:.5px;
+    text-shadow:2.5px 0 0 #181818,-2.5px 0 0 #181818,0 2.5px 0 #181818,0 -2.5px 0 #181818,2px 2px 0 #181818,-2px 2px 0 #181818,0 5px 7px rgba(0,0,0,.5);}
+  .vs-ptr{display:flex;align-items:center;gap:5px;font-family:'Lilita One',sans-serif;font-size:22px;color:#ffe066;text-shadow:0 2px 2px rgba(0,0,0,.55);}
+  .vs-ptr img{width:22px;height:22px;object-fit:contain;vertical-align:-3px;}
+  .vs-badge{position:absolute;top:50%;left:50%;width:104px;height:116px;z-index:6;
+    background:linear-gradient(180deg,#ffe98a,#e0a81c);clip-path:polygon(50% 0,100% 27%,100% 73%,50% 100%,0 73%,0 27%);
+    display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5));animation:vsbadge .5s .25s both cubic-bezier(.2,1.5,.4,1);}
+  .vs-badge::before{content:"";position:absolute;inset:7px;background:linear-gradient(180deg,#4aa6ff,#1f63d8);clip-path:polygon(50% 0,100% 27%,100% 73%,50% 100%,0 73%,0 27%);}
+  .vs-badge span{position:relative;z-index:2;font-family:'Lilita One',sans-serif;font-style:italic;font-size:38px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.4);}
+  @keyframes vsbadge{0%{transform:translate(-50%,-50%) scale(0) rotate(-30deg);opacity:0}100%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1}}
+  .match-status{position:absolute;left:0;right:0;bottom:calc(22px + var(--sab));text-align:center;font-family:'Lilita One',sans-serif;font-size:18px;color:#fff;text-shadow:0 2px 3px rgba(0,0,0,.6);z-index:6;}
   /* ===== Panneaux du lobby (Combat / Cartes / Boutique) ===== */
   .panel{flex:1 1 auto;width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center;overflow-y:auto;padding:4px 10px 24px;}
   .panel-title{font-size:22px;color:#ffe79a;margin:8px 0 2px;text-shadow:0 2px 2px rgba(0,0,0,.5);}
@@ -287,7 +334,7 @@
     padding-top:calc(24px + var(--sat));padding-bottom:calc(24px + var(--sab));
     padding-left:calc(24px + var(--sal));padding-right:calc(24px + var(--sar));}
   .overlay.lobby{padding:0;}                 /* le lobby gère ses marges via topbar/tabbar */
-  #loading{padding-bottom:calc(60px + var(--sab));}
+  #loading{padding-bottom:calc(24px + var(--sab));}
   /* Spacers flexibles : centrent le contenu quand il tient, basculent en défilement depuis le haut sinon
      (exclut le lobby en flex-start et le loading en flex-end) */
   .overlay:not(.lobby):not(#loading)::before,
@@ -323,7 +370,7 @@
   <canvas id="ui"></canvas>
   <!-- 1) STUDIO : écran noir lumineux (façon Supercell) -->
   <div id="brand" class="overlay scr">
-    <div class="brand-logo">DAMIEN<br>GAMES</div>
+    <div class="brand-logo">DAMTAMZ<br>GAMES</div>
   </div>
 
   <!-- 2) CHARGEMENT -->
@@ -335,37 +382,46 @@
 
   <!-- 3) LOBBY / MENU -->
   <div id="lobby" class="overlay scr hidden lobby">
+    <!-- Barre de devises (haut) -->
     <div class="topbar">
-      <div class="tb-left" id="profileBtn">
-        <div class="avatar"><img src="assets/ui_avatar.png" onerror="this.replaceWith('👑')"></div>
-        <div class="tb-name">
-          <div class="lvlrow"><span class="lvlbadge" id="lvlBadge">Niv 12</span><b>Manon</b></div>
-          <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
-        </div>
-      </div>
-      <div class="tb-mid">
-        <div class="arena-name" id="arenaName">Arène 7</div>
-        <div class="arena-sub" id="arenaSub">Royaume de la Mode</div>
-      </div>
-      <div class="tb-right">
-        <div class="cur cur-gold" id="goldBtn"><img src="assets/ui_coin.png" onerror="this.outerHTML='🪙'"> <span id="goldVal">2500</span></div>
-        <div class="cur cur-gem" id="gemBtn"><img src="assets/ui_gem.png" onerror="this.outerHTML='💎'"> <span id="gemVal">120</span></div>
-      </div>
-      <div class="gear" id="gearBtn"><img src="assets/ui_gear.png" onerror="this.replaceWith('⚙️')"></div>
+      <div class="cur cur-cards"><img src="assets/ui_level.png" onerror="this.outerHTML='🃏'"> <span id="lvlBadge">18</span>
+        <span class="xpbar"><span class="xpfill" id="xpFill"></span></span></div>
+      <div class="cur cur-gold" id="goldBtn"><img src="assets/ui_coin.png" onerror="this.outerHTML='🪙'"> <span id="goldVal">113</span> +</div>
+      <div class="cur cur-gem" id="gemBtn"><img src="assets/ui_gem.png" onerror="this.outerHTML='💎'"> <span id="gemVal">100</span> +</div>
     </div>
-    <div class="trophybar" id="trophyBtn"><img src="assets/ui_trophy.png" onerror="this.outerHTML='🏆'"> <b id="trophyVal">4146</b> <span class="tb-go">›</span></div>
+
+    <!-- Bandeau couronne (trophy road) + boutons + Pass Royale -->
+    <div class="lobby-head">
+      <div class="crown-banner ph-slot" id="trophyBtn" data-ph="ui_crownbanner">
+        <img class="ph-img" src="assets/ui_crownbanner.png" alt="" onerror="this.parentNode.classList.add('ph')">
+        <span class="cb-trophy"><img src="assets/ui_trophy.png" onerror="this.outerHTML='🏆'"> <b id="trophyVal">0</b></span>
+      </div>
+      <div class="head-right">
+        <div class="head-btns">
+          <div class="sqbtn ph-slot" id="friendsBtn" data-ph="👥"><img class="ph-img" src="assets/ui_btn_friends.png" onerror="this.parentNode.classList.add('ph')"></div>
+          <div class="sqbtn ph-slot" id="newsBtn" data-ph="📜"><img class="ph-img" src="assets/ui_btn_news.png" onerror="this.parentNode.classList.add('ph')"></div>
+          <div class="sqbtn ph-slot" id="gearBtn" data-ph="☰"><img class="ph-img" src="assets/ui_btn_menu.png" onerror="this.parentNode.classList.add('ph')"></div>
+        </div>
+        <div class="passroyale ph-slot" id="passBtn" data-ph="ui_passroyale"><img class="ph-img" src="assets/ui_passroyale.png" alt="" onerror="this.parentNode.classList.add('ph')"><span class="pr-txt">Pass Royale</span></div>
+      </div>
+    </div>
+
+    <!-- Nom du joueur + clan -->
+    <div class="namebar">
+      <div class="avatar" id="profileBtn"><img src="assets/ui_avatar.png" onerror="this.replaceWith('👑')"></div>
+      <div class="nb-txt"><b>manondidier</b><span class="nb-clan">No Clan</span></div>
+    </div>
 
     <!-- PANNEAU COMBAT -->
     <div class="panel" id="panelBattle">
       <div class="arena-art"><img class="arena-diorama" src="assets/ui_arena.png" onerror="this.remove()"></div>
-      <div class="diff lobby-diff">Niveau du rival :
-        <span class="diffBtn" data-d="0">Facile</span>
-        <span class="diffBtn sel" data-d="1">Normal</span>
-        <span class="diffBtn" data-d="2">Difficile</span>
-      </div>
-      <button class="btn battle-btn" id="battleBtn">⚔️ COMBATTRE</button>
-      <div class="chest-label">Tape un coffre pour l'ouvrir</div>
+      <div class="arena-label"><b id="arenaName">Arène 7</b><span id="arenaSub">Royaume de la Mode</span></div>
       <div class="chests" id="chestRow"></div>
+      <div class="battle-row">
+        <div class="battle-side ph-slot" data-ph="Carte"><img class="ph-img" src="assets/ui_battlecard.png" onerror="this.parentNode.classList.add('ph')"></div>
+        <button class="btn battle-btn" id="battleBtn">Bataille</button>
+        <div class="battle-side ph-slot" id="ticketBtn" data-ph="ui_ticket"><img class="ph-img" src="assets/ui_ticket.png" onerror="this.parentNode.classList.add('ph')"></div>
+      </div>
     </div>
 
     <!-- PANNEAU CARTES -->
@@ -411,13 +467,18 @@
 
   <!-- 4) MATCHMAKING -->
   <div id="match" class="overlay scr hidden">
-    <div class="match-vs">
-      <div class="fighter me"><div class="f-av"><img src="assets/ui_avatar.png" onerror="this.replaceWith('👑')"></div><div class="f-name">Manon</div><div class="f-tr" id="meTr">4146</div></div>
-      <div class="vs">VS</div>
-      <div class="fighter foe"><div class="f-av"><img src="assets/card_robot.png" onerror="this.replaceWith('🤖')"></div><div class="f-name" id="rivalName">Rival</div><div class="f-tr" id="rivalTr">----</div></div>
+    <div class="vs-half foe">
+      <div class="vs-arena"><img src="assets/ui_arena.png" alt="" onerror="this.style.display='none'"></div>
+      <div class="vs-pname" id="rivalName">Rival</div>
+      <div class="vs-ptr"><img src="assets/ui_trophy.png" onerror="this.outerHTML='🏆'"> <span id="rivalTr">----</span></div>
+    </div>
+    <div class="vs-badge"><span>VS</span></div>
+    <div class="vs-half me">
+      <div class="vs-arena"><img src="assets/ui_arena.png" alt="" onerror="this.style.display='none'"></div>
+      <div class="vs-pname" id="meName">Manon</div>
+      <div class="vs-ptr"><img src="assets/ui_trophy.png" onerror="this.outerHTML='🏆'"> <span id="meTr">4146</span></div>
     </div>
     <div id="matchStatus" class="match-status">Recherche d'un adversaire…</div>
-    <div class="spinner"></div>
   </div>
 
   <!-- RÉCOMPENSE / OUVERTURE DE COFFRE -->
@@ -527,6 +588,9 @@ const TEAM={me:{main:'#2f74da',hp:'#3fa9ff'},foe:{main:'#e23b34',hp:'#ff5c5c'}};
 
 // ===================== ÉTAT =====================
 let towers,units,fx,elixir,foeElixir,hand,deckIdx,selCard,timeLeft,state,last,foeTimer,intro,overtime,foePlayed,dragLogic,difficulty=1,lastTick,battleDeck;
+let shake=0;function addShake(a){shake=Math.min(0.7,shake+a);}   // secousse caméra (impacts, chute de tour) — du punch sans bouger le HUD
+let flash=0;                       // flash blanc plein écran (chute de tour)
+let crownPop={me:0,foe:0};         // pop du compteur de couronnes quand on en gagne une
 
 function mkTower(side,role,x,y){const king=role==='king';
   return {side,role,x,y,r:king?38:28,kind:'tower',active:!king,hp:king?2200:1200,max:king?2200:1200,range:king?112:122,dmg:king?70:55,atk:king?1:0.8,cd:0,hit:0};}
@@ -585,9 +649,10 @@ function castSpell(x,y,c,side){const foe=side==='foe'?'me':'foe';const M=lvlMult
     for(const t of towers)if(t.side===foe&&t.hp>0&&dist(t,{x,y})<c.radius)t.hp-=dmg*0.4;
   }
   fx.push({type:'spell',x,y,r:c.radius,t:.5,life:.5,color:c.color});
+  if(!c.heal&&!c.rage)addShake(0.16);   // un sort offensif fait trembler l'arène
 }
 function playCard(slot,x,y){const c=CARDS[hand[slot]];if(elixir<c.cost)return;
-  if(c.spell)castSpell(x,y,c,'me');else{const s=snap(x,y);spawnTroop('me',c,s.x,s.y);}
+  if(c.spell)castSpell(x,y,c,'me');else{const s=snap(x,y);spawnTroop('me',c,s.x,s.y);}   // la poussière part à l'atterrissage (cf. syncScene)
   if(typeof sfx==='function')sfx('deploy');if(typeof save==='object')save.cardsPlayed=(save.cardsPlayed||0)+1;
   elixir-=c.cost;hand[slot]=battleDeck[deckIdx];deckIdx=(deckIdx+1)%battleDeck.length;}
 
@@ -643,7 +708,8 @@ function acquire(u){
 function hurt(t,d){if(t.shield&&t.shield>0){const a=Math.min(t.shield,d);t.shield-=a;d-=a;}if(d>0)t.hp-=d;t.hit=.15;}
 function dealDamage(u,tgt,mult){const dmg=u.dmg*(mult||1)*(u.rage>0?1.4:1);
   if(u.splash>0){for(const o of units)if(validTarget(u,o)&&dist(o,tgt)<=u.splash){hurt(o,dmg);if(u.freeze)o.stun=Math.max(o.stun||0,u.freeze);}for(const t of towers)if(validTarget(u,t)&&dist(t,tgt)<=u.splash)t.hp-=dmg;fx.push({type:'spell',x:tgt.x,y:tgt.y,r:u.splash,t:.3,life:.3,color:'#ffd23f'});}
-  else{hurt(tgt,dmg);if(u.freeze&&!tgt.building)tgt.stun=Math.max(tgt.stun||0,u.freeze);}}
+  else{hurt(tgt,dmg);if(u.freeze&&!tgt.building)tgt.stun=Math.max(tgt.stun||0,u.freeze);}
+  fx.push({type:'spark',x:tgt.x,y:tgt.y,t:.22,life:.22,seed:Math.random()});}   // étincelles au point d'impact
 const BRIDGES=LANE;
 function moveToward(u,tx,ty,dt){let gx=tx,gy=ty;
   if((u.y<RIVER)!==(ty<RIVER)){const bx=Math.abs(u.x-BRIDGES[0])<Math.abs(u.x-BRIDGES[1])?BRIDGES[0]:BRIDGES[1];
@@ -702,7 +768,8 @@ function update(dt){
   aiUpdate(dt);for(const u of units)updateUnit(u,dt);separate();
   for(const u of units){u.x=Math.max(16,Math.min(W-16,u.x));u.y=Math.max(30,Math.min(AB-20,u.y));}
   for(const t of towers)updateTower(t,dt);
-  for(const t of towers)if(t.hp<=0&&!t.boomed){t.boomed=true;onTowerDown(t);fx.push({type:'boom',x:t.x,y:t.y,r:t.r,t:.5,life:.5});}
+  for(const t of towers)if(t.hp<=0&&!t.boomed){t.boomed=true;onTowerDown(t);fx.push({type:'boom',x:t.x,y:t.y,r:t.r*1.4,t:.6,life:.6});fx.push({type:'crownpop',x:t.x,y:t.y,t:1.1,life:1.1});addShake(0.5);flash=Math.min(0.55,flash+0.45);crownPop[t.side]=0.6;if(typeof sfx==='function')sfx('boom');   // chute de tour : gros boom + couronne + secousse + flash + pop couronne
+    for(let i=0;i<9;i++){const a=Math.random()*6.283,sp=18+Math.random()*30;fx.push({type:'debris',x:t.x,y:t.y,dx:Math.cos(a)*sp,dy:Math.sin(a)*sp,vUp:3+Math.random()*3.5,t:.7,life:.7,col:i%2?'#caa23a':'#8a8079'});}}   // éclats de débris
   // ☠️ zones toxiques persistantes (sort Poison) : dégâts continus aux ennemis dans la zone
   for(const f of fx)if(f.type==='poison'){const tick=f.dps*dt,foe=f.side==='foe'?'me':'foe';
     for(const u of units)if(u.side===foe&&dist(u,f)<f.r){u.hp-=tick;u.hit=.1;}
@@ -712,7 +779,7 @@ function update(dt){
     if(u.deathDmg){const dd=u.deathDmg.dmg,rr2=u.deathDmg.radius;        // 💀 mort explosive (Colossal)
       for(const o of units)if(o.side!==u.side&&o.hp>0&&dist(o,u)<rr2){o.hp-=dd;o.hit=.15;}
       for(const t of towers)if(t.side!==u.side&&t.hp>0&&dist(t,u)<rr2)t.hp-=dd;
-      fx.push({type:'boom',x:u.x,y:u.y,r:rr2,t:.45,life:.45,color:u.color});}}
+      fx.push({type:'boom',x:u.x,y:u.y,r:rr2,t:.45,life:.45,color:u.color});addShake(0.22);}}
   for(const u of units)if(u.hp<=0)removeUnitMesh(u);
   units=units.filter(u=>u.hp>0);
   for(const f of fx)f.t-=dt;fx=fx.filter(f=>f.t>0);
@@ -986,26 +1053,25 @@ function addTowerMesh(t){
   const castleKey='towercastle_cut_'+t.role+'_'+sd, pKey='towerchar_bust_'+t.role+'_'+sd, fullKey='towerfull_'+t.role+'_'+sd;
   // ----- CHÂTEAU VIDE (image) + PERSO ANIMÉ posé dessus : prioritaire -----
   if(TEXR[castleKey]){
-    const Rs=ws(t.r);
-    const sh=new THREE.Mesh(new THREE.CircleGeometry(Rs*1.2,18),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:0.28}));sh.rotation.x=-Math.PI/2;sh.position.y=0.015;g.add(sh);
     const cmap=TEX[castleKey],csp=new THREE.Sprite(new THREE.SpriteMaterial({map:cmap,transparent:true,alphaTest:0.5,depthTest:true}));
     csp.center.set(0.5,0);let ca=1;if(cmap.image&&cmap.image.width)ca=cmap.image.width/cmap.image.height;
-    const Hs=ws(t.r)*(king?4.5:4.5),sink=0;
-    csp.scale.set(Hs*ca,Hs,1);csp.position.y=0.02-sink;g.add(csp);
+    const Hs=ws(t.r)*(king?4.0:4.0);
+    csp.scale.set(Hs*ca,Hs,1);csp.position.y=0.02;g.add(csp);
     // buste animé posé DANS le rempart (devant le château, bien dimensionné)
     if(TEXR[pKey]){
       const pmap=TEX[pKey],psp=new THREE.Sprite(new THREE.SpriteMaterial({map:pmap,transparent:true,alphaTest:0.5,depthTest:false}));
       psp.center.set(0.5,0);let pa=0.7;if(pmap.image&&pmap.image.width)pa=pmap.image.width/pmap.image.height;
-      const pH=Hs*(king?0.52:0.48),pW=pH*pa;psp.scale.set(pW,pH,1);
-      psp.position.set(0,Hs*(king?0.52:0.52)-sink,0.3);psp.renderOrder=2;g.add(psp);
+      const pH=Hs*(king?0.42:0.40),pW=pH*pa;psp.scale.set(pW,pH,1);
+      const py=king?0.60:0.62;psp.position.set(0,Hs*py,0.0);psp.renderOrder=2;g.add(psp);
       t.charSpr=psp;t.charW=pW;t.charH=pH;t.charBaseY=psp.position.y;t.charAnim=true;t.phase=(t.x*1.7+t.y*0.9)%6.283;
     }
-    g.position.set(wx(t.x),0,wz(t.y));t.mesh=g;t.base=null;dynGroup&&dynGroup.add(g);return;
+    t.vy=t.y+t.r*0.95;   // décale le visuel vers le bas pour centrer la tour sur sa dalle (la barre de PV suit via t.vy)
+    g.position.set(wx(t.x),0,wz(t.vy));t.mesh=g;t.base=null;dynGroup&&dynGroup.add(g);return;
   }
   // ----- TOUR COMPLÈTE EN IMAGE (perso intégré, statique) : repli -----
   if(TEXR[fullKey]){
     const Rs=ws(t.r);
-    const sh=new THREE.Mesh(new THREE.CircleGeometry(Rs*1.2,18),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:0.28}));sh.rotation.x=-Math.PI/2;sh.position.y=0.015;g.add(sh);
+    const sh=new THREE.Mesh(new THREE.CircleGeometry(Rs*1.55,22),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:0.34}));sh.rotation.x=-Math.PI/2;sh.scale.z=0.78;sh.position.y=0.015;g.add(sh);
     const map=TEX[fullKey];const spr=new THREE.Sprite(new THREE.SpriteMaterial({map,transparent:true,alphaTest:0.5,depthTest:true}));
     spr.center.set(0.5,0);
     const im=map.image;let asp=1;if(im&&im.width&&im.height)asp=im.width/im.height;
@@ -1201,7 +1267,13 @@ function syncScene(dt){
       if(u.target){const a=Math.atan2(wx(u.target.x)-wx(u.x),wz(u.target.y)-wz(u.y));u.mesh.rotation.y=a;}
       u.mesh.position.y=u.moving?Math.abs(Math.sin((u.walk||0)*12))*0.08:0;
     }
-    u.mesh.visible=!(u.deploy>0&&Math.floor(u.deploy*12)%2===0);
+    // ----- arrivée : la troupe tombe du ciel + grossit, puis atterrit en squash + poussière -----
+    if(u.deploy>0){u.mesh.visible=true;const d=Math.min(1,u.deploy);
+      u.mesh.position.y+=d*d*5.5;u.mesh.scale.setScalar(Math.max(0.2,1-d*0.55));u._fall=true;}
+    else{u.mesh.visible=true;
+      if(u._fall){u._fall=false;u.land=0.2;fx.push({type:'ring',x:u.x,y:u.y,r:34,t:.4,life:.4,color:TEAM[u.side].main});}
+      if(u.land>0){u.land-=dt;const p=Math.sin(Math.min(1,u.land/0.2)*Math.PI);u.mesh.scale.set(1+p*0.28,Math.max(0.4,1-p*0.34),1+p*0.28);}
+      else u.mesh.scale.setScalar(1);}
   }
   for(const t of towers){if(t.mesh&&t.base){t.base.material.emissive=THREEC(t.hit>0?'#ffffff':'#000000');t.base.material.emissiveIntensity=t.hit>0?t.hit*2:0;}
     // ----- personnages des tours vivants (reine/roi respirent & balancent, archères visent & décochent) -----
@@ -1238,6 +1310,13 @@ function syncScene(dt){
   if(dragLogic&&selCard>=0&&!CARDS[hand[selCard]].spell){const valid=canDeploy(selCard,dragLogic.x,dragLogic.y),s=snap(dragLogic.x,dragLogic.y);
     previewMesh.visible=true;previewMesh.position.set(wx(s.x),0.05,wz(s.y));previewMesh.material.color=THREEC(valid?'#5cd685':'#ff5c5c');}
   else previewMesh.visible=false;
+  // ----- secousse caméra : translate la vue (pas le HUD) puis revient au repos -----
+  if(camera){if(shake>0.001){shake=Math.max(0,shake-dt*2.6);const s=shake*shake;
+      camera.position.set((Math.random()*2-1)*s*3.0,44+(Math.random()*2-1)*s*1.5,13.5+(Math.random()*2-1)*s*3.0);}
+    else if(camera.position.x!==0||camera.position.z!==13.5){camera.position.set(0,44,13.5);}}
+  if(flash>0)flash=Math.max(0,flash-dt*4);
+  if(crownPop.me>0)crownPop.me=Math.max(0,crownPop.me-dt);
+  if(crownPop.foe>0)crownPop.foe=Math.max(0,crownPop.foe-dt);
   // animation eau
   if(scene){const w=scene.children.find(o=>o.geometry&&o.geometry.type==='BoxGeometry'&&Math.abs(o.position.z-wz(RIVER))<0.01);}
 }
@@ -1249,10 +1328,12 @@ let uic,VW,VH,DPR;
 const MAXA=0.60;    // ratio l/h max : au-delà (paysage/PC) on borne pour garder tout le plateau visible
 function resize(){
   DPR=Math.min(2.75,window.devicePixelRatio||1);
-  // On mesure la taille RÉELLE du conteneur (#wrap = 100dvh en CSS, qui s'auto-corrige sur tous les écrans/encoches)
-  // au lieu de figer window.innerHeight (valeur parfois transitoire au lancement en mode app installée).
-  const wrap=document.getElementById('wrap'), rect=wrap.getBoundingClientRect();
-  const winW=Math.round(rect.width)||window.innerWidth, winH=Math.round(rect.height)||window.innerHeight;
+  // ⚠️ iOS app installée (standalone) : 100dvh/100vh sont BUGGÉS (souvent plus grands que l'écran réel,
+  // -> le bas est coupé). La seule mesure fiable du visible est visualViewport.height. On l'impose au DOM via --app-h.
+  const vv=window.visualViewport;
+  const winW=Math.round((vv&&vv.width)||window.innerWidth);
+  const winH=Math.round((vv&&vv.height)||window.innerHeight);
+  document.documentElement.style.setProperty('--app-h', winH+'px');
   let cw=winW, ch=winH, left=0, top=0, aspect=cw/ch;
   if(aspect>MAXA){ cw=Math.round(ch*MAXA); left=Math.round((winW-cw)/2); aspect=MAXA; }   // écran trop large : on centre
   VW=cw; VH=ch;
@@ -1270,9 +1351,9 @@ function resize(){
 window.addEventListener('resize',resize);
 window.addEventListener('orientationchange',()=>{resize();setTimeout(resize,300);});
 window.addEventListener('pageshow',resize);   // retour depuis l'arrière-plan (app installée)
-if(window.visualViewport)window.visualViewport.addEventListener('resize',resize);
-// iOS standalone : la hauteur peut se stabiliser un instant après le lancement -> on re-mesure
-[150,500,1200].forEach(ms=>setTimeout(()=>{try{resize();}catch(e){}},ms));
+if(window.visualViewport){window.visualViewport.addEventListener('resize',resize);window.visualViewport.addEventListener('scroll',resize);}
+// iOS standalone : la hauteur peut se stabiliser un instant après le lancement -> on re-mesure plusieurs fois
+[60,150,300,500,900,1500,2500].forEach(ms=>setTimeout(()=>{try{resize();}catch(e){}},ms));
 function rr(x,y,w,h,r){uic.beginPath();uic.moveTo(x+r,y);uic.arcTo(x+w,y,x+w,y+h,r);uic.arcTo(x+w,y+h,x,y+h,r);uic.arcTo(x,y+h,x,y,r);uic.arcTo(x,y,x+w,y,r);uic.closePath();}
 // image de carte (object-fit: cover) si dispo, sinon null
 function cardImg(key){const im=IMG['card_'+key];return (im&&im.complete&&im.naturalWidth)?im:null;}
@@ -1314,13 +1395,23 @@ function drawWorldFx(){
       uic.globalAlpha=0.6;uic.strokeStyle='#3f8a2a';uic.lineWidth=2;uic.beginPath();uic.arc(s.x,s.y,R,0,7);uic.stroke();uic.globalAlpha=1;}
     else if(f.type==='poof'){const R=f.r*sc*(0.5+p);uic.globalAlpha=(1-p)*0.6;uic.fillStyle=f.color||'#fff';
       uic.beginPath();uic.arc(s.x,s.y,R,0,7);uic.fill();uic.globalAlpha=1;}
+    else if(f.type==='spark'){const rad=4+p*16,seed=(f.seed||0)*6.283;uic.globalAlpha=(1-p);   // ✨ gerbe d'étincelles à l'impact
+      uic.strokeStyle='#fff2c0';uic.lineWidth=2.2;uic.lineCap='round';
+      for(let i=0;i<6;i++){const a=seed+i*1.0472;uic.beginPath();uic.moveTo(s.x+Math.cos(a)*rad*0.45,s.y+Math.sin(a)*rad*0.45);uic.lineTo(s.x+Math.cos(a)*rad,s.y+Math.sin(a)*rad);uic.stroke();}
+      uic.globalAlpha=(1-p)*0.9;uic.fillStyle='#fff';uic.beginPath();uic.arc(s.x,s.y,2+(1-p)*2.5,0,7);uic.fill();uic.globalAlpha=1;}
+    else if(f.type==='ring'){const R=f.r*sc*(0.3+p*1.0);uic.globalAlpha=(1-p)*0.75;   // 💨 onde de poussière au sol (déploiement)
+      uic.strokeStyle=f.color||'#ffe6a8';uic.lineWidth=(1-p)*3+1;uic.beginPath();
+      if(uic.ellipse)uic.ellipse(s.x,s.y,R,R*0.5,0,0,7);else uic.arc(s.x,s.y,R,0,7);uic.stroke();uic.globalAlpha=1;}
+    else if(f.type==='crownpop'){const cs2=worldToScreen(f.x,f.y,1.2+p*2.8);if(!cs2.vis)continue;   // 👑 couronne qui s'envole quand une tour tombe
+      const a=p<0.18?p/0.18:1-(p-0.18)/0.82;uic.globalAlpha=Math.max(0,a);uic.textAlign='center';uic.textBaseline='middle';
+      uic.font=crFont(34+p*18);uic.fillText('👑',cs2.x,cs2.y);uic.textBaseline='alphabetic';uic.textAlign='left';uic.globalAlpha=1;}
   }
 }
 function drawHUD(){
   uic.clearRect(0,0,VW,VH);
   drawWorldFx();
   // barres de vie tours
-  for(const t of towers){const s=worldToScreen(t.x,t.y,(t.role==='king'?3.2:2.7));if(!s.vis)continue;
+  for(const t of towers){const s=worldToScreen(t.x,(t.vy!=null?t.vy:t.y),(t.role==='king'?3.2:2.7));if(!s.vis)continue;
     const lvl=t.level||1,col=TEAM[t.side].hp,colD=TEAM[t.side].main,ratio=Math.max(0,t.hp/t.max);
     const bw=54,bh=12,R0=bh/2,badge=11,bx=s.x-bw/2+badge*0.5,by=s.y;
     // piste (pill arrondie + contour sombre)
@@ -1455,6 +1546,9 @@ function drawCards(){
     else uic.fillStyle=part?'#7a2f8a':'#3a2440';
     rr(sx,ey,sw,elixH,3);uic.fill();
     if(full){uic.fillStyle='rgba(255,255,255,.45)';rr(sx,ey,sw,elixH*0.42,3);uic.fill();}}
+  if(elixir>=10){const pl=0.5+0.5*Math.sin(ANIMT*7);uic.save();          // ⚡ élixir plein : scintillement doré pulsé
+    uic.globalAlpha=0.22+pl*0.3;uic.fillStyle='#ffe27a';rr(elx-2,ey-2,ew+4,elixH+4,(elixH+4)/2);uic.fill();
+    uic.globalAlpha=0.45+pl*0.4;uic.lineWidth=2;uic.strokeStyle='#fff3b0';rr(elx-3,ey-3,ew+6,elixH+6,(elixH+6)/2);uic.stroke();uic.restore();}
   elixDrop(lw+13,ey+elixH/2,14,Math.floor(elixir),false);
   uic.textAlign='left';crText('Max: 10',elx,ey+elixH+11,8,'#f0e2bf','#3a2614',2.5);
   // ----- carte suivante (bas-gauche) -----
@@ -1665,6 +1759,7 @@ function openReward(type){const T=CHEST_TYPES[type];const r=openChest(type);sfx(
 function switchTab(panel,el){sfx('click');
   document.querySelectorAll('#lobby .panel').forEach(p=>p.classList.add('hidden'));
   document.getElementById(panel).classList.remove('hidden');
+  const lob=document.getElementById('lobby');lob.className=lob.className.replace(/\btab-\w+/g,'').trim()+' tab-'+panel;
   document.querySelectorAll('.tabbar .tab').forEach(t=>t.classList.remove('sel'));if(el)el.classList.add('sel');
   if(panel==='panelCards')renderCards();
   else if(panel==='panelShop')renderShop();
@@ -1677,10 +1772,10 @@ let actx;
 function sfx(type){if(!save||!save.sound)return;
   try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();
     const t=actx.currentTime,o=actx.createOscillator(),g=actx.createGain();o.connect(g);g.connect(actx.destination);
-    const P={click:[620,.06,'square'],deploy:[300,.12,'sawtooth'],up:[760,.18,'triangle'],chest:[440,.32,'sine'],win:[660,.45,'triangle'],lose:[200,.5,'sawtooth'],coin:[1040,.08,'square'],error:[140,.18,'square']}[type]||[500,.07,'square'];
+    const P={click:[620,.06,'square'],deploy:[300,.12,'sawtooth'],up:[760,.18,'triangle'],chest:[440,.32,'sine'],win:[660,.45,'triangle'],lose:[200,.5,'sawtooth'],coin:[1040,.08,'square'],error:[140,.18,'square'],boom:[130,.5,'sawtooth']}[type]||[500,.07,'square'];
     o.type=P[2];o.frequency.setValueAtTime(P[0],t);
     if(type==='win')o.frequency.exponentialRampToValueAtTime(P[0]*2,t+P[1]);
-    if(type==='lose')o.frequency.exponentialRampToValueAtTime(P[0]*.5,t+P[1]);
+    if(type==='lose'||type==='boom')o.frequency.exponentialRampToValueAtTime(P[0]*.5,t+P[1]);
     g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.14,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+P[1]);
     o.start(t);o.stop(t+P[1]+.03);}catch(e){}}
 
@@ -1802,7 +1897,6 @@ document.getElementById('rewardBtn').onclick=()=>{sfx('click');showLobby();};
 document.getElementById('challengeBtn').onclick=()=>{sfx('click');startMatch();};
 document.querySelectorAll('.tabbar .tab').forEach(t=>t.onclick=()=>{
   if(t.dataset.panel)switchTab(t.dataset.panel,t);else toast('🚧 Bientôt disponible !');});
-document.querySelectorAll('.diffBtn').forEach(b=>b.onclick=()=>{sfx('click');difficulty=+b.dataset.d;document.querySelectorAll('.diffBtn').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');});
 // éléments cliquables du lobby
 document.getElementById('profileBtn').onclick=()=>{sfx('click');openProfile();};
 document.getElementById('gearBtn').onclick=()=>{sfx('click');openSettings();};

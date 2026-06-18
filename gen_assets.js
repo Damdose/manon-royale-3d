@@ -50,6 +50,14 @@ const ASSETS_LIST={
   quilt_green:{type:'bg',prompt:BG+"Seamless quilted diamond pattern background, soft padded tufted 3D diamonds (like quilted leather), rich GREEN, subtle highlight and shadow on each diamond, smooth glossy, even lighting, full vertical mobile UI background, perfectly tileable, no characters."},
   quilt_purple:{type:'bg',prompt:BG+"Seamless quilted diamond pattern background, soft padded tufted 3D diamonds (like quilted leather), deep PURPLE, subtle highlight and shadow on each diamond, smooth glossy, even lighting, full vertical mobile UI background, perfectly tileable, no characters."},
   gear:{type:'icon',prompt:"a mobile game settings gear cog icon, metallic, bold simple glossy 3D."},
+  // ---- en-tête lobby façon Clash Royale (widgets sur fond blanc, à détourer) ----
+  crownbanner:{type:'icon',aspect:'16:9',prompt:"a horizontal trophy-road banner plaque: a big shiny 3D golden royal crown sitting on a wooden plaque with a blue ribbon and a few small diamond gems, ornate, glossy."},
+  passroyale:{type:'icon',aspect:'16:9',prompt:"a horizontal premium golden 'season pass' banner button, ornate gold ribbon frame, a glowing blue crown emblem badge on the right side, rich and shiny, NO letters, NO words, NO text."},
+  ticket:{type:'icon',aspect:'3:4',prompt:"a single blue event entry ticket voucher with perforated edges and a golden trophy cup emblem in the center, glossy."},
+  battlecard:{type:'icon',aspect:'3:4',prompt:"a single Clash Royale style trading card with a blue and gold frame showing a friendly cartoon king character portrait, a small purple elixir cost gem badge in the top-left corner, glossy."},
+  btn_friends:{type:'icon',prompt:"two stylized white-and-blue person silhouettes side by side (a friends / social icon), bold simple glossy 3D, single free-standing object, no tile, no frame."},
+  btn_news:{type:'icon',prompt:"a rolled parchment scroll with a small golden crown badge (a news / notice icon), bold simple glossy 3D, single free-standing object, no tile, no frame."},
+  btn_menu:{type:'icon',prompt:"three thick horizontal rounded bars stacked (a hamburger menu icon), white and light blue, bold simple glossy 3D, single free-standing object, no tile, no frame."},
 };
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -57,7 +65,7 @@ async function genOne(key){
   const a=ASSETS_LIST[key];const out=path.join(ASSETS,'ui_'+key+'.png');
   if(fs.existsSync(out)&&!process.env.FORCE){console.log(`\n• ${key} déjà fait (skip)`);return true;}
   const prompt=(a.type==='bg'?a.prompt:ICON+a.prompt);
-  const aspect=a.type==='bg'?'9:16':'1:1';
+  const aspect=a.aspect||(a.type==='bg'?'9:16':'1:1');
   process.stdout.write(`\n🎨 ${key} [${a.type}] … `);
   let r=await fetch(CREATE,{method:'POST',headers:{'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},
     body:JSON.stringify({model:MODEL,input:{prompt,aspect_ratio:aspect,output_format:'png',resolution:'2K'}})});
