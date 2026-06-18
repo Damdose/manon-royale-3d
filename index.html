@@ -85,9 +85,10 @@
     box-shadow:0 3px 0 #a9760f,inset 0 2px 0 rgba(255,255,255,.5);text-shadow:0 2px 0 rgba(140,90,10,.6);
     clip-path:polygon(3% 0,97% 0,100% 50%,97% 100%,3% 100%,0 50%);}
   .trophybar{margin-top:6px;background:linear-gradient(180deg,#2a2038,#140c22);border:2px solid #caa23a;border-radius:14px;padding:5px 18px;font-size:20px;color:#ffe79a;display:flex;gap:8px;align-items:center;text-shadow:0 2px 2px rgba(0,0,0,.6);}
-  .arena-art{flex:1 1 auto;display:flex;align-items:center;justify-content:center;position:relative;width:100%;min-height:110px;}
+  .arena-art{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;width:100%;overflow:hidden;}
   .king-tower{font-size:clamp(70px,22vw,120px);filter:drop-shadow(0 10px 12px rgba(0,0,0,.5));animation:bobv 3s ease-in-out infinite;}
-  .arena-diorama{width:min(78%,300px);object-fit:contain;filter:drop-shadow(0 12px 14px rgba(0,0,0,.45));animation:bobv 3.4s ease-in-out infinite;}
+  /* image bornée en largeur ET hauteur -> tient toujours dans son conteneur, ne déborde jamais sur le texte */
+  .arena-diorama{max-width:min(80%,300px);max-height:94%;width:auto;height:auto;object-fit:contain;filter:drop-shadow(0 12px 14px rgba(0,0,0,.45));animation:bobv 3.4s ease-in-out infinite;}
   .gear img{width:30px;height:30px;object-fit:contain;}
   .floaty{position:absolute;font-size:34px;opacity:.92;animation:bobv 2.6s ease-in-out infinite;}
   .floaty.f1{left:18%;top:18%;} .floaty.f2{right:16%;top:30%;animation-delay:.6s;} .floaty.f3{left:26%;bottom:14%;animation-delay:1.2s;}
@@ -199,7 +200,7 @@
   @keyframes vsbadge{0%{transform:translate(-50%,-50%) scale(0) rotate(-30deg);opacity:0}100%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1}}
   .match-status{position:absolute;left:0;right:0;bottom:calc(22px + var(--sab));text-align:center;font-family:'Supercell Magic','Lilita One',sans-serif;font-size:18px;color:#fff;text-shadow:0 2px 3px rgba(0,0,0,.6);z-index:6;}
   /* ===== Panneaux du lobby (Combat / Cartes / Boutique) ===== */
-  .panel{flex:1 1 auto;width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center;overflow-y:auto;padding:4px 10px 24px;}
+  .panel{flex:1 1 auto;min-height:0;width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center;overflow-y:auto;padding:4px 10px 24px;}
   .panel-title{font-size:22px;color:#ffe79a;margin:8px 0 2px;text-shadow:0 2px 2px rgba(0,0,0,.5);}
   .panel-sub{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:11px;color:#cfe0ff;opacity:.85;margin-bottom:12px;text-align:center;}
   .chest-label{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:10px;color:#cfe0ff;opacity:.8;margin-top:8px;}
