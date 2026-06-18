@@ -1095,12 +1095,14 @@ function addTowerMesh(t){
   // ----- TOUR COMPLÈTE EN IMAGE (perso intégré, statique) : repli -----
   if(TEXR[fullKey]){
     const Rs=ws(t.r);
-    const sh=new THREE.Mesh(new THREE.CircleGeometry(Rs*1.55,22),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:0.34}));sh.rotation.x=-Math.PI/2;sh.scale.z=0.78;sh.position.y=0.015;g.add(sh);
+    const seat=t.r*0.6;            // avance la tour pour poser sa base pile sur la dalle peinte de l'arène
+    t.vy=t.y+seat;                 // la barre de PV (et le centre visuel) suivent la base posée
+    // PAS d'ombre ronde sous la tour (refusée par l'utilisateur : accentue le flottement)
     const map=TEX[fullKey];const spr=new THREE.Sprite(new THREE.SpriteMaterial({map,transparent:true,alphaTest:0.5,depthTest:true}));
     spr.center.set(0.5,0);
     const im=map.image;let asp=1;if(im&&im.width&&im.height)asp=im.width/im.height;
-    const Hs=ws(t.r)*(king?5.5:5.2);spr.scale.set(Hs*asp,Hs,1);spr.position.y=0.02;g.add(spr);
-    g.position.set(wx(t.x),0,wz(t.y));t.mesh=g;t.base=null;dynGroup&&dynGroup.add(g);return;
+    const Hs=ws(t.r)*(king?4.5:4.4);spr.scale.set(Hs*asp,Hs,1);spr.position.y=0.02;g.add(spr);
+    g.position.set(wx(t.x),0,wz(t.vy));t.mesh=g;t.base=null;dynGroup&&dynGroup.add(g);return;
   }
   // ----- TOUR EN PIERRE 3D (repli si pas d'image) : pierre grise dominante, accents d'équipe -----
   const R=ws(t.r), sz=R*1.4, wallH=king?1.95:1.5;
@@ -1353,10 +1355,24 @@ function worldToScreen(x,y,h){const v=new THREE.Vector3(wx(x),h||0,wz(y));v.proj
 // ===================== OVERLAY 2D (HUD) =====================
 let uic,VW,VH,DPR;
 const MAXA=0.60;    // ratio l/h max : au-delà (paysage/PC) on borne pour garder tout le plateau visible
+// Mesure les safe-area en JS (plus fiable que le CSS env() seul au démarrage à froid iOS) et les impose en variables CSS.
+function measureInset(side){
+  const el=document.createElement('div');
+  el.style.cssText='position:fixed;top:0;left:0;visibility:hidden;pointer-events:none;width:env(safe-area-inset-'+side+',0px);height:env(safe-area-inset-'+side+',0px);';
+  document.body.appendChild(el); const r=el.getBoundingClientRect(); el.remove();
+  return Math.round(Math.max(r.width,r.height));
+}
+function applyInsets(){
+  const s=document.documentElement.style;
+  s.setProperty('--sat',measureInset('top')+'px');
+  s.setProperty('--sab',measureInset('bottom')+'px');
+  s.setProperty('--sal',measureInset('left')+'px');
+  s.setProperty('--sar',measureInset('right')+'px');
+}
 function resize(){
   DPR=Math.min(2.75,window.devicePixelRatio||1);
-  // #wrap est en position:fixed inset:0 -> le navigateur le fait remplir l'écran RÉEL (standalone comme navigateur).
-  // On mesure SA boîte réelle : aucune dépendance à 100vh/dvh/visualViewport (tous foireux en app installée iOS).
+  applyInsets();   // ré-applique les marges d'encoche/barre home à chaque mesure (corrige le env()=0 au lancement)
+  // #wrap est en position:fixed 100vw/100vh -> le navigateur le fait remplir l'écran réel. On mesure SA boîte réelle.
   const wrap=document.getElementById('wrap'), rect=wrap.getBoundingClientRect();
   const winW=Math.round(rect.width)||window.innerWidth, winH=Math.round(rect.height)||window.innerHeight;
   let cw=winW, ch=winH, left=0, top=0, aspect=cw/ch;
@@ -2026,7 +2042,7 @@ if('serviceWorker' in navigator){
 <script>
 // Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
 (function(){
-  var BUILD='v14';
+  var BUILD='v15';
   // Badge de version tapotable (coin bas-droit). Un appui ouvre/ferme le diagnostic — marche aussi en app installée.
   var tag=document.createElement('div');
   tag.textContent=BUILD;
