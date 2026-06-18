@@ -179,15 +179,22 @@
   .tab.sel::after{content:'›';right:-9px;}
   /* 4) Matchmaking */
   /* ===== Écran VS (matchmaking façon Clash Royale) ===== */
-  #match{padding:0;justify-content:stretch;gap:0;}
+  #match{padding:0;justify-content:stretch;gap:0;background:transparent;}
   #match::before,#match::after{display:none!important;}
-  .vs-half{flex:1 1 50%;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative;overflow:hidden;}
-  .vs-half.foe{background:radial-gradient(120% 130% at 50% 0%,#ff6b7e,#c0264a 75%,#8e1838);animation:vsdown .55s cubic-bezier(.2,.7,.3,1) both;}
-  .vs-half.me{background:radial-gradient(120% 130% at 50% 100%,#49a6ff,#1f51c8 75%,#143a93);animation:vsup .55s cubic-bezier(.2,.7,.3,1) both;}
+  .vs-half{flex:1 1 50%;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden;}
+  /* fond = arène 3D vivante (canvas) teintée rouge en haut / bleu en bas */
+  .vs-half.foe{background:linear-gradient(180deg,rgba(214,42,70,.60) 0%,rgba(150,22,48,.74) 100%);animation:vsdown .55s cubic-bezier(.2,.7,.3,1) both;}
+  .vs-half.me{background:linear-gradient(180deg,rgba(34,86,206,.74) 0%,rgba(22,60,168,.60) 100%);animation:vsup .55s cubic-bezier(.2,.7,.3,1) both;}
   @keyframes vsdown{from{transform:translateY(-101%)}to{transform:none}}
   @keyframes vsup{from{transform:translateY(101%)}to{transform:none}}
-  .vs-arena img{width:min(70%,290px);max-height:32vh;object-fit:contain;filter:drop-shadow(0 10px 16px rgba(0,0,0,.45));}
-  .vs-half.me .vs-arena img{transform:scaleX(-1);}
+  /* bannière drapeau (flag ribbon) tenant l'illustration de l'adversaire */
+  .vsflag{position:relative;width:min(82%,360px);aspect-ratio:1000/420;padding:7px;
+    background:linear-gradient(180deg,#7cc6f7,#2c7fd2);
+    clip-path:polygon(0 0,100% 0,90% 50%,100% 100%,0 100%,10% 50%);
+    filter:drop-shadow(0 9px 14px rgba(0,0,0,.45));}
+  .vsflag img{width:100%;height:100%;object-fit:cover;display:block;
+    clip-path:polygon(0 0,100% 0,89% 50%,100% 100%,0 100%,11% 50%);}
+  .vs-crown{width:min(88%,380px);object-fit:contain;filter:drop-shadow(0 9px 14px rgba(0,0,0,.45));}
   .vs-pname{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:clamp(28px,8vw,42px);color:#fff;letter-spacing:.5px;
     text-shadow:2.5px 0 0 #181818,-2.5px 0 0 #181818,0 2.5px 0 #181818,0 -2.5px 0 #181818,2px 2px 0 #181818,-2px 2px 0 #181818,0 5px 7px rgba(0,0,0,.5);}
   .vs-ptr{display:flex;align-items:center;gap:5px;font-family:'Supercell Magic','Lilita One',sans-serif;font-size:22px;color:#ffe066;text-shadow:0 2px 2px rgba(0,0,0,.55);}
@@ -474,13 +481,13 @@
   <!-- 4) MATCHMAKING -->
   <div id="match" class="overlay scr hidden">
     <div class="vs-half foe">
-      <div class="vs-arena"><img src="assets/ui_arena.png" alt="" onerror="this.style.display='none'"></div>
+      <div class="vsflag"><img src="assets/ui_arena.png" alt="" onerror="this.parentNode.style.display='none'"></div>
       <div class="vs-pname" id="rivalName">Rival</div>
       <div class="vs-ptr"><img src="assets/ui_trophy.png" onerror="this.outerHTML='🏆'"> <span id="rivalTr">----</span></div>
     </div>
     <div class="vs-badge"><span>VS</span></div>
     <div class="vs-half me">
-      <div class="vs-arena"><img src="assets/ui_arena.png" alt="" onerror="this.style.display='none'"></div>
+      <img class="vs-crown" src="assets/ui_crownbanner.png" alt="" onerror="this.style.display='none'">
       <div class="vs-pname" id="meName">Manon</div>
       <div class="vs-ptr"><img src="assets/ui_trophy.png" onerror="this.outerHTML='🏆'"> <span id="meTr">4146</span></div>
     </div>
@@ -545,7 +552,7 @@ const W=480;
 const COLS=18, ROWS=32, TILE=W/COLS;            // tuile carrée (≈26,7 px)
 const AB=ROWS*TILE, RIVER=AB/2;                 // terrain au ratio réel 18:32 (≈0,56)
 const LANE=[W*0.194, W*0.806];                  // ponts & lanes : colonnes ~3,5 et 14,5
-const ROW_KING=2.5*TILE, ROW_PRINCESS=6.5*TILE; // rangées des tours (côté adverse)
+const ROW_KING=AB*0.10, ROW_PRINCESS=AB*0.168; // alignées sur les dalles de l'arène (assets/arena.png)
 function snap(x,y){return {x:(Math.floor(x/TILE)+0.5)*TILE, y:(Math.floor(y/TILE)+0.5)*TILE};}
 
 // ===================== CARTES =====================
@@ -841,6 +848,11 @@ function groundTexture(){
 const OUT='#2a1c12';
 function _cv(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.lineJoin='round';x.lineCap='round';return [c,x];}
 function _tex(c){const t=new THREE.CanvasTexture(c);t.anisotropy=4;if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;return t;}
+// ombre « blob » douce (dégradé radial) partagée par toutes les troupes — bords flous au lieu d'un disque net
+let _shTex;
+function softShadowTex(){if(_shTex)return _shTex;const[c,x]=_cv(64,64);
+  const g=x.createRadialGradient(32,32,2,32,32,31);g.addColorStop(0,'rgba(0,0,0,.42)');g.addColorStop(.55,'rgba(0,0,0,.24)');g.addColorStop(1,'rgba(0,0,0,0)');
+  x.fillStyle=g;x.beginPath();x.arc(32,32,32,0,7);x.fill();_shTex=new THREE.CanvasTexture(c);return _shTex;}
 function _circ(x,cx,cy,r,f,o){x.beginPath();x.arc(cx,cy,r,0,7);if(f){x.fillStyle=f;x.fill();}if(o){x.lineWidth=o;x.strokeStyle=OUT;x.stroke();}}
 function _ell(x,cx,cy,rx,ry,f,o,rot){x.save();x.translate(cx,cy);if(rot)x.rotate(rot);x.beginPath();x.ellipse(0,0,rx,ry,0,0,7);if(f){x.fillStyle=f;x.fill();}if(o){x.lineWidth=o;x.strokeStyle=OUT;x.stroke();}x.restore();}
 function _rr(x,a,b,w,h,r,f,o){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath();if(f){x.fillStyle=f;x.fill();}if(o){x.lineWidth=o;x.strokeStyle=OUT;x.stroke();}}
@@ -1075,7 +1087,7 @@ function addTowerMesh(t){
       psp.position.set(0,0.02+Hs*(1-cf.f),0.0);psp.renderOrder=2;g.add(psp);
       t.charSpr=psp;t.charW=pW;t.charH=pH;t.charBaseY=psp.position.y;t.charAnim=true;t.phase=(t.x*1.7+t.y*0.9)%6.283;
     }
-    t.vy=t.y+t.r*0.7;   // recentre la tour sur sa dalle (sinon sa masse paraît trop haute) ; la barre de PV suit via t.vy
+    t.vy=t.y+t.r*0.85;   // pose la base large de la tour sur la dalle peinte de l'arène ; la barre de PV suit via t.vy
     g.position.set(wx(t.x),0,wz(t.vy));t.mesh=g;t.base=null;dynGroup&&dynGroup.add(g);return;
   }
   // ----- TOUR COMPLÈTE EN IMAGE (perso intégré, statique) : repli -----
@@ -1192,7 +1204,9 @@ function addUnitMesh(u){
   ring.rotation.x=-Math.PI/2;ring.position.y=0.02;g.add(ring);
   const tkey='troop_'+u.kind;
   if(TEXR[tkey]){
-    const sh=new THREE.Mesh(new THREE.CircleGeometry(R*1.15,18),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:0.3}));sh.rotation.x=-Math.PI/2;sh.position.y=0.012;g.add(sh);
+    // ombre douce décalée dans la direction du soleil (façon vraies ombres du décor) + légèrement aplatie
+    const sh=new THREE.Mesh(new THREE.PlaneGeometry(R*2.7,R*2.7),new THREE.MeshBasicMaterial({map:softShadowTex(),transparent:true,depthWrite:false}));
+    sh.rotation.x=-Math.PI/2;sh.scale.set(1,1.18,1);sh.position.set(R*0.2,0.012,-R*0.26);g.add(sh);
     let map=TEX[tkey];const sheet=SHEET[u.kind];   // texture animée (clone par unité => cycles indépendants)
     if(sheet){map=map.clone();map.needsUpdate=true;map.wrapS=THREE.RepeatWrapping;map.repeat.x=1/sheet.frames;u.sprSheet=sheet;u.sprTex=map;}
     const spr=new THREE.Sprite(new THREE.SpriteMaterial({map,transparent:true,alphaTest:0.5,depthTest:true}));
@@ -1993,6 +2007,27 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').then(reg=>{ reg.update(); }).catch(()=>{});
   });
 }
+</script>
+<script>
+// Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
+(function(){
+  var BUILD='v12';
+  var tag=document.createElement('div');
+  tag.textContent=BUILD;
+  tag.style.cssText='position:fixed;z-index:99998;right:calc(5px + env(safe-area-inset-right));bottom:calc(3px + env(safe-area-inset-bottom));font:10px/1 monospace;color:rgba(255,255,255,.45);pointer-events:none;';
+  document.body.appendChild(tag);
+  if(location.search.indexOf('debug')>=0){
+    var probe=document.createElement('div');
+    probe.style.cssText='position:fixed;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);visibility:hidden;';
+    document.body.appendChild(probe);
+    var cs=getComputedStyle(probe);
+    var box=document.createElement('div');
+    box.style.cssText='position:fixed;z-index:99999;left:50%;top:46%;transform:translate(-50%,-50%);background:rgba(0,0,0,.88);color:#0f0;font:13px/1.7 monospace;padding:16px 18px;border-radius:12px;white-space:pre;text-align:left;';
+    function upd(){var vv=window.visualViewport;var w=document.getElementById('wrap').getBoundingClientRect();
+      box.textContent='BUILD '+BUILD+'\nscreen '+screen.width+'x'+screen.height+'\ninner  '+window.innerWidth+'x'+window.innerHeight+'\nvisVP  '+(vv?Math.round(vv.width)+'x'+Math.round(vv.height):'-')+'\nwrap   '+Math.round(w.width)+'x'+Math.round(w.height)+'\nDPR    '+window.devicePixelRatio+'\nsafe   T'+cs.paddingTop+' B'+cs.paddingBottom+'\n       L'+cs.paddingLeft+' R'+cs.paddingRight+'\nstandalone '+(matchMedia('(display-mode:standalone)').matches||!!navigator.standalone);}
+    upd();document.body.appendChild(box);addEventListener('resize',upd);if(window.visualViewport)visualViewport.addEventListener('resize',upd);
+  }
+})();
 </script>
 </body>
 </html>
