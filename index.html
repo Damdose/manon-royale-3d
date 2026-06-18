@@ -753,7 +753,10 @@ function separate(){for(let i=0;i<units.length;i++)for(let j=i+1;j<units.length;
   const d=dist(a,b),m=a.r+b.r;if(d>0&&d<m){const p=(m-d)/2,an=Math.atan2(b.y-a.y,b.x-a.x);a.x-=Math.cos(an)*p;a.y-=Math.sin(an)*p;b.x+=Math.cos(an)*p;b.y+=Math.sin(an)*p;}}}
 function updateTower(t,dt){if(t.hp<=0||!t.active)return;if(t.hit>0)t.hit-=dt;let tgt=null,bd=1e9;
   for(const o of units){if(o.side===t.side||o.hp<=0||o.building||o.deploy>0||(o.invis&&o.moving))continue;const d=dist(t,o);if(d<t.range&&d<bd){bd=d;tgt=o;}}
-  if(tgt){t.cd-=dt;if(t.cd<=0){hurt(tgt,t.dmg);t.cd=t.atk;t.swing=0.2;fx.push({type:'shot',x:t.x,y:t.y,tx:tgt.x,ty:tgt.y,t:.12,life:.12});}}}
+  if(tgt){t.cd-=dt;if(t.cd<=0){hurt(tgt,t.dmg);t.cd=t.atk;t.swing=0.22;
+    // le tir part DU perso sur le rempart (position posée t.vy + hauteur t.shootH), pas du sol
+    fx.push({type:'shot',x:t.x,y:(t.vy!=null?t.vy:t.y),tx:tgt.x,ty:tgt.y,h0:(t.shootH||(t.role==='king'?2.4:1.8)),t:.18,life:.18,tower:true});
+    fx.push({type:'spark',x:t.x,y:(t.vy!=null?t.vy:t.y),h:(t.shootH||2),t:.16,life:.16,seed:Math.random()});}}}
 function endGame(res){state='over';const T=document.getElementById('overTitle');
   const rn=document.getElementById('rivalName');document.getElementById('overFoeName').textContent=(rn&&rn.textContent)||'Robot DamtamZ';
   T.textContent=res==='win'?'Victoire !':res==='lose'?'Défaite':'Égalité';
@@ -1097,13 +1100,14 @@ function addTowerMesh(t){
   // ----- TOUR COMPLÈTE EN IMAGE (perso intégré, statique) : repli -----
   if(TEXR[fullKey]){
     const Rs=ws(t.r);
-    const seat=t.r*0.6;            // avance la tour pour poser sa base pile sur la dalle peinte de l'arène
+    const seat=t.r*1.0;            // avance la tour pour COUVRIR la dalle de l'arène (plus de slab qui dépasse, juste un liseré de terre façon CR)
     t.vy=t.y+seat;                 // la barre de PV (et le centre visuel) suivent la base posée
     // PAS d'ombre ronde sous la tour (refusée par l'utilisateur : accentue le flottement)
     const map=TEX[fullKey];const spr=new THREE.Sprite(new THREE.SpriteMaterial({map,transparent:true,alphaTest:0.5,depthTest:true}));
     spr.center.set(0.5,0);
     const im=map.image;let asp=1;if(im&&im.width&&im.height)asp=im.width/im.height;
     const Hs=ws(t.r)*(king?4.5:4.4);spr.scale.set(Hs*asp,Hs,1);spr.position.y=0.02;g.add(spr);
+    t.fullSpr=spr;t.fullAsp=asp;t.fullH=Hs;t.shootH=Hs*0.58;   // hauteur du perso sur le rempart (origine des tirs)
     g.position.set(wx(t.x),0,wz(t.vy));t.mesh=g;t.base=null;dynGroup&&dynGroup.add(g);return;
   }
   // ----- TOUR EN PIERRE 3D (repli si pas d'image) : pierre grise dominante, accents d'équipe -----
@@ -1336,6 +1340,14 @@ function syncScene(dt){
       cs.scale.x=t.charW*sx;cs.scale.y=t.charH*sy;cs.position.y=t.charBaseY+lift;
       const col=cs.material.color;if(t.hit>0){const f=Math.min(1,t.hit/0.15);col.setRGB(1,1-0.4*f,1-0.6*f);}else col.setRGB(1,1,1);
     }
+    // tour COMPLÈTE (image figée) : léger recul au tir + flash quand touchée (donne vie sans casser le placement)
+    const fs=t.fullSpr;
+    if(fs&&t.hp>0){
+      if(t.swing>0)t.swing-=dt;
+      const pk=t.swing>0?Math.sin(Math.min(1,t.swing/0.22)*Math.PI):0;
+      fs.scale.x=t.fullH*t.fullAsp*(1+pk*0.04);fs.scale.y=t.fullH*(1-pk*0.05);   // petit punch vertical au tir
+      const col=fs.material.color;if(t.hit>0){const f=Math.min(1,t.hit/0.15);col.setRGB(1,1-0.35*f,1-0.5*f);}else col.setRGB(1,1,1);
+    }
   }
   // anneau d'aperçu
   if(dragLogic&&selCard>=0&&!CARDS[hand[selCard]].spell){const valid=canDeploy(selCard,dragLogic.x,dragLogic.y),s=snap(dragLogic.x,dragLogic.y);
@@ -1371,12 +1383,20 @@ function applyInsets(){
   s.setProperty('--sal',measureInset('left')+'px');
   s.setProperty('--sar',measureInset('right')+'px');
 }
+// Mesure 100vh réel en px (en app installée iOS = TOUT l'écran, y compris sous la barre d'état — contrairement à innerHeight).
+function measure100vh(){
+  const el=document.createElement('div');
+  el.style.cssText='position:fixed;top:0;left:0;width:0;height:100vh;visibility:hidden;pointer-events:none;';
+  document.body.appendChild(el); const h=Math.round(el.getBoundingClientRect().height); el.remove(); return h;
+}
+function isStandalone(){return (window.matchMedia&&matchMedia('(display-mode:standalone)').matches)||!!window.navigator.standalone;}
 function resize(){
   DPR=Math.min(2.75,window.devicePixelRatio||1);
   applyInsets();   // ré-applique les marges d'encoche/barre home à chaque mesure (corrige le env()=0 au lancement)
-  // Hauteur visible RÉELLE = visualViewport.height : plein écran en app installée, zone entre barres en navigateur.
+  // APP INSTALLÉE -> 100vh (plein écran réel 852, sous la barre d'état, PAS de bordure en bas).
+  // NAVIGATEUR    -> visualViewport.height (zone visible entre les barres Safari).
   const vv=window.visualViewport;
-  const appH=Math.round((vv&&vv.height)||window.innerHeight);
+  const appH = isStandalone() ? measure100vh() : Math.round((vv&&vv.height)||window.innerHeight);
   document.documentElement.style.setProperty('--app-h', appH+'px');
   const wrap=document.getElementById('wrap'), rect=wrap.getBoundingClientRect();
   const winW=Math.round(rect.width)||window.innerWidth, winH=Math.round(rect.height)||appH;
@@ -1436,11 +1456,16 @@ const UIH=()=>Math.min(140,VH*0.155);                // hauteur barre de cartes 
 // rendu des effets de combat (projectiles, sorts, explosions) projetés au sol
 function drawWorldFx(){
   for(const f of fx){const p=Math.max(0,Math.min(1,1-f.t/(f.life||0.3)));
-    if(f.type==='shot'){const a=worldToScreen(f.x,f.y,0.9),b=worldToScreen(f.tx,f.ty,0.9);if(!a.vis&&!b.vis)continue;
+    if(f.type==='shot'){const a=worldToScreen(f.x,f.y,f.h0!=null?f.h0:0.9),b=worldToScreen(f.tx,f.ty,0.5);if(!a.vis&&!b.vis)continue;
+      if(f.tower){ // projectile qui VOLE de la tour (perso) vers la cible : trait + tête lumineuse
+        const cx=a.x+(b.x-a.x)*p,cy=a.y+(b.y-a.y)*p,p0=Math.max(0,p-0.25),qx=a.x+(b.x-a.x)*p0,qy=a.y+(b.y-a.y)*p0;
+        uic.strokeStyle='rgba(255,226,138,.9)';uic.lineWidth=3.6;uic.lineCap='round';
+        uic.beginPath();uic.moveTo(qx,qy);uic.lineTo(cx,cy);uic.stroke();
+        uic.fillStyle='#fff7c8';uic.beginPath();uic.arc(cx,cy,3.4,0,7);uic.fill();continue;}
       uic.strokeStyle='rgba(255,236,150,.9)';uic.lineWidth=3;uic.lineCap='round';
       uic.beginPath();uic.moveTo(a.x,a.y);uic.lineTo(b.x,b.y);uic.stroke();
       uic.fillStyle='#fff7c8';uic.beginPath();uic.arc(b.x,b.y,3,0,7);uic.fill();continue;}
-    const s=worldToScreen(f.x,f.y,0.05);if(!s.vis)continue;const sc=VW/W;
+    const s=worldToScreen(f.x,f.y,f.h!=null?f.h:0.05);if(!s.vis)continue;const sc=VW/W;
     if(f.type==='spell'){const R=f.r*sc*(0.5+p*0.7);uic.globalAlpha=(1-p)*0.85;
       uic.strokeStyle=f.color||'#ffd23f';uic.lineWidth=4;uic.beginPath();uic.arc(s.x,s.y,R,0,7);uic.stroke();
       uic.globalAlpha=(1-p)*0.25;uic.fillStyle=f.color||'#ffd23f';uic.beginPath();uic.arc(s.x,s.y,R,0,7);uic.fill();uic.globalAlpha=1;}
@@ -2047,7 +2072,7 @@ if('serviceWorker' in navigator){
 <script>
 // Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
 (function(){
-  var BUILD='v16';
+  var BUILD='v17';
   // Badge tapotable (coin bas-droit) qui affiche EN PERMANENCE les métriques clés -> toute capture me révèle la cause.
   var tag=document.createElement('div');
   tag.style.cssText='position:fixed;z-index:99999;left:calc(3px + env(safe-area-inset-left));bottom:calc(3px + env(safe-area-inset-bottom));padding:5px 7px;font:9px/1.25 monospace;color:rgba(255,255,255,.55);background:rgba(0,0,0,.35);border-radius:5px;pointer-events:auto;cursor:pointer;white-space:pre;';
