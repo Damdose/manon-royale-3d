@@ -484,7 +484,7 @@
   <!-- 4) MATCHMAKING -->
   <div id="match" class="overlay scr hidden">
     <div class="vs-half foe">
-      <div class="vsflag"><img src="assets/ui_arena.png" alt="" onerror="this.parentNode.style.display='none'"></div>
+      <img class="vs-crown" src="assets/ui_robotbanner.png" alt="" onerror="this.style.display='none'">
       <div class="vs-pname" id="rivalName">Rival</div>
       <div class="vs-ptr"><img src="assets/ui_trophy.png" onerror="this.outerHTML='🏆'"> <span id="rivalTr">----</span></div>
     </div>
@@ -1428,12 +1428,13 @@ window.__diag={};
 function resize(){
   DPR=Math.min(2.75,window.devicePixelRatio||1);
   applyInsets();   // ré-applique les marges d'encoche/barre home à chaque mesure (corrige le env()=0 au lancement)
-  // APP INSTALLÉE -> on remplit le viewport fixe RÉEL (tout l'écran fillable : ni bordure, ni débordement).
+  // APP INSTALLÉE -> 100vh = TOUT l'écran (852), y compris sous la barre d'état -> aucun espace en bas.
+  //   (prouvé par diag réel iPhone : 100vh=852, fvp=793. fvp laissait 59px de vide en bas.)
   // NAVIGATEUR    -> visualViewport.height (zone visible entre les barres Safari).
   const vv=window.visualViewport;
-  const fvp=measureFixedVP();
-  window.__diag={fvp:fvp,vh:measure100vh(),scr:screen.height,vv:vv?Math.round(vv.height):0,inner:window.innerHeight};
-  const appH = isStandalone() ? fvp : Math.round((vv&&vv.height)||window.innerHeight);
+  const fvp=measureFixedVP(), vh=measure100vh();
+  window.__diag={fvp:fvp,vh:vh,scr:screen.height,vv:vv?Math.round(vv.height):0,inner:window.innerHeight};
+  const appH = isStandalone() ? Math.max(vh,fvp) : Math.round((vv&&vv.height)||window.innerHeight);
   document.documentElement.style.setProperty('--app-h', appH+'px');
   const wrap=document.getElementById('wrap'), rect=wrap.getBoundingClientRect();
   const winW=Math.round(rect.width)||window.innerWidth, winH=Math.round(rect.height)||appH;
@@ -2180,7 +2181,7 @@ if('serviceWorker' in navigator){
 <script>
 // Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
 (function(){
-  var BUILD='v23';
+  var BUILD='v24';
   // Badge tapotable (coin bas-gauche) qui affiche EN PERMANENCE toutes les mesures -> une capture me révèle la bonne valeur.
   var tag=document.createElement('div');
   tag.style.cssText='position:fixed;z-index:99999;left:calc(3px + env(safe-area-inset-left));bottom:calc(3px + env(safe-area-inset-bottom));padding:5px 7px;font:9px/1.25 monospace;color:rgba(255,255,255,.6);background:rgba(0,0,0,.45);border-radius:5px;pointer-events:auto;cursor:pointer;white-space:pre;';
