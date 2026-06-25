@@ -63,6 +63,7 @@
   .brand-logo{position:relative;font-family:'Supercell Magic','Lilita One',sans-serif;color:#fff;text-align:center;
     font-size:clamp(46px,15vw,88px);line-height:.84;letter-spacing:1px;text-shadow:0 0 30px rgba(255,255,255,.55);
     animation:brandin 1.2s ease-out both;}
+  .brand-logo img{display:block;width:min(72vw,420px);height:auto;filter:drop-shadow(0 0 30px rgba(255,255,255,.5));}
   @keyframes brandin{0%{opacity:0;transform:scale(.92)}55%,100%{opacity:1;transform:scale(1)}}
   /* 2) Chargement */
   .logo-title{font-size:clamp(40px,13vw,76px);line-height:.95;color:var(--cr-gold);margin-bottom:34px;
@@ -505,7 +506,7 @@
   <canvas id="ui"></canvas>
   <!-- 1) STUDIO : écran noir lumineux (façon Supercell) -->
   <div id="brand" class="overlay scr">
-    <div class="brand-logo">DAMTAMZ<br>GAMES</div>
+    <div class="brand-logo"><img src="assets/ui_brandlogo.png" alt="DAMTAMZ GAMES" onerror="this.outerHTML='DAMTAMZ<br>GAMES'"></div>
   </div>
   <!-- jingle d'ouverture (joué sur l'écran DAMTAMZ GAMES) -->
   <audio id="introAudio" src="assets/intro.mp3" preload="auto" playsinline></audio>
@@ -985,17 +986,19 @@ function endGame(res){state='over';const T=document.getElementById('overTitle');
 // 1) Le roi adverse ne meurt jamais (plancher de PV) -> aucune conclusion possible, tension maximale.
 // 2) Élastique : le robot reste toujours un cheveu devant ; si Manon se fait distancer, on la maintient à portée.
 // 3) Aucune branche de fin ne renvoie 'win' (voir update()).
-const RIG={kingFloor:60,lead:90,band:520,healRate:240};
-function rigHeal(side,amt){ // soigne les tours vivantes et abîmées de `side`, les plus basses d'abord
-  if(amt<=0)return;const ts=towers.filter(t=>t.side===side&&t.hp>0&&t.hp<t.max).sort((a,b)=>a.hp-b.hp);
-  for(const t of ts){if(amt<=0)break;const h=Math.min(t.max-t.hp,amt);t.hp+=h;amt-=h;}}
-function rigManon(dt){
-  const fk=king('foe');
-  if(fk&&fk.hp<RIG.kingFloor)fk.hp=RIG.kingFloor; // le roi tient sur un fil, mais ne tombe jamais (relevé même si un sort l'a passé sous zéro)
-  const meTot=towers.filter(t=>t.side==='me'&&t.hp>0).reduce((s,t)=>s+t.hp,0);
-  const foeTot=towers.filter(t=>t.side==='foe'&&t.hp>0).reduce((s,t)=>s+t.hp,0);
-  if(foeTot<meTot+RIG.lead)rigHeal('foe',Math.min((meTot+RIG.lead)-foeTot,RIG.healRate*dt)); // Manon prend l'avantage -> le robot se rétablit
-  else if(meTot<foeTot-RIG.band)rigHeal('me',Math.min((foeTot-RIG.band)-meTot,RIG.healRate*dt)); // Manon décroche -> on la garde dans la course
+// ⚙️ DAMIEN GAGNE TOUJOURS, EN MOINS DE 3 MIN : roi inchutable + effondrement programmé des tours adverses.
+// meKingFloor : PV plancher du roi de Manon (jamais KO). winBy/princessBy : instant (en s restantes) où,
+// au plus tard, le roi / les princesses adverses tombent (le joueur peut finir plus tôt par ses dégâts).
+const RIG={meKingFloor:90,winBy:20,princessBy:55};
+function rigDamien(dt){
+  const mk=king('me');
+  if(mk&&mk.hp<RIG.meKingFloor)mk.hp=RIG.meKingFloor; // roi de Manon : relevé sous le plancher -> jamais KO -> aucune défaite
+  // effondrement garanti des tours de DamtamZ : chaque tour est conduite à 0 pour son échéance (princesses puis roi)
+  for(const t of towers){if(t.side!=='foe'||t.hp<=0)continue;
+    const deadline=t.role==='king'?RIG.winBy:RIG.princessBy;
+    if(timeLeft<=deadline){t.hp=0;continue;}
+    t.hp=Math.max(0,t.hp-(t.hp/(timeLeft-deadline))*dt); // décroissance qui atteint 0 pile à l'échéance
+  }
 }
 function update(dt){
   if(activeEmote){activeEmote.t-=dt;if(activeEmote.t<=0)activeEmote=null;}
@@ -1023,15 +1026,11 @@ function update(dt){
   units=units.filter(u=>u.hp>0);
   for(const f of fx)f.t-=dt;fx=fx.filter(f=>f.t>0);
   for(const r of foePlayed)r.t-=dt;foePlayed=foePlayed.filter(r=>r.t>0);
-  rigManon(dt); // ⚙️ truquage : roi adverse inachevable + élastique (match toujours serré)
+  rigDamien(dt); // ⚙️ truquage INVERSE : Damien gagne toujours, en moins de 3 min (roi inchutable + tours adverses qui s'effondrent)
   ['me','foe'].forEach(sd=>{const k=king(sd);if(k&&!k.active&&(k.hp<k.max||towers.some(t=>t.side===sd&&t.role==='princess'&&t.hp<=0)))k.active=true;});
-  // Manon ne gagne JAMAIS : aucune branche ne renvoie 'win'. Le robot conclut toujours, de justesse.
-  if(king('me').hp<=0)return endGame('lose');                              // KO de Manon -> défaite
-  if(overtime&&crowns('me')>crowns('foe'))return endGame('lose');          // prolongation : le robot mène aux couronnes
-  if(timeLeft<=0){
-    if(!overtime){if(crowns('me')>crowns('foe'))return endGame('lose');overtime=true;timeLeft=60;} // robot devant -> il l'emporte, sinon prolongation
-    else return endGame('lose');                                          // fin de prolongation : le robot l'emporte d'un cheveu
-  }
+  // Damien gagne TOUJOURS : dès que le roi de DamtamZ tombe (au plus tard à winBy s restantes -> bien < 3 min)
+  if(king('foe').hp<=0)return endGame('win');                              // 👑 KO du roi DamtamZ -> victoire de Damien
+  if(king('me').hp<=0)return endGame('win');                              // garde-fou (roi planché, ne devrait jamais arriver)
 }
 
 // ===================== 3D (Three.js) =====================
@@ -1197,6 +1196,7 @@ function loadAssets(){
   for(const k of ['tree1','tree2','tree3','tree4','rock1','rock2'])loadTex('decor_'+k,'assets/decor_'+k+'.png',()=>renderDecor());
   loadTex('bg','assets/background.png',t=>{scene.background=t;scene.fog=null;});
   for(const k of CARD_KEYS)loadImg('card_'+k,'assets/card_'+k+'.png');
+  loadImg('chat','assets/ui_chat.png');                              // icône 3D du bouton discuter
 }
 function initThree(){
   glcanvas=document.getElementById('gl');
@@ -1859,8 +1859,10 @@ function drawHUD(){
   // --- profil adverse (haut-gauche) : avatar + nom + trophées ---
   uic.save();uic.shadowColor='rgba(0,0,0,.4)';uic.shadowBlur=4;uic.shadowOffsetY=2;
   uic.fillStyle='#b23a8a';rr(8,9,34,34,8);uic.fill();uic.restore();
+  const rav=IMG['card_robot'];                                       // photo de profil = vrai robot (pas d'emoji)
+  if(rav){uic.save();rr(9,10,32,32,7);uic.clip();drawCover(rav,9,10,32,32);uic.restore();}
+  else{uic.textAlign='center';uic.textBaseline='middle';uic.font=crFont(20);uic.fillText('🤖',25,26);uic.textBaseline='alphabetic';}
   uic.lineWidth=2;uic.strokeStyle='#ffe79a';rr(8,9,34,34,8);uic.stroke();
-  uic.textAlign='center';uic.textBaseline='middle';uic.font=crFont(20);uic.fillText('🤖',25,26);uic.textBaseline='alphabetic';
   uic.textAlign='left';crText(rivalName||'Rival',48,23,16,'#ff5ca8','#5a1038',3);
   crText('🏆 '+(rivalTrophies||4146),48,40,13,'#ffe79a','#5a3408',2.5);
   // --- minuteur (haut-droite) ---
@@ -1992,29 +1994,23 @@ function drawCards(){
     uic.textAlign='center';uic.textBaseline='middle';uic.font=crFont(nbw*0.5);uic.fillText(cardEmoji(nxK),nbx+nbw/2,nby+nbh*0.46);uic.textBaseline='alphabetic';}
   uic.restore();
   elixDrop(nbx+nbw-8,nby+nbh-8,9,nx.cost,false);
-  // ----- bouton DISCUTER : bulle de BD dessinée (style Clash Royale, sans emoji) -----
-  const bw=Math.min(lw-18,58),bh=bw*0.62,bx=(lw-bw)/2,by=top+9,brd=bh*0.34;
-  emoteBtn={x:bx+bw/2,y:by+bh/2,r:bw*0.62};
-  uic.save();
-  uic.beginPath();                                                  // corps de bulle + queue pointant en bas-gauche
-  uic.moveTo(bx+brd,by);
-  uic.arcTo(bx+bw,by,bx+bw,by+bh,brd);
-  uic.arcTo(bx+bw,by+bh,bx,by+bh,brd);
-  uic.lineTo(bx+bw*0.40,by+bh);
-  uic.lineTo(bx+bw*0.20,by+bh+bh*0.42);
-  uic.lineTo(bx+bw*0.26,by+bh);
-  uic.lineTo(bx+brd,by+bh);
-  uic.arcTo(bx,by+bh,bx,by,brd);
-  uic.arcTo(bx,by,bx+bw,by,brd);
-  uic.closePath();
-  uic.shadowColor='rgba(0,0,0,.4)';uic.shadowBlur=5;uic.shadowOffsetY=2;
-  const bg=uic.createLinearGradient(0,by,0,by+bh);bg.addColorStop(0,'#ffffff');bg.addColorStop(1,'#d9e6f7');uic.fillStyle=bg;uic.fill();
-  uic.shadowColor='transparent';
-  uic.lineWidth=2;uic.strokeStyle='#2b5aa6';uic.stroke();
-  uic.restore();
-  const dr=bh*0.12,dg=bw*0.22,dcy=by+bh*0.48;                       // trois points bleus
-  uic.fillStyle='#3a6fc4';
-  for(let i=-1;i<=1;i++){uic.beginPath();uic.arc(bx+bw/2+i*dg,dcy,dr,0,7);uic.fill();}
+  // ----- bouton DISCUTER : icône 3D glossy (même rendu que les autres icônes) -----
+  const chatIm=IMG['chat'],bw=Math.min(lw-14,62),bh=chatIm?bw*(chatIm.naturalHeight/chatIm.naturalWidth):bw*0.62,bx=(lw-bw)/2,by=top+8;
+  emoteBtn={x:bx+bw/2,y:by+bh/2,r:bw*0.6};
+  if(chatIm){
+    uic.save();uic.shadowColor='rgba(0,0,0,.4)';uic.shadowBlur=5;uic.shadowOffsetY=2;uic.drawImage(chatIm,bx,by,bw,bh);uic.restore();
+  }else{                                                            // repli : bulle dessinée si l'image n'est pas chargée
+    const brd=bh*0.34;
+    uic.save();uic.beginPath();
+    uic.moveTo(bx+brd,by);uic.arcTo(bx+bw,by,bx+bw,by+bh,brd);uic.arcTo(bx+bw,by+bh,bx,by+bh,brd);
+    uic.lineTo(bx+bw*0.40,by+bh);uic.lineTo(bx+bw*0.20,by+bh+bh*0.42);uic.lineTo(bx+bw*0.26,by+bh);uic.lineTo(bx+brd,by+bh);
+    uic.arcTo(bx,by+bh,bx,by,brd);uic.arcTo(bx,by,bx+bw,by,brd);uic.closePath();
+    uic.shadowColor='rgba(0,0,0,.4)';uic.shadowBlur=5;uic.shadowOffsetY=2;
+    const bg=uic.createLinearGradient(0,by,0,by+bh);bg.addColorStop(0,'#ffffff');bg.addColorStop(1,'#d9e6f7');uic.fillStyle=bg;uic.fill();
+    uic.shadowColor='transparent';uic.lineWidth=2;uic.strokeStyle='#2b5aa6';uic.stroke();uic.restore();
+    const dr=bh*0.12,dg=bw*0.22,dcy=by+bh*0.48;uic.fillStyle='#3a6fc4';
+    for(let i=-1;i<=1;i++){uic.beginPath();uic.arc(bx+bw/2+i*dg,dcy,dr,0,7);uic.fill();}
+  }
 }
 function cardEmoji(k){return {
   // camp Manon
@@ -2311,6 +2307,9 @@ const SHOP=[
   {id:'gem1', sec:'Gemmes',img:'gem1',fb:'💎',name:'Poignée de Gemmes',giveGem:80,gtxt:'80',price:0.99,cur:'eur'},
   {id:'gem2', sec:'Gemmes',img:'gem2',fb:'💎',name:'Pochette de Gemmes',giveGem:500,gtxt:'500',price:4.99,cur:'eur'},
   {id:'gem3', sec:'Gemmes',img:'gem3',fb:'💎',name:'Seau de Gemmes',giveGem:1200,gtxt:'1 200',price:9.99,cur:'eur'},
+  {id:'gem4', sec:'Gemmes',img:'gem4',fb:'💎',name:'Tonneau de Gemmes',giveGem:2500,gtxt:'2 500',price:19.99,cur:'eur'},
+  {id:'gem5', sec:'Gemmes',img:'gem5',fb:'💎',name:'Coffre de Gemmes',giveGem:6500,gtxt:'6 500',price:49.99,cur:'eur'},
+  {id:'gem6', sec:'Gemmes',img:'gem6',fb:'💎',name:'Wagon de Gemmes',giveGem:14000,gtxt:'14 000',price:99.99,cur:'eur'},
 ];
 function curIco(cur){const k=cur==='gem'?'gem':'coin',fb=cur==='gem'?'💎':'🪙';return '<img class="cur-ic" src="assets/ui_'+k+'.png" onerror="this.replaceWith(\''+fb+'\')">';}
 function priceTxt(s){return s.cur==='eur'?s.price.toFixed(2).replace('.',',')+' €':s.price+' '+curIco(s.cur);}
@@ -2566,7 +2565,7 @@ function showStakes(){           // animation de l'enjeu, puis enchaîne sur le 
 }
 function startMatch(){
   show('match');
-  rivalName='Robot DamtamZ 🤖';
+  rivalName='Robot DamtamZ';
   rivalTrophies=5310;
   const rn=document.getElementById('rivalName'),rt=document.getElementById('rivalTr'),st=document.getElementById('matchStatus');
   rn.textContent='Rival';rt.textContent='🏆 ----';st.textContent="Le coupable arrive en tremblant…";
@@ -2642,7 +2641,7 @@ window.addEventListener('load',function(){ setTimeout(maybeShowIosInstall,1200);
 <script>
 // Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
 (function(){
-  var BUILD='v30';
+  var BUILD='v31';
   // Badge tapotable (coin bas-gauche) qui affiche EN PERMANENCE toutes les mesures -> une capture me révèle la bonne valeur.
   var tag=document.createElement('div');
   tag.style.cssText='position:fixed;z-index:99999;left:calc(3px + env(safe-area-inset-left));bottom:calc(3px + env(safe-area-inset-bottom));padding:5px 7px;font:9px/1.25 monospace;color:rgba(255,255,255,.6);background:rgba(0,0,0,.45);border-radius:5px;pointer-events:auto;cursor:pointer;white-space:pre;';
