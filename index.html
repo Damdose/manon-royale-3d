@@ -312,7 +312,11 @@
   .card-item .ci-frame{cursor:pointer;}
   .ci-frame.indeck{outline:3px solid #5cd685;outline-offset:-1px;}
   /* écran de choix du deck (avant combat) */
-  .ds-wrap{width:92%;max-width:460px;margin:auto;}
+  .ds-wrap{width:92%;max-width:460px;margin-left:auto;margin-right:auto;}
+  /* Écran de deck : contenu haut → centré quand il tient, défile depuis le HAUT quand il déborde
+     (les spacers flex:1 0 0 + justify-center rendaient le sommet inatteignable au scroll) */
+  #deckSelect{justify-content:flex-start;}
+  #deckSelect::before,#deckSelect::after{flex:none;margin:auto;}
   .ds-hint{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:11px;color:#cfe0ff;margin:6px 0 12px;line-height:1.35;}
   .ds-actions{display:flex;gap:12px;align-items:center;justify-content:center;margin:16px 0 6px;}
   .ds-actions .battle-btn{flex:1;}
@@ -482,6 +486,8 @@
   <div id="brand" class="overlay scr">
     <div class="brand-logo">DAMTAMZ<br>GAMES</div>
   </div>
+  <!-- jingle d'ouverture (joué sur l'écran DAMTAMZ GAMES) -->
+  <audio id="introAudio" src="assets/intro.mp3" preload="auto" playsinline></audio>
 
   <!-- 2) CHARGEMENT -->
   <div id="loading" class="overlay scr hidden">
@@ -529,7 +535,7 @@
     <!-- Nom du joueur + clan -->
     <div class="namebar">
       <div class="avatar" id="profileBtn"><img src="assets/ui_avatar.png" onerror="this.replaceWith('👑')"></div>
-      <div class="nb-txt"><b>manondu67</b><span class="nb-clan">No Clan</span></div>
+      <div class="nb-txt"><b>manondu67</b><span class="nb-clan">BipolairetypeA</span></div>
       <div class="nb-trophy" id="trophyBtn"><img src="assets/ui_trophy.png" onerror="this.outerHTML='🏆'"> <b id="trophyVal">0</b></div>
     </div>
 
@@ -560,7 +566,7 @@
 
     <!-- PANNEAU CLAN -->
     <div class="panel hidden" id="panelClan">
-      <div class="cr-banner">Les Reines du Style</div>
+      <div class="cr-banner">BipolairetypeA</div>
       <div class="panel-sub">Clan #MODE77 · <span id="clanTrophies">5 210</span> · <span id="clanCount">2</span>/50 membres</div>
       <div class="clan-actions">
         <button class="btn btn-sm clan-don" id="donateBtn">Demander des gemmes</button>
@@ -672,7 +678,7 @@
     <div class="vs-banner foe"><b id="overFoeName">Robot DamtamZ</b><small>Robot DamtamZ</small></div>
     <div class="vs-label" id="overTitle">Victoire&nbsp;!</div>
     <div class="crowns-row" id="overCrowns"></div>
-    <div class="vs-banner me"><b>manondu67</b><small>Les Reines du Style</small></div>
+    <div class="vs-banner me"><b>manondu67</b><small>BipolairetypeA</small></div>
     <p class="sub" id="overMsg"></p>
     <div class="over-chest" id="overChest"></div>
     <div class="big" id="overTrophy"></div>
@@ -2479,7 +2485,18 @@ const HINTS=[
 ];
 function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.add('hidden'));if(id)document.getElementById(id).classList.remove('hidden');}
 
-function startBrand(){show('brand');setTimeout(startLoading,2100);}
+function playIntroJingle(){
+  const a=document.getElementById('introAudio');if(!a)return;
+  a.currentTime=0;a.volume=1;
+  const p=a.play();
+  if(p&&p.catch)p.catch(()=>{
+    // autoplay bloqué (iOS/Safari) : on rejoue au tout premier contact de l'utilisatrice
+    const go=()=>{a.currentTime=0;a.play().catch(()=>{});clean();};
+    const clean=()=>['pointerdown','touchstart','keydown'].forEach(e=>document.removeEventListener(e,go));
+    ['pointerdown','touchstart','keydown'].forEach(e=>document.addEventListener(e,go,{once:true}));
+  });
+}
+function startBrand(){show('brand');playIntroJingle();setTimeout(startLoading,2100);}
 function startLoading(){
   show('loading');
   const fill=document.getElementById('loadfill'),hint=document.getElementById('loadhint');
@@ -2529,7 +2546,22 @@ document.getElementById('trophyBtn').onclick=()=>{sfx('click');openRoad();};
 document.getElementById('roadBtn').onclick=()=>{sfx('click');openRoad();};
 document.getElementById('goldBtn').onclick=()=>switchTab('panelShop',document.querySelector('.tab[data-panel="panelShop"]'));
 document.getElementById('gemBtn').onclick=()=>switchTab('panelShop',document.querySelector('.tab[data-panel="panelShop"]'));
-document.getElementById('donateBtn').onclick=()=>{window.open('https://lydia-app.com/collect/request?phone=0760554000','_blank');};
+document.getElementById('donateBtn').onclick=()=>claimClanGems();
+function claimClanGems(){const m=document.getElementById('payModal');const GIFT=10000;
+  m.innerHTML='<div class="pay-sheet" style="text-align:center;background:linear-gradient(180deg,#1b2550,#0d1430);color:#fff;border:2px solid #ffe79a;">'
+    +'<button class="pay-close" id="giftClose" style="color:#cfd9f5;">✕</button>'
+    +'<div style="padding:26px 22px 22px;">'
+    +'<div style="font-size:64px;line-height:1;margin-bottom:8px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5));">💎</div>'
+    +'<div style="font-family:\'Supercell Magic\',\'Lilita One\',sans-serif;font-size:20px;color:#ffe79a;text-shadow:0 2px 0 #7a4a00;">Cadeau reçu !</div>'
+    +'<div style="margin:10px 0 4px;font-size:15px;color:#dbe5ff;">Vous venez de recevoir</div>'
+    +'<div style="font-family:\'Supercell Magic\',\'Lilita One\',sans-serif;font-size:34px;color:#7fe0ff;text-shadow:0 2px 0 #134a66;">'+GIFT.toLocaleString('fr-FR')+' 💎</div>'
+    +'<div style="margin:8px 0 18px;font-size:15px;color:#dbe5ff;">de la part de <b style="color:#ffe79a;">Robot damtamz</b></div>'
+    +'<button class="btn btn-sm clan-don" id="giftClaim" style="width:100%;">Encaisser</button>'
+    +'</div></div>';
+  m.classList.remove('hidden');sfx('coin');
+  const claim=()=>{save.gems+=GIFT;persist();renderTopbar();sfx('coin');m.classList.add('hidden');toast('+'+GIFT.toLocaleString('fr-FR')+' gemmes 💎');};
+  m.querySelector('#giftClaim').onclick=claim;
+  m.querySelector('#giftClose').onclick=()=>{sfx('click');m.classList.add('hidden');};}
 document.getElementById('clanChatBtn').onclick=()=>{const msg='Damien je crois que tu as de l\'emprise sur moi...';window.open('https://wa.me/33760554000?text='+encodeURIComponent(msg),'_blank');};
 document.getElementById('soundToggle').onclick=()=>{save.sound=!save.sound;persist();const t=document.getElementById('soundToggle');t.textContent=save.sound?'ON':'OFF';t.classList.toggle('off',!save.sound);sfx('click');};
 document.getElementById('resetBtn').onclick=()=>{if(confirm('Effacer toute ta progression ?')){localStorage.removeItem(SAVE_KEY);save=defaultSave();persist();sfx('error');showLobby();toast('Progression réinitialisée');}};
