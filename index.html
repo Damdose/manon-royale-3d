@@ -540,6 +540,9 @@
       <div class="cur cur-gem" id="gemBtn"><img src="assets/ui_gem.png" onerror="this.outerHTML='💎'"> <span id="gemVal">100</span> +</div>
     </div>
 
+    <!-- Milieu défilant : tout ce qui est entre la topbar (haut) et la tabbar (bas).
+         Garantit que la barre de navigation reste TOUJOURS visible, jamais coupée. -->
+    <div class="lobby-mid">
     <!-- Bandeau couronne (trophy road) + boutons + Pass Royale -->
     <div class="lobby-head">
       <div class="crown-banner ph-slot" id="roadBtn" data-ph="ui_crownbanner">
@@ -605,6 +608,7 @@
       <button class="btn battle-btn evt-btn" id="challengeBtn">DÉFI SPÉCIAL</button>
       <div class="quest-list" id="questList"></div>
     </div>
+    </div><!-- /lobby-mid -->
 
     <div class="tabbar">
       <div class="tab" data-panel="panelShop"><img class="tab-ico" src="assets/ui_tab_shop.png" onerror="this.replaceWith('🛒')"><span>Boutique</span></div>
@@ -2543,7 +2547,7 @@ function startLoading(){
 }
 function afterLoading(){ showIntro(); }   // toujours montrer le principe au démarrage
 function showIntro(){state='intro';show('intro');}
-document.getElementById('introBtn').onclick=()=>{sfx('click');save.introSeen=true;persist();showLobby();};
+document.getElementById('introBtn').onclick=()=>{playIntroJingle();sfx('click');save.introSeen=true;persist();showLobby();};
 document.getElementById('introBtn2').onclick=()=>{sfx('click');showIntro();};
 function showLobby(){state='menu';document.getElementById('over').classList.add('hidden');show('lobby');renderTopbar();
   switchTab('panelBattle',document.querySelector('.tab[data-panel="panelBattle"]'));}
