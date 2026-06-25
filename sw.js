@@ -1,6 +1,6 @@
-// Service worker — Manon Royale 3D
+// Service worker — Clash of the Last Chance
 // Bump CACHE when you ship changes so clients pull the new version.
-const CACHE = 'manon-royale-v25';
+const CACHE = 'clash-lastchance-v29';
 
 // App shell precached on install so the game boots offline.
 const SHELL = [
