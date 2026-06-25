@@ -1,6 +1,6 @@
 // Service worker — Clash of the Last Chance
 // Bump CACHE when you ship changes so clients pull the new version.
-const CACHE = 'clash-lastchance-v32';
+const CACHE = 'clash-lastchance-v33';
 
 // App shell precached on install so the game boots offline.
 const SHELL = [
