@@ -772,12 +772,12 @@ const CARDS={
   ketamine:   {camp:'robot',name:'Ketamine K',cost:4,color:'#f2f2f2',spell:true,radius:50,dmg:380,abil:'Frappe',icon:'☄️',desc:'Sort lourd : énormes dégâts sur petite zone.'},
   chiffretwo: {camp:'robot',name:'Chiffre Two',cost:2,color:'#ff6bd0',spell:true,radius:96,rage:6,abil:'Rage',icon:'😤',desc:'Sort : enrage les alliés (vitesse et dégâts +40%).'},
   tempete:    {camp:'robot',name:'Tempête Émo',cost:4,color:'#5a7ad6',count:1,hp:380,dmg:95,range:92,atk:1.0,speed:40,r:12,kind:'tempete',targets:'any',body:'human',skin:'#e3b48a',abil:'Anti-air',icon:'🎯',desc:'Tireur longue portée, sol et air.'},
-  braish:     {camp:'robot',name:'Manon Braish',cost:5,color:'#c0392b',count:1,hp:460,dmg:100,range:80,atk:1.4,speed:36,r:13,kind:'braish',targets:'any',splash:32,body:'human',skin:'#6b4a2e',abil:'Éclats',icon:'💥',desc:'Soutien splash à distance, sol et air.'},
+  braish:     {camp:'robot',name:'Manon Braish',cost:5,color:'#c0392b',count:1,hp:460,dmg:100,range:80,atk:1.4,speed:36,r:13,kind:'braish',targets:'any',splash:32,body:'human',skin:'#c79a6f',abil:'Éclats',icon:'💥',desc:'Soutien splash à distance, sol et air.'},
   inferno:    {camp:'robot',name:'Attaque Nihiliste',cost:5,color:'#3a3340',building:true,life:30,hp:500,dmg:28,range:72,atk:0.4,r:13,kind:'inferno',targets:'any',ramp:{step:0.5,max:6},abil:'Néant',icon:'🥀',desc:'Bâtiment : Nietzsche distille un néant qui ronge de plus en plus fort (sol et air).'},
   cimetiere:  {camp:'robot',name:'Attaque de la Voyante',cost:3,color:'#5a3a7a',building:true,life:22,hp:300,r:12,kind:'cimetiere',targets:'ground',spawner:{card:'reubeu',interval:5},abil:'Invocation',icon:'🔮',desc:'Bâtiment : la voyante invoque des sbires en continu pour défendre.'},
   colis:      {camp:'robot',name:'Avalanche Colis',cost:4,color:'#b5853f',spell:true,radius:72,dmg:200,stun:0.5,abil:'Impact',icon:'🧱',desc:'Sort : dégâts + courte stun (coupe les charges).'},
   addition:   {camp:'robot',name:"Paye l'Addition",cost:3,color:'#5cd685',spell:true,radius:74,poison:{dps:75,dur:4},abil:'Poison',icon:'☠️',desc:'Sort : zone toxique qui ronge les PV dans la durée.'},
-  reubeu:     {camp:'robot',name:'Reubeu Soins',cost:4,color:'#3a3a44',count:4,hp:165,dmg:62,range:16,atk:1.0,speed:88,r:9,kind:'reubeu',targets:'ground',body:'human',skin:'#8a6a4a',abil:'Essaim',icon:'👥',desc:'Essaim costaud : submerge les tanks au sol.'},
+  reubeu:     {camp:'robot',name:'Reubeu Soins',cost:4,color:'#3a3a44',count:6,hp:165,dmg:62,range:16,atk:1.0,speed:88,r:9,kind:'reubeu',targets:'ground',body:'human',skin:'#b5895f',abil:'Essaim',icon:'👥',desc:'Essaim de 6 : submerge les tanks au sol.'},
   heartbreak2:{camp:'robot',name:'Brisage de Cœur',cost:2,color:'#ff5c9e',spell:true,radius:62,dmg:160,knock:30,abil:'Recul',icon:'💨',desc:'Sort : repousse l’ennemi et coupe les charges.'},
 };
 // ⚖️ ÉQUILIBRAGE : les cartes de DamtamZ sont volontairement plus FORTES → Manon perd par le JEU
@@ -1132,7 +1132,7 @@ function drawTroopTex(kind){const W=256,H=256,[c,x]=_cv(W,H);
     case 'diva': _human(x,W,H,{skin:'#f3c9a8',hair:'#3a2a4a',dress:'#ff4d96'});break;
     case 'damien': _human(x,W,H,{skin:'#c89a78',hair:'#26262e',dress:'#26262e',sleeve:'#26262e',shoe:'#111'});break;
     case 'mannequin': _human(x,W,H,{skin:'#bcd0e8',hair:null,dress:'#2f7bd6'});break;
-    case 'eoghan': _human(x,W,H,{skin:'#e8b48a',hair:'#a85a32',dress:'#2e7d4f',sleeve:'#256b42'});break;
+    case 'eoghan': _human(x,W,H,{skin:'#e8b48a',hair:'#7a4a2a',dress:'#2e7d4f',sleeve:'#256b42'});break;
     case 'caniche': drawPoodle(x,W,H);break;
     case 'pigeon': drawBird(x,W,H);break;
     case 'sac': drawObject(x,W,H,'#f4c84a','bag');break;
@@ -1512,7 +1512,7 @@ function addUnitMesh(u){
     // tête
     const head=new THREE.Mesh(new THREE.SphereGeometry(R*0.6,18,14),mat(skin));head.position.y=R*1.92+fly;head.castShadow=true;g.add(head);
     // cheveux selon le perso
-    const hairCol={queenmanon:'#ffd95e',marcels:'#3a2a20',anais:'#4a2e1c',givenchy:'#1a1a1a',cecilie:'#cfcfd6',kanye:'#1a1a1a',eoghan:'#a85a32',juliette:'#3a241a',darknans:'#ffe07a',tempete:'#3a241a',braish:'#1a1a1a',reubeu:'#1a1a1a'}[u.kind];
+    const hairCol={queenmanon:'#ffd95e',marcels:'#3a2a20',anais:'#4a2e1c',givenchy:'#1a1a1a',cecilie:'#cfcfd6',kanye:'#1a1a1a',eoghan:'#7a4a2a',juliette:'#3a241a',darknans:'#ffe07a',tempete:'#3a241a',braish:'#1a1a1a',reubeu:'#1a1a1a'}[u.kind];
     if(hairCol){const hair=new THREE.Mesh(new THREE.SphereGeometry(R*0.64,14,12),mat(hairCol));hair.scale.set(1,0.92,1);hair.position.set(0,R*2.0+fly,-R*0.12);hair.castShadow=true;g.add(hair);}
     // yeux (vers l'avant = +z, le perso est tourné vers sa cible)
     const eye=new THREE.MeshBasicMaterial({color:0x222222});
@@ -2541,7 +2541,10 @@ const HINTS=[
   "Astuce sentimentale : perdre n'a jamais été aussi romantique.",
   "DamtamZ a codé une app entière juste pour s'excuser. Ça compte un peu, non ?",
 ];
-function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.add('hidden'));if(id)document.getElementById(id).classList.remove('hidden');}
+// Le fond de page remplit la zone "barre d'accueil" qu'iOS exclut du viewport (prouvé par le test vert).
+// On le colore selon l'écran -> la bande du bas devient INVISIBLE (se fond dans la nav / le bois). Marche sur tous les iPhone.
+function setPageBg(battle){var c=battle?'#483017':'#1a2540';document.documentElement.style.background=c;document.body.style.background=c;}
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.add('hidden'));if(id)document.getElementById(id).classList.remove('hidden');setPageBg(id===null);}
 
 let __introPlayed=false, introFirstRun=false;
 // joué DANS le geste de l'utilisatrice (seul moment où iOS autorise le son)
@@ -2589,7 +2592,7 @@ function startMatch(){
   setTimeout(()=>{st.textContent='COMBAT !';},2200);
   setTimeout(beginBattle,2900);
 }
-function beginBattle(){show(null);document.getElementById('over').classList.add('hidden');startGame();}
+function beginBattle(){show(null);setPageBg(true);document.getElementById('over').classList.add('hidden');startGame();}
 function startGame(){document.getElementById('over').classList.add('hidden');reset();}
 
 document.getElementById('battleBtn').onclick=()=>{sfx('click');showDeckSelect();};        // « Combat » → on choisit son deck d'abord
@@ -2656,11 +2659,11 @@ window.addEventListener('load',function(){ setTimeout(maybeShowIosInstall,1200);
 <script>
 // Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
 (function(){
-  var BUILD='v37';
+  var BUILD='v38';
   // Badge tapotable (coin bas-gauche) qui affiche EN PERMANENCE toutes les mesures -> une capture me révèle la bonne valeur.
   var tag=document.createElement('div');
-  tag.style.cssText='position:fixed;z-index:99999;left:50%;transform:translateX(-50%);top:calc(4px + env(safe-area-inset-top));padding:7px 10px;font:12px/1.3 monospace;color:#fff;background:rgba(200,0,0,.85);border-radius:8px;pointer-events:auto;cursor:pointer;white-space:pre;text-align:center;';
-  var FULL=true;   // diag affiché AUTOMATIQUEMENT (en haut) -> une capture suffit. Tap pour masquer/réduire.
+  tag.style.cssText='position:fixed;z-index:99999;left:calc(3px + env(safe-area-inset-left));bottom:calc(3px + env(safe-area-inset-bottom));padding:5px 7px;font:9px/1.25 monospace;color:rgba(255,255,255,.6);background:rgba(0,0,0,.45);border-radius:5px;pointer-events:auto;cursor:pointer;white-space:pre;';
+  var FULL=location.search.indexOf('debug')>=0;   // petit badge version ; tap (ou ?debug) = diag complet
   function badge(){var d=window.__diag||{};var w=document.getElementById('wrap').getBoundingClientRect();
     var app=(matchMedia('(display-mode:standalone)').matches||!!navigator.standalone)?'APP':'WEB';
     if(!FULL){tag.textContent=BUILD+' '+app;return;}
