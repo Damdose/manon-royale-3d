@@ -71,6 +71,9 @@
   .loadhint{margin-top:18px;font-family:'Supercell Magic','Lilita One',sans-serif;font-weight:600;font-size:13px;color:#dce9ff;max-width:300px;min-height:42px;line-height:1.5;text-shadow:0 2px 3px rgba(0,0,0,.5);}
   /* 3) Lobby */
   .lobby{justify-content:flex-start;padding:0;}
+  /* Le vide va EN HAUT (sous la Dynamic Island, zone morte) et non en bas : marge auto sur le 1er enfant
+     pousse tout le contenu vers le bas. Si ça déborde (petits iPhone), la marge se replie -> scroll depuis le haut. */
+  .lobby > .topbar{margin-top:auto;}
   .topbar{width:100%;max-width:520px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px 0;}
   .tb-left{display:flex;gap:8px;align-items:center;}
   .avatar{width:46px;height:46px;border-radius:12px;background:#b23a8a;border:2px solid #ffe79a;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 3px 0 rgba(0,0,0,.3);}
@@ -317,6 +320,18 @@
      (les spacers flex:1 0 0 + justify-center rendaient le sommet inatteignable au scroll) */
   #deckSelect{justify-content:flex-start;}
   #deckSelect::before,#deckSelect::after{flex:none;margin:auto;}
+  /* Compactage : tout l'écran de deck tient sans défilement (deck haut + vivier hors deck) */
+  #deckSelect{padding-top:calc(10px + var(--sat));padding-bottom:calc(10px + var(--sab));}
+  #deckSelect .ds-wrap{max-width:368px;}
+  #deckSelect .cr-banner{margin:4px auto 7px;font-size:18px;padding:6px 26px;}
+  #deckSelect .deck-row,#deckSelect .card-grid{gap:5px;}
+  #deckSelect .deck-avg{margin-top:4px;}
+  #deckSelect .ds-hint{margin:3px 0 6px;}
+  #deckSelect .card-item{gap:1px;}
+  #deckSelect .ci-name{font-size:11px;margin-top:1px;}
+  #deckSelect .ds-actions{margin:6px 0 2px;gap:10px;}
+  #deckSelect .ds-actions .battle-btn{font-size:22px;padding:12px 0;animation:none;}
+  #deckSelect .ds-actions .btn-sm{font-size:16px;padding:11px 18px;}
   .ds-hint{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:11px;color:#cfe0ff;margin:6px 0 12px;line-height:1.35;}
   .ds-actions{display:flex;gap:12px;align-items:center;justify-content:center;margin:16px 0 6px;}
   .ds-actions .battle-btn{flex:1;}
@@ -2405,10 +2420,11 @@ function renderDeck(){const row=document.getElementById('deckRow');if(!row)retur
   // coût moyen d'élixir
   let sum=0;for(const k of save.deck)sum+=CARDS[k].cost||0;
   document.getElementById('deckAvg').textContent='💧 Coût moyen d\'élixir : '+(sum/8).toFixed(1);}
-// vivier de cartes du joueur pour l'écran de choix de deck (les cartes en deck sont surlignées)
+// vivier de cartes hors deck (pas de doublon avec la rangée du haut → tient sur un écran)
 function renderDeckPool(){const g=document.getElementById('deckPool');if(!g)return;let h='';
-  for(const key of DECK){const c=CARDS[key],rar=RAR_COL[RARITY[key]||0],indeck=save.deck.indexOf(key)>=0,lvl=save.levels[key]||1;
-    h+='<div class="card-item"><div class="ci-frame'+(indeck?' indeck':'')+'" data-pool="'+key+'" style="background:linear-gradient(180deg,#fff7d8,'+rar+' 55%,#15101f)">'
+  for(const key of DECK){if(save.deck.indexOf(key)>=0)continue;   // déjà dans le deck → on ne le réaffiche pas
+    const c=CARDS[key],rar=RAR_COL[RARITY[key]||0],lvl=save.levels[key]||1;
+    h+='<div class="card-item"><div class="ci-frame" data-pool="'+key+'" style="background:linear-gradient(180deg,#fff7d8,'+rar+' 55%,#15101f)">'
       +'<div class="ci-cost">'+(c.cost||'•')+'</div><img class="ci-img" src="assets/card_'+key+'.png" onerror="this.remove()">'+cardEmoji(key)
       +'<span class="ds-lvl" style="position:absolute;bottom:1px;right:3px;font-size:9px;color:#ffe79a;text-shadow:0 1px 2px #000">N'+lvl+'</span></div>'
       +'<div class="ci-name">'+c.name+'</div></div>';}
@@ -2485,16 +2501,22 @@ const HINTS=[
 ];
 function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.add('hidden'));if(id)document.getElementById(id).classList.remove('hidden');}
 
+let __introPlayed=false;
 function playIntroJingle(){
   const a=document.getElementById('introAudio');if(!a)return;
-  a.currentTime=0;a.volume=1;
-  const p=a.play();
-  if(p&&p.catch)p.catch(()=>{
-    // autoplay bloqué (iOS/Safari) : on rejoue au tout premier contact de l'utilisatrice
-    const go=()=>{a.currentTime=0;a.play().catch(()=>{});clean();};
-    const clean=()=>['pointerdown','touchstart','keydown'].forEach(e=>document.removeEventListener(e,go));
-    ['pointerdown','touchstart','keydown'].forEach(e=>document.addEventListener(e,go,{once:true}));
-  });
+  const fire=()=>{
+    if(__introPlayed)return;
+    a.currentTime=0;a.volume=1;
+    const p=a.play();
+    if(p&&p.then)p.then(()=>{__introPlayed=true;detach();}).catch(()=>{});
+  };
+  // 1) tentative directe (marche sur desktop si le domaine a déjà été touché)
+  fire();
+  // 2) iOS/Safari bloquent sans geste : le TOUT PREMIER contact n'importe où lance le jingle.
+  //    Capture-phase = on l'attrape avant tout bouton du jeu (impossible à "avaler").
+  const EVTS=['pointerdown','touchstart','touchend','click','keydown'];
+  const detach=()=>EVTS.forEach(e=>document.removeEventListener(e,fire,true));
+  EVTS.forEach(e=>document.addEventListener(e,fire,true));
 }
 function startBrand(){show('brand');playIntroJingle();setTimeout(startLoading,2100);}
 function startLoading(){
