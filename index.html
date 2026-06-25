@@ -32,10 +32,8 @@
   /* hauteur pilotée en JS (--app-h = visualViewport.height) : plein écran en app installée, zone visible en navigateur.
      100dvh en repli avant que le JS tourne. */
   #wrap{position:fixed;top:0;left:0;width:100vw;height:100dvh;height:var(--app-h,100dvh);overflow:hidden;background:#0a1736;touch-action:none;}
-  /* App installée iOS : on utilise le MOT-CLÉ CSS 100vh (qu'iOS peint vraiment plein écran), pas une valeur px.
-     Ancré EN BAS (bottom:0) : si 100vh < écran physique sur certains iOS, le manque (bande navy) apparaît
-     EN HAUT sous la Dynamic Island (zone morte) et jamais en bas où on coupe la barre de navigation. */
-  #wrap.fs{height:100vh;top:auto;bottom:0;}
+  /* App installée iOS : le MOT-CLÉ CSS 100vh (qu'iOS peint vraiment plein écran), pas une valeur px. */
+  #wrap.fs{height:100vh;}
   #gl,#ui{position:absolute;display:block;touch-action:none;}
   #ui{touch-action:none;}
   .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff7e6;
@@ -76,11 +74,14 @@
   .loadbar{width:min(70vw,340px);height:20px;border-radius:12px;background:rgba(0,0,0,.4);border:2px solid #6ea6ee;overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,.5);}
   .loadfill{height:100%;width:0;border-radius:10px;background:linear-gradient(180deg,#ffe79a,#ffce3a 50%,#c8881a);transition:width .18s linear;box-shadow:inset 0 2px 0 rgba(255,255,255,.5);}
   .loadhint{margin-top:18px;font-family:'Supercell Magic','Lilita One',sans-serif;font-weight:600;font-size:13px;color:#dce9ff;max-width:300px;min-height:42px;line-height:1.5;text-shadow:0 2px 3px rgba(0,0,0,.5);}
-  /* 3) Lobby */
-  .lobby{justify-content:flex-start;padding:0;}
-  /* Le vide va EN HAUT (sous la Dynamic Island, zone morte) et non en bas : marge auto sur le 1er enfant
-     pousse tout le contenu vers le bas. Si ça déborde (petits iPhone), la marge se replie -> scroll depuis le haut. */
-  .lobby > .topbar{margin-top:auto;}
+  /* 3) Lobby — webapp responsive : 3 zones.
+     topbar = épinglée en HAUT, tabbar = épinglée en BAS (toujours visibles, jamais coupées),
+     .lobby-mid = milieu qui DÉFILE si le contenu dépasse. Marche sur tous les iPhone quelle que soit la hauteur. */
+  .lobby{justify-content:flex-start;padding:0;overflow:hidden;}
+  .lobby > .topbar{flex:0 0 auto;}
+  .lobby > .tabbar{flex:0 0 auto;}
+  .lobby-mid{flex:1 1 auto;min-height:0;width:100%;display:flex;flex-direction:column;align-items:center;
+    overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-y;}
   .topbar{width:100%;max-width:520px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px 0;}
   .tb-left{display:flex;gap:8px;align-items:center;}
   .avatar{width:46px;height:46px;border-radius:12px;background:#b23a8a;border:2px solid #ffe79a;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 3px 0 rgba(0,0,0,.3);}
@@ -463,13 +464,14 @@
   /* La topbar/tabbar du lobby ne passent plus sous l'encoche ni la barre d'accueil */
   .topbar{padding-top:calc(10px + var(--sat));padding-left:calc(12px + var(--sal));padding-right:calc(12px + var(--sar));}
   .gear{top:calc(10px + var(--sat));right:calc(10px + var(--sar));}
-  .tabbar{padding-bottom:calc(6px + var(--sab));padding-left:calc(4px + var(--sal));padding-right:calc(4px + var(--sar));}
+  /* marge basse = max(safe-area mesurée, env() direct) -> jamais sous la barre d'accueil même si la mesure JS rate */
+  .tabbar{padding-bottom:max(calc(6px + var(--sab)),calc(6px + env(safe-area-inset-bottom,0px)));padding-left:calc(4px + var(--sal));padding-right:calc(4px + var(--sar));}
 
   /* Écrans centrés : défilables si plus hauts que l'écran + marges qui évitent les bords sûrs */
   .overlay{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
     padding-top:calc(24px + var(--sat));padding-bottom:calc(24px + var(--sab));
     padding-left:calc(24px + var(--sal));padding-right:calc(24px + var(--sar));}
-  .overlay.lobby{padding:0;}                 /* le lobby gère ses marges via topbar/tabbar */
+  .overlay.lobby{padding:0;overflow:hidden;}  /* le lobby ne défile pas lui-même : c'est .lobby-mid qui scrolle */
   #loading{padding-bottom:calc(24px + var(--sab));}
   /* Spacers flexibles : centrent le contenu quand il tient, basculent en défilement depuis le haut sinon
      (exclut le lobby en flex-start et le loading en flex-end) */
@@ -2634,7 +2636,7 @@ window.addEventListener('load',function(){ setTimeout(maybeShowIosInstall,1200);
 <script>
 // Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
 (function(){
-  var BUILD='v27';
+  var BUILD='v28';
   // Badge tapotable (coin bas-gauche) qui affiche EN PERMANENCE toutes les mesures -> une capture me révèle la bonne valeur.
   var tag=document.createElement('div');
   tag.style.cssText='position:fixed;z-index:99999;left:calc(3px + env(safe-area-inset-left));bottom:calc(3px + env(safe-area-inset-bottom));padding:5px 7px;font:9px/1.25 monospace;color:rgba(255,255,255,.6);background:rgba(0,0,0,.45);border-radius:5px;pointer-events:auto;cursor:pointer;white-space:pre;';
