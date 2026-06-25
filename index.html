@@ -33,7 +33,8 @@
      100dvh en repli avant que le JS tourne. */
   #wrap{position:fixed;top:0;left:0;width:100vw;height:100dvh;height:var(--app-h,100dvh);overflow:hidden;background:#0a1736;touch-action:none;}
   /* App installée iOS : le MOT-CLÉ CSS 100vh (qu'iOS peint vraiment plein écran), pas une valeur px. */
-  #wrap.fs{height:100vh;}
+  /* App installée : hauteur = --app-h (= max des mesures, dont screen.height) -> remplit l'écran physique, pas de bande. */
+  #wrap.fs{height:var(--app-h,100vh);}
   #gl,#ui{position:absolute;display:block;touch-action:none;}
   #ui{touch-action:none;}
   .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff7e6;
@@ -182,6 +183,7 @@
   .intro-rule{display:flex;align-items:center;gap:11px;text-align:left;background:rgba(0,0,0,.32);border-radius:13px;padding:11px 13px;margin:9px 0;border:2px solid transparent;}
   .intro-rule.win{border-color:rgba(255,122,168,.6);} .intro-rule.lose{border-color:rgba(155,232,106,.6);}
   .intro-rule .ir-emo{font-size:30px;line-height:1;flex:0 0 auto;}
+  .intro-rule img.ir-emo{width:54px;height:54px;object-fit:contain;filter:drop-shadow(0 3px 4px rgba(0,0,0,.45));}
   .intro-rule .ir-txt{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:12.5px;line-height:1.45;color:#fff;}
   .intro-rule.win .ir-txt b{color:#ff7aa8;} .intro-rule.lose .ir-txt b{color:#9be86a;}
   .intro-trap{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:11.5px;color:#ffd9a0;line-height:1.5;margin:13px 4px 16px;}
@@ -520,8 +522,8 @@
     <div class="intro-card">
       <h1>Avant de jouer…</h1>
       <div class="intro-sub">J'ai déconné. Pour me faire pardonner, je t'ai codé ce jeu rien que pour toi.<br>Une seule bataille décidera de tout</div>
-      <div class="intro-rule win"><span class="ir-emo">💔</span><span class="ir-txt">Si <b>TU gagnes</b>, tu m'élimines pour de bon : on ne s'adresse plus JAMAIS la parole.</span></div>
-      <div class="intro-rule lose"><span class="ir-emo">🥹</span><span class="ir-txt">Si tu <b>PERDS</b> contre mon robot, la règle t'oblige à me pardonner et ne plus jamais me reparler de ta candidature spontanée.</span></div>
+      <div class="intro-rule win"><img class="ir-emo" src="assets/ui_intro_heart.png" alt=""><span class="ir-txt">Si <b>TU gagnes</b>, tu m'élimines pour de bon : on ne s'adresse plus JAMAIS la parole.</span></div>
+      <div class="intro-rule lose"><img class="ir-emo" src="assets/ui_intro_robot.png" alt=""><span class="ir-txt">Si tu <b>PERDS</b> contre mon robot, la règle t'oblige à me pardonner et ne plus jamais me reparler de ta candidature spontanée.</span></div>
       <button class="btn" id="introBtn" style="margin-top:22px">C'est parti</button>
     </div>
   </div>
@@ -752,8 +754,9 @@ const CARDS={
   cecilie:    {camp:'manon',name:'Cécilie Bahnsen',cost:4,color:'#c89ad6',count:1,hp:380,dmg:90,range:90,atk:1.0,speed:40,r:12,kind:'cecilie',targets:'any',splash:30,body:'human',skin:'#ecc8a2',abil:'Éclats',icon:'💥',desc:'Soutien à distance : dégâts de zone, balaye les essaims.'},
   feets:      {camp:'manon',name:'5 Feets',cost:4,color:'#cf3a2c',count:1,hp:1350,dmg:135,range:20,atk:1.3,speed:78,r:14,kind:'feets',targets:'buildings',body:'blob',abil:'Bâtiments',icon:'🏰',desc:'Condition de victoire : fonce sur les tours, ignore les troupes.'},
   kanye:      {camp:'manon',name:'Kanye West',cost:5,color:'#3a3340',count:1,hp:640,dmg:115,range:72,atk:1.4,speed:40,r:13,kind:'kanye',targets:'any',splash:40,body:'human',skin:'#6b4a2e',abil:'Splash++',icon:'💢',desc:'Gros splash longue portée, sol et air.'},
-  cannon:     {camp:'manon',name:'Cannon Royale',cost:3,color:'#6a6e76',building:true,life:28,hp:360,dmg:64,range:68,atk:0.8,r:12,kind:'cannon',targets:'ground',abil:'Défense',icon:'🏯',desc:'Bâtiment : canonne les troupes au sol pour défendre. Durée limitée.'},
-  pompe:      {camp:'manon',name:'Pompe à Élixir',cost:5,color:'#c64bd6',building:true,life:60,hp:320,pumpRate:8.5,r:12,kind:'pump',targets:'ground',abil:'Élixir',icon:'⚗️',desc:'Bâtiment : génère ~7 élixir sur sa durée de vie (avantage économique).'},
+  cannon:     {camp:'manon',name:'Culotte de Strasbourg',cost:3,color:'#d8b08c',building:true,life:28,hp:360,dmg:64,range:68,atk:0.8,r:12,kind:'cannon',targets:'ground',abil:'Défense',icon:'🩲',desc:'Bâtiment : mitraille les troupes au sol pour défendre. Durée limitée.'},
+  pompe:      {camp:'manon',name:'Mamie au volant',cost:5,color:'#7fb3e0',building:true,life:60,hp:320,pumpRate:8.5,r:12,kind:'pump',targets:'ground',abil:'Élixir',icon:'🚗',desc:'Bâtiment : la mamie génère ~7 élixir sur sa durée de vie (avantage économique).'},
+  eoghan:     {camp:'manon',name:'Eoghan au PCC',cost:4,color:'#2e7d4f',count:1,hp:880,dmg:120,range:20,atk:1.2,speed:80,r:13,kind:'eoghan',targets:'ground',body:'human',skin:'#e8b48a',abil:'Bagarre',icon:'🍻',desc:'Irlandais déchaîné en sortie de bar : fonce et cogne fort au corps-à-corps.'},
   sorciere:   {camp:'manon',name:'Magie Sorcière',cost:4,color:'#7a3ad6',spell:true,radius:62,dmg:320,abil:'Frappe',icon:'☄️',desc:'Sort : gros dégâts de zone instantanés.'},
   lecturemain:{camp:'manon',name:'Lecture de Main',cost:3,color:'#5ad6c8',spell:true,radius:74,dmg:90,stun:1.6,abil:'Gel',icon:'❄️',desc:'Sort : fige toutes les cibles 1,6 s + dégâts.'},
   heartbreak: {camp:'manon',name:'Brisage de Cœur',cost:2,color:'#ff5c9e',spell:true,radius:62,dmg:160,knock:30,abil:'Recul',icon:'💨',desc:'Sort : repousse l’ennemi et coupe les charges.'},
@@ -768,18 +771,28 @@ const CARDS={
   chiffretwo: {camp:'robot',name:'Chiffre Two',cost:2,color:'#ff6bd0',spell:true,radius:96,rage:6,abil:'Rage',icon:'😤',desc:'Sort : enrage les alliés (vitesse et dégâts +40%).'},
   tempete:    {camp:'robot',name:'Tempête Émo',cost:4,color:'#5a7ad6',count:1,hp:380,dmg:95,range:92,atk:1.0,speed:40,r:12,kind:'tempete',targets:'any',body:'human',skin:'#e3b48a',abil:'Anti-air',icon:'🎯',desc:'Tireur longue portée, sol et air.'},
   braish:     {camp:'robot',name:'Manon Braish',cost:5,color:'#c0392b',count:1,hp:460,dmg:100,range:80,atk:1.4,speed:36,r:13,kind:'braish',targets:'any',splash:32,body:'human',skin:'#6b4a2e',abil:'Éclats',icon:'💥',desc:'Soutien splash à distance, sol et air.'},
-  inferno:    {camp:'robot',name:'Tour Infernale',cost:5,color:'#e0633a',building:true,life:30,hp:500,dmg:28,range:72,atk:0.4,r:13,kind:'inferno',targets:'any',ramp:{step:0.5,max:6},abil:'Inferno',icon:'🔥',desc:'Bâtiment : dégâts qui montent sans cesse, fait fondre les tanks (sol et air).'},
-  cimetiere:  {camp:'robot',name:'Cimetière',cost:3,color:'#4a4a55',building:true,life:22,hp:300,r:12,kind:'cimetiere',targets:'ground',spawner:{card:'reubeu',interval:5},abil:'Invocation',icon:'⚰️',desc:'Bâtiment : invoque des sbires en continu pour défendre.'},
+  inferno:    {camp:'robot',name:'Attaque Nihiliste',cost:5,color:'#3a3340',building:true,life:30,hp:500,dmg:28,range:72,atk:0.4,r:13,kind:'inferno',targets:'any',ramp:{step:0.5,max:6},abil:'Néant',icon:'🥀',desc:'Bâtiment : Nietzsche distille un néant qui ronge de plus en plus fort (sol et air).'},
+  cimetiere:  {camp:'robot',name:'Attaque de la Voyante',cost:3,color:'#5a3a7a',building:true,life:22,hp:300,r:12,kind:'cimetiere',targets:'ground',spawner:{card:'reubeu',interval:5},abil:'Invocation',icon:'🔮',desc:'Bâtiment : la voyante invoque des sbires en continu pour défendre.'},
   colis:      {camp:'robot',name:'Avalanche Colis',cost:4,color:'#b5853f',spell:true,radius:72,dmg:200,stun:0.5,abil:'Impact',icon:'🧱',desc:'Sort : dégâts + courte stun (coupe les charges).'},
   addition:   {camp:'robot',name:"Paye l'Addition",cost:3,color:'#5cd685',spell:true,radius:74,poison:{dps:75,dur:4},abil:'Poison',icon:'☠️',desc:'Sort : zone toxique qui ronge les PV dans la durée.'},
   reubeu:     {camp:'robot',name:'Reubeu Soins',cost:4,color:'#3a3a44',count:4,hp:165,dmg:62,range:16,atk:1.0,speed:88,r:9,kind:'reubeu',targets:'ground',body:'human',skin:'#8a6a4a',abil:'Essaim',icon:'👥',desc:'Essaim costaud : submerge les tanks au sol.'},
   heartbreak2:{camp:'robot',name:'Brisage de Cœur',cost:2,color:'#ff5c9e',spell:true,radius:62,dmg:160,knock:30,abil:'Recul',icon:'💨',desc:'Sort : repousse l’ennemi et coupe les charges.'},
 };
+// ⚖️ ÉQUILIBRAGE : les cartes de DamtamZ sont volontairement plus faibles → Damien gagne par le JEU
+// (vraies stats nerfées, aucun mode triche). Ajuste FOE_NERF pour rendre l'adversaire + ou - dur.
+const FOE_NERF={hp:0.55,dmg:0.6,shield:0.5,spell:0.55,poison:0.55,death:0.5};
+for(const k in CARDS){const c=CARDS[k];if(c.camp!=='robot')continue;
+  if(c.hp)c.hp=Math.round(c.hp*FOE_NERF.hp);
+  if(c.dmg)c.dmg=Math.round(c.dmg*(c.spell?FOE_NERF.spell:FOE_NERF.dmg));
+  if(c.shield)c.shield=Math.round(c.shield*FOE_NERF.shield);
+  if(c.poison&&c.poison.dps)c.poison.dps=Math.round(c.poison.dps*FOE_NERF.poison);
+  if(c.deathDmg&&c.deathDmg.dmg)c.deathDmg.dmg=Math.round(c.deathDmg.dmg*FOE_NERF.death);
+}
 // deck du JOUEUR (camp Manon) + deck de l'IA (Robot DamtamZ)
-const DECK=['queenmanon','ptc','marcels','anais','givenchy','lardons','bierepeche','cecilie','feets','kanye','cannon','pompe','sorciere','lecturemain','heartbreak'];
+const DECK=['queenmanon','ptc','marcels','anais','givenchy','lardons','bierepeche','cecilie','feets','kanye','eoghan','cannon','pompe','sorciere','lecturemain','heartbreak'];
 const FOE_DECK=['robot','juliette','darknans','tornade','champagne','womanizer','ketamine','chiffretwo','tempete','braish','inferno','cimetiere','colis','addition','reubeu','heartbreak2'];
 const PLAYABLE=DECK.slice();
-const RARITY={ptc:0,lardons:0,marcels:0,anais:0,bierepeche:0,givenchy:1,cecilie:1,feets:1,lecturemain:1,heartbreak:1,cannon:1,cimetiere:1,inferno:2,queenmanon:2,kanye:2,sorciere:2,pompe:2};
+const RARITY={ptc:0,lardons:0,marcels:0,anais:0,bierepeche:0,givenchy:1,cecilie:1,feets:1,lecturemain:1,heartbreak:1,cannon:1,cimetiere:1,eoghan:1,inferno:2,queenmanon:2,kanye:2,sorciere:2,pompe:2};
 const RAR_COL=['#c4ccd6','#ff993d','#b56bff','#ffe14d'];
 const TEAM={me:{main:'#2f74da',hp:'#3fa9ff'},foe:{main:'#e23b34',hp:'#ff5c5c'}};
 
@@ -989,7 +1002,7 @@ function update(dt){
   if(intro>0){intro-=dt;return;}
   timeLeft=Math.max(0,timeLeft-dt);
   // ⚗️ tempo Clash Royale : ×1 (180→60 s) → ×2 (dernière minute) → ×3 (prolongation)
-  const rate=overtime?(2.8/3):(timeLeft<=60?1.4:2.8),foeRate=rate*(difficulty===0?1.5:difficulty===2?0.72:1);
+  const rate=overtime?(2.8/3):(timeLeft<=60?1.4:2.8),foeRate=rate*(difficulty===0?1.6:difficulty===2?0.9:1.3);
   elixir=Math.min(10,elixir+dt/rate);foeElixir=Math.min(10,foeElixir+dt/foeRate);
   aiUpdate(dt);for(const u of units)updateUnit(u,dt);separate();
   for(const u of units){u.x=Math.max(16,Math.min(W-16,u.x));u.y=Math.max(30,Math.min(AB-20,u.y));}
@@ -1118,6 +1131,7 @@ function drawTroopTex(kind){const W=256,H=256,[c,x]=_cv(W,H);
     case 'diva': _human(x,W,H,{skin:'#f3c9a8',hair:'#3a2a4a',dress:'#ff4d96'});break;
     case 'damien': _human(x,W,H,{skin:'#c89a78',hair:'#26262e',dress:'#26262e',sleeve:'#26262e',shoe:'#111'});break;
     case 'mannequin': _human(x,W,H,{skin:'#bcd0e8',hair:null,dress:'#2f7bd6'});break;
+    case 'eoghan': _human(x,W,H,{skin:'#e8b48a',hair:'#a85a32',dress:'#2e7d4f',sleeve:'#256b42'});break;
     case 'caniche': drawPoodle(x,W,H);break;
     case 'pigeon': drawBird(x,W,H);break;
     case 'sac': drawObject(x,W,H,'#f4c84a','bag');break;
@@ -1160,7 +1174,7 @@ const texLoader=new THREE.TextureLoader();
 const TEX={},TEXR={},IMG={};
 function loadTex(key,url,cb){texLoader.load(url,t=>{if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;TEX[key]=t;TEXR[key]=true;if(cb)cb(t);},undefined,()=>{});}
 function loadImg(key,url){const im=new Image();im.onload=()=>IMG[key]=im;im.src=url;}
-const TROOP_KINDS=['queenmanon','ptc','marcels','anais','givenchy','lardons','bierepeche','cecilie','feets','kanye','robot','juliette','darknans','womanizer','tempete','braish','reubeu'];
+const TROOP_KINDS=['queenmanon','ptc','marcels','anais','givenchy','lardons','bierepeche','cecilie','feets','kanye','eoghan','robot','juliette','darknans','womanizer','tempete','braish','reubeu'];
 // (Optionnel) Animation par feuille de sprites : si ton PNG troop_<kind>.png est une BANDE
 // horizontale de N images côte à côte, déclare-le ici → le jeu joue le cycle de marche.
 // Laisse vide pour une image fixe. Ex : manon:{frames:6,fps:10}
@@ -1495,7 +1509,7 @@ function addUnitMesh(u){
     // tête
     const head=new THREE.Mesh(new THREE.SphereGeometry(R*0.6,18,14),mat(skin));head.position.y=R*1.92+fly;head.castShadow=true;g.add(head);
     // cheveux selon le perso
-    const hairCol={queenmanon:'#ffd95e',marcels:'#3a2a20',anais:'#4a2e1c',givenchy:'#1a1a1a',cecilie:'#cfcfd6',kanye:'#1a1a1a',juliette:'#3a241a',darknans:'#ffe07a',tempete:'#3a241a',braish:'#1a1a1a',reubeu:'#1a1a1a'}[u.kind];
+    const hairCol={queenmanon:'#ffd95e',marcels:'#3a2a20',anais:'#4a2e1c',givenchy:'#1a1a1a',cecilie:'#cfcfd6',kanye:'#1a1a1a',eoghan:'#a85a32',juliette:'#3a241a',darknans:'#ffe07a',tempete:'#3a241a',braish:'#1a1a1a',reubeu:'#1a1a1a'}[u.kind];
     if(hairCol){const hair=new THREE.Mesh(new THREE.SphereGeometry(R*0.64,14,12),mat(hairCol));hair.scale.set(1,0.92,1);hair.position.set(0,R*2.0+fly,-R*0.12);hair.castShadow=true;g.add(hair);}
     // yeux (vers l'avant = +z, le perso est tourné vers sa cible)
     const eye=new THREE.MeshBasicMaterial({color:0x222222});
@@ -1663,9 +1677,12 @@ function resize(){
   const vv=window.visualViewport;
   const fvp=measureFixedVP(), vh=measure100vh(), sa=isStandalone();
   window.__diag={fvp:fvp,vh:vh,scr:screen.height,vv:vv?Math.round(vv.height):0,inner:window.innerHeight};
-  // App installée : la classe .fs applique le MOT-CLÉ CSS 100vh (peint plein écran par iOS, pas de bande navy en bas).
+  // App installée : on remplit l'ÉCRAN PHYSIQUE réel. On prend le MAX de toutes les mesures (dont screen.height)
+  // -> le wrap atteint toujours le bas de l'écran = AUCUNE bande navy. La marge safe-area de la tabbar
+  //    absorbe la zone de la barre d'accueil pour ne rien couper.
   const wrapEl=document.getElementById('wrap'); if(wrapEl)wrapEl.classList.toggle('fs', sa);
-  const appH = sa ? Math.max(vh,fvp) : Math.round((vv&&vv.height)||window.innerHeight);
+  const appH = sa ? Math.max(vh,fvp,window.innerHeight||0,screen.height||0)
+                  : Math.round((vv&&vv.height)||window.innerHeight);
   document.documentElement.style.setProperty('--app-h', appH+'px');
   const wrap=document.getElementById('wrap'), rect=wrap.getBoundingClientRect();
   const winW=Math.round(rect.width)||window.innerWidth, winH=Math.round(rect.height)||appH;
@@ -2001,9 +2018,9 @@ function drawCards(){
 }
 function cardEmoji(k){return {
   // camp Manon
-  queenmanon:'👸',ptc:'🔵',marcels:'👕',anais:'👯‍♀️',givenchy:'👠',lardons:'🥓',bierepeche:'🍺',cecilie:'🧵',feets:'🦶',kanye:'🎤',cannon:'🏯',pompe:'⚗️',sorciere:'🧙‍♀️',lecturemain:'🖐️',heartbreak:'💔',
+  queenmanon:'👸',ptc:'🔵',marcels:'👕',anais:'👯‍♀️',givenchy:'👠',lardons:'🥓',bierepeche:'🍺',cecilie:'🧵',feets:'🦶',kanye:'🎤',eoghan:'🍻',cannon:'🩲',pompe:'🚗',sorciere:'🧙‍♀️',lecturemain:'🖐️',heartbreak:'💔',
   // camp Robot DamtamZ
-  robot:'🤖',juliette:'🦹‍♀️',darknans:'👹',tornade:'🌪️',champagne:'🍾',womanizer:'💗',ketamine:'💊',chiffretwo:'✌️',tempete:'💢',braish:'🎶',inferno:'🔥',cimetiere:'⚰️',colis:'📦',addition:'💸',reubeu:'🧢',heartbreak2:'💔'
+  robot:'🤖',juliette:'🦹‍♀️',darknans:'👹',tornade:'🌪️',champagne:'🍾',womanizer:'💗',ketamine:'💊',chiffretwo:'✌️',tempete:'💢',braish:'🎶',inferno:'🥀',cimetiere:'🔮',colis:'📦',addition:'💸',reubeu:'🧢',heartbreak2:'💔'
   }[k]||'❓';}
 
 // ===================== INPUT =====================
@@ -2625,7 +2642,7 @@ window.addEventListener('load',function(){ setTimeout(maybeShowIosInstall,1200);
 <script>
 // Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
 (function(){
-  var BUILD='v29';
+  var BUILD='v30';
   // Badge tapotable (coin bas-gauche) qui affiche EN PERMANENCE toutes les mesures -> une capture me révèle la bonne valeur.
   var tag=document.createElement('div');
   tag.style.cssText='position:fixed;z-index:99999;left:calc(3px + env(safe-area-inset-left));bottom:calc(3px + env(safe-area-inset-bottom));padding:5px 7px;font:9px/1.25 monospace;color:rgba(255,255,255,.6);background:rgba(0,0,0,.45);border-radius:5px;pointer-events:auto;cursor:pointer;white-space:pre;';
