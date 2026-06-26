@@ -1,6 +1,6 @@
 // Service worker — Clash of the Last Chance
 // Bump CACHE when you ship changes so clients pull the new version.
-const CACHE = 'clash-lastchance-v42';
+const CACHE = 'clash-lastchance-v43';
 
 // App shell precached on install so the game boots offline.
 const SHELL = [
@@ -41,8 +41,26 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // TOUT en NETWORK-FIRST : on récupère toujours la version fraîche du serveur,
-  // le cache ne sert QUE de repli hors-ligne. Plus jamais de "rien n'a changé".
+  // Assets statiques (images/polices/audio) : CACHE-FIRST -> chargement INSTANTANÉ après la 1re fois,
+  // plus de "galère à charger". Le bump de CACHE à chaque déploiement force la récupération des nouveaux.
+  // En tâche de fond, on rafraîchit le cache (stale-while-revalidate) pour la prochaine fois.
+  if (/\.(png|jpe?g|webp|gif|svg|woff2?|ttf|otf|mp3|ogg|wav)$/i.test(new URL(req.url).pathname)) {
+    e.respondWith(
+      caches.match(req).then((hit) => {
+        const net = fetch(req).then((res) => {
+          if (res && (res.ok || res.type === 'opaque')) {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+          }
+          return res;
+        }).catch(() => hit);
+        return hit || net;   // sert le cache tout de suite s'il existe, sinon attend le réseau
+      })
+    );
+    return;
+  }
+
+  // Le reste (JS, JSON, etc.) : NETWORK-FIRST -> toujours frais, cache en repli hors-ligne.
   e.respondWith(
     fetch(req).then((res) => {
       if (res && (res.ok || res.type === 'opaque')) {

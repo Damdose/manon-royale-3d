@@ -1196,7 +1196,7 @@ function loadAssets(){
   loadTex('arena','assets/arena.png',t=>{t.anisotropy=MAXANISO;groundMesh.material.map=t;groundMesh.material.needsUpdate=true;});
   // décor de bordure (arbres + rochers) en art détouré -> reconstruit dès qu'une texture arrive
   for(const k of ['tree1','tree2','tree3','tree4','rock1','rock2'])loadTex('decor_'+k,'assets/decor_'+k+'.png',()=>renderDecor());
-  loadTex('bg','assets/background.png',t=>{scene.background=t;scene.fog=null;});
+  // (background.png supprimé : fichier inexistant -> 404 inutile à chaque chargement)
   for(const k of CARD_KEYS)loadImg('card_'+k,'assets/card_'+k+'.png');
   loadImg('chat','assets/ui_chat.png');                              // icône 3D du bouton discuter
 }
@@ -2659,7 +2659,7 @@ window.addEventListener('load',function(){ setTimeout(maybeShowIosInstall,1200);
 <script>
 // Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
 (function(){
-  var BUILD='v38';
+  var BUILD='v39';
   // Badge tapotable (coin bas-gauche) qui affiche EN PERMANENCE toutes les mesures -> une capture me révèle la bonne valeur.
   var tag=document.createElement('div');
   tag.style.cssText='position:fixed;z-index:99999;left:calc(3px + env(safe-area-inset-left));bottom:calc(3px + env(safe-area-inset-bottom));padding:5px 7px;font:9px/1.25 monospace;color:rgba(255,255,255,.6);background:rgba(0,0,0,.45);border-radius:5px;pointer-events:auto;cursor:pointer;white-space:pre;';
