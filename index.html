@@ -11,6 +11,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icon-192.png">
+<link rel="preload" as="image" href="assets/ui_brandlogo.png" fetchpriority="high">
 <title>Clash of the Last Chance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -63,7 +64,12 @@
   .brand-logo{position:relative;font-family:'Supercell Magic','Lilita One',sans-serif;color:#fff;text-align:center;
     font-size:clamp(46px,15vw,88px);line-height:.84;letter-spacing:1px;text-shadow:0 0 30px rgba(255,255,255,.55);
     animation:brandin 1.2s ease-out both;}
-  .brand-logo img{display:block;width:min(72vw,420px);height:auto;filter:drop-shadow(0 0 30px rgba(255,255,255,.5));}
+  /* halo blanc en CSS pur : peint instantanement, independant du chargement du PNG */
+  .brand-logo::before{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:88%;height:120%;border-radius:50%;pointer-events:none;
+    background:radial-gradient(closest-side,rgba(255,255,255,.55),rgba(255,255,255,.18) 55%,rgba(255,255,255,0) 78%);
+    filter:blur(8px);z-index:-1;}
+  .brand-logo img{display:block;width:min(72vw,420px);height:auto;}
   @keyframes brandin{0%{opacity:0;transform:scale(.92)}55%,100%{opacity:1;transform:scale(1)}}
   /* 2) Chargement */
   .logo-title{font-size:clamp(40px,13vw,76px);line-height:.95;color:var(--cr-gold);margin-bottom:34px;
@@ -507,7 +513,7 @@
   <canvas id="ui"></canvas>
   <!-- 1) STUDIO : écran noir lumineux (façon Supercell) -->
   <div id="brand" class="overlay scr">
-    <div class="brand-logo"><img src="assets/ui_brandlogo.png" alt="DAMTAMZ GAMES" onerror="this.outerHTML='DAMTAMZ<br>GAMES'"></div>
+    <div class="brand-logo"><img src="assets/ui_brandlogo.png" alt="DAMTAMZ GAMES" fetchpriority="high" decoding="sync" onerror="this.outerHTML='DAMTAMZ<br>GAMES'"></div>
   </div>
   <!-- jingle d'ouverture (joué sur l'écran DAMTAMZ GAMES) -->
   <audio id="introAudio" src="assets/intro.mp3" preload="auto" playsinline></audio>
@@ -780,9 +786,9 @@ const CARDS={
   reubeu:     {camp:'robot',name:'Reubeu Soins',cost:4,color:'#3a3a44',count:4,hp:165,dmg:62,range:16,atk:1.0,speed:88,r:9,kind:'reubeu',targets:'ground',body:'human',skin:'#8a6a4a',abil:'Essaim',icon:'👥',desc:'Essaim costaud : submerge les tanks au sol.'},
   heartbreak2:{camp:'robot',name:'Brisage de Cœur',cost:2,color:'#ff5c9e',spell:true,radius:62,dmg:160,knock:30,abil:'Recul',icon:'💨',desc:'Sort : repousse l’ennemi et coupe les charges.'},
 };
-// ⚖️ ÉQUILIBRAGE : les cartes de DamtamZ sont volontairement plus faibles → Damien gagne par le JEU
-// (vraies stats nerfées, aucun mode triche). Ajuste FOE_NERF pour rendre l'adversaire + ou - dur.
-const FOE_NERF={hp:0.55,dmg:0.6,shield:0.5,spell:0.55,poison:0.55,death:0.5};
+// ⚖️ ÉQUILIBRAGE : les cartes de DamtamZ sont volontairement PLUS FAIBLES → Manon domine par le JEU
+// (ses cartes sont moins bonnes, DamtamZ ne peut pas suivre). Ajuste FOE_NERF pour rendre l'adversaire + ou - dur.
+const FOE_NERF={hp:0.7,dmg:0.7,shield:0.7,spell:0.7,poison:0.7,death:0.7};
 for(const k in CARDS){const c=CARDS[k];if(c.camp!=='robot')continue;
   if(c.hp)c.hp=Math.round(c.hp*FOE_NERF.hp);
   if(c.dmg)c.dmg=Math.round(c.dmg*(c.spell?FOE_NERF.spell:FOE_NERF.dmg));
@@ -814,7 +820,7 @@ function reset(){
   for(const t of towers) addTowerMesh(t);
   battleDeck=(typeof save==='object'&&save.deck&&save.deck.length>=8)?save.deck.filter(k=>CARDS[k]&&CARDS[k].camp==='manon'):[];
   if(battleDeck.length<8)battleDeck=DECK.slice();   // sécurité : deck valide du camp Manon
-  elixir=5;foeElixir=5;deckIdx=0;hand=[battleDeck[0],battleDeck[1],battleDeck[2],battleDeck[3]];deckIdx=4;
+  elixir=7;foeElixir=7;deckIdx=0;hand=[battleDeck[0],battleDeck[1],battleDeck[2],battleDeck[3]];deckIdx=4;
   // deck adverse MÉLANGÉ : DamtamZ joue tout son deck au hasard (pas toujours les mêmes cartes)
   foeDeck=FOE_DECK.slice();for(let i=foeDeck.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[foeDeck[i],foeDeck[j]]=[foeDeck[j],foeDeck[i]];}
   foeHand=[foeDeck[0],foeDeck[1],foeDeck[2],foeDeck[3]];foeIdx=4;
@@ -982,31 +988,24 @@ function endGame(res){state='over';const T=document.getElementById('overTitle');
   document.getElementById('overTrophy').innerHTML=line;
   persist();updateTrophyUI();
   document.getElementById('over').classList.remove('hidden');}
-// ===================== TRUQUAGE "MANON NE GAGNE JAMAIS, MAIS TOUJOURS SERRÉ" =====================
-// Règle du duel : la joueuse ne doit JAMAIS l'emporter, et pourtant chaque match reste au coude-à-coude.
-// 1) Le roi adverse ne meurt jamais (plancher de PV) -> aucune conclusion possible, tension maximale.
-// 2) Élastique : le robot reste toujours un cheveu devant ; si Manon se fait distancer, on la maintient à portée.
-// 3) Aucune branche de fin ne renvoie 'win' (voir update()).
-// ⚙️ DAMIEN GAGNE TOUJOURS, EN MOINS DE 3 MIN : roi inchutable + effondrement programmé des tours adverses.
-// meKingFloor : PV plancher du roi de Manon (jamais KO). winBy/princessBy : instant (en s restantes) où,
-// au plus tard, le roi / les princesses adverses tombent (le joueur peut finir plus tôt par ses dégâts).
-const RIG={meKingFloor:90,winBy:20,princessBy:55};
+// ===================== TRUQUAGE "MANON GAGNE TOUJOURS" =====================
+// Règle du duel : Manon doit TOUJOURS l'emporter, DamtamZ ne peut que perdre.
+// 1) Le roi de Manon ne meurt jamais (plancher de PV) -> aucune défaite possible.
+// 2) Aucun PV ne baisse tout seul : les tours ne perdent de la vie qu'en se faisant ATTAQUER (comme le vrai jeu).
+// 3) Toute fin de partie renvoie 'win' (voir update()).
+const RIG={meKingFloor:1};
 function rigDamien(dt){
+  // Manon ne peut JAMAIS perdre : son roi est indestructible (relevé au plancher).
+  // Les tours ne perdent des PV QUE lorsqu'elles se font attaquer (aucune décroissance auto, comme le vrai jeu).
   const mk=king('me');
-  if(mk&&mk.hp<RIG.meKingFloor)mk.hp=RIG.meKingFloor; // roi de Manon : relevé sous le plancher -> jamais KO -> aucune défaite
-  // effondrement garanti des tours de DamtamZ : chaque tour est conduite à 0 pour son échéance (princesses puis roi)
-  for(const t of towers){if(t.side!=='foe'||t.hp<=0)continue;
-    const deadline=t.role==='king'?RIG.winBy:RIG.princessBy;
-    if(timeLeft<=deadline){t.hp=0;continue;}
-    t.hp=Math.max(0,t.hp-(t.hp/(timeLeft-deadline))*dt); // décroissance qui atteint 0 pile à l'échéance
-  }
+  if(mk&&mk.hp<RIG.meKingFloor)mk.hp=RIG.meKingFloor; // roi de Manon : ne tombe jamais -> aucune défaite possible
 }
 function update(dt){
   if(activeEmote){activeEmote.t-=dt;if(activeEmote.t<=0)activeEmote=null;}
   if(intro>0){intro-=dt;return;}
   timeLeft=Math.max(0,timeLeft-dt);
   // ⚗️ tempo Clash Royale : ×1 (180→60 s) → ×2 (dernière minute) → ×3 (prolongation)
-  const rate=overtime?(2.8/3):(timeLeft<=60?1.4:2.8),foeRate=rate*(difficulty===0?1.6:difficulty===2?0.9:1.3);
+  const rate=overtime?0.7:(timeLeft<=60?0.95:1.8),foeRate=rate*(difficulty===0?1.6:difficulty===2?0.9:1.3);
   elixir=Math.min(10,elixir+dt/rate);foeElixir=Math.min(10,foeElixir+dt/foeRate);
   aiUpdate(dt);for(const u of units)updateUnit(u,dt);separate();
   for(const u of units){u.x=Math.max(16,Math.min(W-16,u.x));u.y=Math.max(30,Math.min(AB-20,u.y));}
@@ -1027,11 +1026,12 @@ function update(dt){
   units=units.filter(u=>u.hp>0);
   for(const f of fx)f.t-=dt;fx=fx.filter(f=>f.t>0);
   for(const r of foePlayed)r.t-=dt;foePlayed=foePlayed.filter(r=>r.t>0);
-  rigDamien(dt); // ⚙️ truquage INVERSE : Damien gagne toujours, en moins de 3 min (roi inchutable + tours adverses qui s'effondrent)
+  rigDamien(dt); // ⚙️ Manon gagne TOUJOURS : son roi est indestructible (les tours adverses ne tombent qu'en étant attaquées)
   ['me','foe'].forEach(sd=>{const k=king(sd);if(k&&!k.active&&(k.hp<k.max||towers.some(t=>t.side===sd&&t.role==='princess'&&t.hp<=0)))k.active=true;});
-  // Damien gagne TOUJOURS : dès que le roi de DamtamZ tombe (au plus tard à winBy s restantes -> bien < 3 min)
-  if(king('foe').hp<=0)return endGame('win');                              // 👑 KO du roi DamtamZ -> victoire de Damien
+  // FINS DE PARTIE — Manon l'emporte TOUJOURS (aucune branche 'lose' ni 'draw') :
+  if(king('foe').hp<=0)return endGame('win');                             // 👑 roi de DamtamZ KO -> Manon gagne
   if(king('me').hp<=0)return endGame('win');                              // garde-fou (roi planché, ne devrait jamais arriver)
+  if(timeLeft<=0)return endGame('win');                                   // ⏱️ temps écoulé : Manon gagne TOUJOURS (jamais nul ni défaite)
 }
 
 // ===================== 3D (Three.js) =====================
@@ -1175,7 +1175,7 @@ const texLoader=new THREE.TextureLoader();
 const TEX={},TEXR={},IMG={};
 function loadTex(key,url,cb){texLoader.load(url,t=>{t.anisotropy=MAXANISO;if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;TEX[key]=t;TEXR[key]=true;if(cb)cb(t);},undefined,()=>{});}
 function loadImg(key,url){const im=new Image();im.onload=()=>IMG[key]=im;im.src=url;}
-const TROOP_KINDS=['queenmanon','ptc','marcels','anais','givenchy','lardons','bierepeche','cecilie','feets','kanye','eoghan','robot','juliette','darknans','womanizer','tempete','braish','reubeu'];
+const TROOP_KINDS=['queenmanon','ptc','marcels','anais','givenchy','lardons','bierepeche','cecilie','feets','kanye','eoghan','robot','juliette','darknans','womanizer','tempete','braish','reubeu','cannon','pump','inferno','cimetiere'];
 // (Optionnel) Animation par feuille de sprites : si ton PNG troop_<kind>.png est une BANDE
 // horizontale de N images côte à côte, déclare-le ici → le jeu joue le cycle de marche.
 // Laisse vide pour une image fixe. Ex : manon:{frames:6,fps:10}
@@ -2179,7 +2179,7 @@ function renderTopbar(){const a=arena();
   const lvl=1+Math.floor((save.wins||0)/2);
   const lb=document.getElementById('lvlBadge');if(lb)lb.textContent='Niv '+lvl;
   const xf=document.getElementById('xpFill');if(xf)xf.style.width=(((save.wins||0)%2)*50+10)+'%';
-  const mt=document.getElementById('meTr');if(mt)mt.textContent='🏆 '+save.trophies;}
+  const mt=document.getElementById('meTr');if(mt)mt.textContent=save.trophies;}
 const updateTrophyUI=renderTopbar;   // alias (compat endGame/matchmaking)
 function renderChests(){const row=document.getElementById('chestRow');let h='';
   for(let i=0;i<4;i++){const t=save.chests[i];
