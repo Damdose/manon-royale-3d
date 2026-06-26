@@ -1689,10 +1689,11 @@ function resize(){
   const visible = Math.round((vv&&vv.height)||window.innerHeight||screen.height);
   // App installée -> on remplit l'écran PHYSIQUE (lvh) = plus aucune bande. Navigateur -> zone visible.
   const appH = sa ? Math.max(lvh||0, vh||0, visible, screen.height||0) : visible;
-  // sab = hauteur de la barre d'accueil = lvh - svh (fiable partout), repli sur env() / (appH-visible).
-  const bandBottom = (lvh&&svh) ? Math.max(0, lvh-svh) : Math.max(0, appH-visible);
-  SABOT = Math.max(measureInset('bottom'), sa ? bandBottom : 0);
-  document.documentElement.style.setProperty('--sab', SABOT+'px');   // décale nav/cartes/HUD au-dessus de la barre d'accueil
+  // Décalage du contenu = seulement la part du canvas qui DÉBORDE dans la zone barre d'accueil (appH - svh).
+  // Si le canvas s'arrête déjà à la zone sûre (cas iPhone : appH==svh), décalage=0 -> le fond de page comble,
+  // PAS de bande de bois/navy morte. Sinon (canvas plein écran), on remonte de la hauteur barre d'accueil.
+  SABOT = sa ? (svh ? Math.max(0, appH - svh) : measureInset('bottom')) : 0;
+  document.documentElement.style.setProperty('--sab', SABOT+'px');
   document.documentElement.style.setProperty('--app-h', appH+'px');
   const wrap=document.getElementById('wrap'), rect=wrap.getBoundingClientRect();
   const winW=Math.round(rect.width)||window.innerWidth, winH=Math.round(rect.height)||appH;
@@ -2659,7 +2660,7 @@ window.addEventListener('load',function(){ setTimeout(maybeShowIosInstall,1200);
 <script>
 // Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
 (function(){
-  var BUILD='v39';
+  var BUILD='v40';
   // Badge tapotable (coin bas-gauche) qui affiche EN PERMANENCE toutes les mesures -> une capture me révèle la bonne valeur.
   var tag=document.createElement('div');
   tag.style.cssText='position:fixed;z-index:99999;left:calc(3px + env(safe-area-inset-left));bottom:calc(3px + env(safe-area-inset-bottom));padding:5px 7px;font:9px/1.25 monospace;color:rgba(255,255,255,.6);background:rgba(0,0,0,.45);border-radius:5px;pointer-events:auto;cursor:pointer;white-space:pre;';
