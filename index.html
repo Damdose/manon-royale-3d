@@ -1040,6 +1040,7 @@ function wx(x){return (x/W-0.5)*FW;}
 function wz(y){return (y/AB-0.5)*FD;}
 function ws(px){return px/W*FW;}   // échelle px -> monde
 let scene,camera,renderer,glcanvas,sunLight,groundMesh,raycaster,mouseNDC,groundPlane,previewMesh,dynGroup;
+let MAXANISO=8;   // anisotropie max du GPU (renseignée à la création du renderer) -> textures nettes en angle rasant
 const THREEC=c=>new THREE.Color(c);
 
 function groundTexture(){
@@ -1072,12 +1073,12 @@ function groundTexture(){
   // pads des tours-princesses (sur la lane)
   for(const lx of LANE){lane(lx-32,lx+32,ROW_PRINCESS-28,ROW_PRINCESS+30);lane(lx-32,lx+32,AB-ROW_PRINCESS-30,AB-ROW_PRINCESS+28);}
   // (rivière + ponts restent en VRAI 3D en relief -> pas peints ici, on garde la profondeur 2.5D)
-  const tex=new THREE.CanvasTexture(c);tex.anisotropy=8;if(THREE.sRGBEncoding!==undefined)tex.encoding=THREE.sRGBEncoding;return tex;
+  const tex=new THREE.CanvasTexture(c);tex.anisotropy=MAXANISO;if(THREE.sRGBEncoding!==undefined)tex.encoding=THREE.sRGBEncoding;return tex;
 }
 // ===================== SPRITES DESSINÉS 2D (style CR, remplacent les primitives moches) =====================
 const OUT='#2a1c12';
 function _cv(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.lineJoin='round';x.lineCap='round';return [c,x];}
-function _tex(c){const t=new THREE.CanvasTexture(c);t.anisotropy=4;if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;return t;}
+function _tex(c){const t=new THREE.CanvasTexture(c);t.anisotropy=MAXANISO;if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;return t;}
 // ombre « blob » douce (dégradé radial) partagée par toutes les troupes — bords flous au lieu d'un disque net
 let _shTex;
 function softShadowTex(){if(_shTex)return _shTex;const[c,x]=_cv(64,64);
@@ -1172,7 +1173,7 @@ function buildDrawnSprites(){
 // ----- chargement des assets images (sprites/textures), repli si absent -----
 const texLoader=new THREE.TextureLoader();
 const TEX={},TEXR={},IMG={};
-function loadTex(key,url,cb){texLoader.load(url,t=>{if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;TEX[key]=t;TEXR[key]=true;if(cb)cb(t);},undefined,()=>{});}
+function loadTex(key,url,cb){texLoader.load(url,t=>{t.anisotropy=MAXANISO;if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;TEX[key]=t;TEXR[key]=true;if(cb)cb(t);},undefined,()=>{});}
 function loadImg(key,url){const im=new Image();im.onload=()=>IMG[key]=im;im.src=url;}
 const TROOP_KINDS=['queenmanon','ptc','marcels','anais','givenchy','lardons','bierepeche','cecilie','feets','kanye','eoghan','robot','juliette','darknans','womanizer','tempete','braish','reubeu'];
 // (Optionnel) Animation par feuille de sprites : si ton PNG troop_<kind>.png est une BANDE
@@ -1192,10 +1193,10 @@ function loadAssets(){
   for(const r of ['king','princess'])for(const s of ['blue','red'])loadTex('towercastle_cut_'+r+'_'+s,'assets/towercastle_cut_'+r+'_'+s+'.png',()=>rebuildTowers());
   // bustes (tête+torse) des persos de tour -> se posent dans le rempart
   for(const r of ['king','princess'])for(const s of ['blue','red'])loadTex('towerchar_bust_'+r+'_'+s,'assets/towerchar_bust_'+r+'_'+s+'.png',()=>rebuildTowers());
-  loadTex('arena','assets/arena.png',t=>{t.anisotropy=4;groundMesh.material.map=t;groundMesh.material.needsUpdate=true;});
+  loadTex('arena','assets/arena.png',t=>{t.anisotropy=MAXANISO;groundMesh.material.map=t;groundMesh.material.needsUpdate=true;});
   // décor de bordure (arbres + rochers) en art détouré -> reconstruit dès qu'une texture arrive
   for(const k of ['tree1','tree2','tree3','tree4','rock1','rock2'])loadTex('decor_'+k,'assets/decor_'+k+'.png',()=>renderDecor());
-  // (background.png supprimé : fichier inexistant -> évite un 404 à chaque chargement)
+  // background.png supprime (404 inutile)
   for(const k of CARD_KEYS)loadImg('card_'+k,'assets/card_'+k+'.png');
   loadImg('chat','assets/ui_chat.png');                              // icône 3D du bouton discuter
 }
@@ -1671,7 +1672,7 @@ function maybeShowIosInstall(){
 }
 window.__diag={};
 function resize(){
-  DPR=Math.min(2.75,window.devicePixelRatio||1);
+  DPR=Math.min(3,window.devicePixelRatio||1);   // HUD/cartes 2D rendus en pleine densité native (iPhone Pro=3) -> texte et icônes nets
   applyInsets();   // ré-applique les marges d'encoche/barre home à chaque mesure (corrige le env()=0 au lancement)
   SATOP=measureInset('top');   // retrait encoche/dynamic island -> décale le HUD de combat dessiné sur le canvas
   // APP INSTALLÉE -> 100vh = TOUT l'écran (852), y compris sous la barre d'état -> aucun espace en bas.
@@ -1684,8 +1685,9 @@ function resize(){
   // -> le wrap atteint toujours le bas de l'écran = AUCUNE bande navy. La marge safe-area de la tabbar
   //    absorbe la zone de la barre d'accueil pour ne rien couper.
   const wrapEl=document.getElementById('wrap'); if(wrapEl)wrapEl.classList.toggle('fs', sa);
-  const appH = sa ? Math.max(vh,fvp,window.innerHeight||0,screen.height||0)
-                  : Math.round((vv&&vv.height)||window.innerHeight);
+  // Hauteur = ZONE RÉELLEMENT VISIBLE (visualViewport), en app comme en navigateur.
+  // Ni screen.height (trop grand -> coupe haut/bas), ni 100vh (variable selon iOS -> bande).
+  const appH = Math.round((vv&&vv.height)||window.innerHeight||screen.height);
   document.documentElement.style.setProperty('--app-h', appH+'px');
   const wrap=document.getElementById('wrap'), rect=wrap.getBoundingClientRect();
   const winW=Math.round(rect.width)||window.innerWidth, winH=Math.round(rect.height)||appH;
@@ -1859,6 +1861,8 @@ function drawHUD(){
     uic.save();uic.shadowColor='rgba(0,0,0,.45)';uic.shadowBlur=4;uic.shadowOffsetY=2;crownIcon(cx,cyy-3,ic,col,colD);uic.restore();
     const py=cyy+11;uic.fillStyle='#160c1e';rr(cx-13,py,26,20,5);uic.fill();uic.lineWidth=2;uic.strokeStyle=colD;rr(cx-13,py,26,20,5);uic.stroke();
     uic.textAlign='center';crText(''+n,cx,py+15,15*(1+pk*0.4),'#fff',colD,3);}
+  // --- HUD du haut : décalé sous l'encoche / dynamic island (safe-area top) ---
+  uic.save();uic.translate(0,SATOP);
   // --- profil adverse (haut-gauche) : avatar + nom + trophées ---
   uic.save();uic.shadowColor='rgba(0,0,0,.4)';uic.shadowBlur=4;uic.shadowOffsetY=2;
   uic.fillStyle='#b23a8a';rr(8,9,34,34,8);uic.fill();uic.restore();
@@ -1884,13 +1888,14 @@ function drawHUD(){
     const eg=uic.createLinearGradient(0,8,0,50);eg.addColorStop(0,exMult===3?'#ff6bd0':'#c64bd6');eg.addColorStop(1,'#5a1450');uic.fillStyle=eg;rr(bx,8,bw,42,8);uic.fill();uic.restore();
     uic.lineWidth=2;uic.strokeStyle='#ffd9f5';rr(bx,8,bw,42,8);uic.stroke();
     uic.textAlign='center';crText('ÉLIXIR',bx+bw/2,22,8,'#ffd9f5',null);crText('×'+exMult,bx+bw/2,44,18,'#fff','#5a1450',3);}
+  uic.restore();   // fin du HUD haut décalé sous l'encoche
   // --- couronnes (bord droit, à hauteur de rivière) ---
   const ry=worldToScreen(W/2,RIVER,0).y,ccx=VW-24;
   crownTally(ccx,Math.max(70,ry-32),crowns('foe'),'#e24b8a','#8a1f4f',crownPop.foe);
   crownTally(ccx,ry+34,crowns('me'),'#2f8fda','#143e8c',crownPop.me);
   // révélation cartes adverses : VRAIE carte (image en grand + nom + coût), haut droite sous le minuteur
   // la dernière carte invoquée s'affiche en GROS avec un pop d'entrée ; les précédentes restent petites en dessous
-  let ry0=58;
+  let ry0=58+SATOP;
   for(let i=0;i<foePlayed.length;i++){const r=foePlayed[i],c=CARDS[r.key];
     const newest=i===0;                                                                            // i=0 = dernière invoquée (unshift)
     const cw=newest?74:46,chh=newest?92:57,x=VW-cw-8,y=ry0;ry0+=chh+8;
@@ -2644,7 +2649,7 @@ window.addEventListener('load',function(){ setTimeout(maybeShowIosInstall,1200);
 <script>
 // Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
 (function(){
-  var BUILD='v43';
+  var BUILD='v44';
   // Badge tapotable (coin bas-gauche) qui affiche EN PERMANENCE toutes les mesures -> une capture me révèle la bonne valeur.
   var tag=document.createElement('div');
   tag.style.cssText='position:fixed;z-index:99999;left:calc(3px + env(safe-area-inset-left));bottom:calc(3px + env(safe-area-inset-bottom));padding:5px 7px;font:9px/1.25 monospace;color:rgba(255,255,255,.6);background:rgba(0,0,0,.45);border-radius:5px;pointer-events:auto;cursor:pointer;white-space:pre;';
