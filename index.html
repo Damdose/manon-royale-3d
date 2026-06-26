@@ -34,7 +34,7 @@
   #wrap{position:fixed;top:0;left:0;width:100vw;height:100dvh;height:var(--app-h,100dvh);overflow:hidden;background:#0a1736;touch-action:none;}
   /* App installée iOS : le MOT-CLÉ CSS 100vh (qu'iOS peint vraiment plein écran), pas une valeur px. */
   /* App installée : hauteur = --app-h (= max des mesures, dont screen.height) -> remplit l'écran physique, pas de bande. */
-  #wrap.fs{height:100lvh;height:var(--app-h,100lvh);}
+  #wrap.fs{height:var(--app-h,100vh);}
   #gl,#ui{position:absolute;display:block;touch-action:none;}
   #ui{touch-action:none;}
   .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff7e6;
@@ -239,7 +239,7 @@
   .pv-rule{position:relative;display:flex;align-items:center;gap:16px;width:min(86vw,380px);padding:16px 20px;border-radius:18px;background:rgba(0,0,0,.42);border:3px solid #fff;box-shadow:0 8px 30px rgba(0,0,0,.5);opacity:0;}
   .pv-rule.win{border-color:#ff6fa5;box-shadow:0 8px 34px rgba(255,60,120,.35);animation:pvInLeft .55s cubic-bezier(.2,1.3,.4,1) .55s both;}
   .pv-rule.lose{border-color:#9be86a;box-shadow:0 8px 34px rgba(110,220,70,.32);animation:pvInRight .55s cubic-bezier(.2,1.3,.4,1) .9s both;}
-  .pv-emo{width:58px;height:58px;object-fit:contain;line-height:1;flex:0 0 auto;filter:drop-shadow(0 3px 4px rgba(0,0,0,.45));animation:pvPulse 1.1s ease-in-out infinite;}
+  .pv-emo{font-size:46px;line-height:1;flex:0 0 auto;animation:pvPulse 1.1s ease-in-out infinite;}
   .pv-txt{font-family:'Supercell Magic','Lilita One',sans-serif;font-size:18px;line-height:1.4;color:#fff;text-shadow:0 2px 3px rgba(0,0,0,.7);}
   .pv-rule.win .pv-txt b{color:#ff8fb8;} .pv-rule.lose .pv-txt b{color:#aef07e;}
   .pv-go{position:relative;font-family:'Supercell Magic','Lilita One',sans-serif;font-size:22px;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.7);opacity:0;animation:pvGo .5s ease 1.5s both;}
@@ -629,7 +629,7 @@
       <div class="card-grid" id="deckPool"></div>
       <div class="ds-actions">
         <button class="btn btn-sm" id="deckBackBtn">Retour</button>
-        <button class="btn battle-btn" id="deckGoBtn">Combattre</button>
+        <button class="btn battle-btn" id="deckGoBtn">Combattre ⚔️</button>
       </div>
     </div>
   </div>
@@ -637,9 +637,9 @@
   <!-- 3b) ANIMATION DE L'ENJEU (avant le VS) -->
   <div id="prevs" class="overlay scr hidden">
     <div class="pv-wrap">
-      <div class="pv-title">L'ENJEU</div>
-      <div class="pv-rule win"><img class="pv-emo" src="assets/ui_intro_heart.png" alt=""><div class="pv-txt">Si tu <b>GAGNES</b><br>on ne se parle plus jamais</div></div>
-      <div class="pv-rule lose"><img class="pv-emo" src="assets/ui_intro_robot.png" alt=""><div class="pv-txt">Si tu <b>PERDS</b><br>tu dois me pardonner</div></div>
+      <div class="pv-title">⚔️ L'ENJEU ⚔️</div>
+      <div class="pv-rule win"><span class="pv-emo">💔</span><div class="pv-txt">Si tu <b>GAGNES</b><br>on ne se parle plus jamais</div></div>
+      <div class="pv-rule lose"><span class="pv-emo">🥹</span><div class="pv-txt">Si tu <b>PERDS</b><br>tu dois me pardonner</div></div>
       <div class="pv-go">Que le duel commence…</div>
     </div>
   </div>
@@ -772,23 +772,23 @@ const CARDS={
   ketamine:   {camp:'robot',name:'Ketamine K',cost:4,color:'#f2f2f2',spell:true,radius:50,dmg:380,abil:'Frappe',icon:'☄️',desc:'Sort lourd : énormes dégâts sur petite zone.'},
   chiffretwo: {camp:'robot',name:'Chiffre Two',cost:2,color:'#ff6bd0',spell:true,radius:96,rage:6,abil:'Rage',icon:'😤',desc:'Sort : enrage les alliés (vitesse et dégâts +40%).'},
   tempete:    {camp:'robot',name:'Tempête Émo',cost:4,color:'#5a7ad6',count:1,hp:380,dmg:95,range:92,atk:1.0,speed:40,r:12,kind:'tempete',targets:'any',body:'human',skin:'#e3b48a',abil:'Anti-air',icon:'🎯',desc:'Tireur longue portée, sol et air.'},
-  braish:     {camp:'robot',name:'Manon Braish',cost:5,color:'#c0392b',count:1,hp:460,dmg:100,range:80,atk:1.4,speed:36,r:13,kind:'braish',targets:'any',splash:32,body:'human',skin:'#c79a6f',abil:'Éclats',icon:'💥',desc:'Soutien splash à distance, sol et air.'},
+  braish:     {camp:'robot',name:'Manon Braish',cost:5,color:'#c0392b',count:1,hp:460,dmg:100,range:80,atk:1.4,speed:36,r:13,kind:'braish',targets:'any',splash:32,body:'human',skin:'#6b4a2e',abil:'Éclats',icon:'💥',desc:'Soutien splash à distance, sol et air.'},
   inferno:    {camp:'robot',name:'Attaque Nihiliste',cost:5,color:'#3a3340',building:true,life:30,hp:500,dmg:28,range:72,atk:0.4,r:13,kind:'inferno',targets:'any',ramp:{step:0.5,max:6},abil:'Néant',icon:'🥀',desc:'Bâtiment : Nietzsche distille un néant qui ronge de plus en plus fort (sol et air).'},
   cimetiere:  {camp:'robot',name:'Attaque de la Voyante',cost:3,color:'#5a3a7a',building:true,life:22,hp:300,r:12,kind:'cimetiere',targets:'ground',spawner:{card:'reubeu',interval:5},abil:'Invocation',icon:'🔮',desc:'Bâtiment : la voyante invoque des sbires en continu pour défendre.'},
   colis:      {camp:'robot',name:'Avalanche Colis',cost:4,color:'#b5853f',spell:true,radius:72,dmg:200,stun:0.5,abil:'Impact',icon:'🧱',desc:'Sort : dégâts + courte stun (coupe les charges).'},
   addition:   {camp:'robot',name:"Paye l'Addition",cost:3,color:'#5cd685',spell:true,radius:74,poison:{dps:75,dur:4},abil:'Poison',icon:'☠️',desc:'Sort : zone toxique qui ronge les PV dans la durée.'},
-  reubeu:     {camp:'robot',name:'Reubeu Soins',cost:4,color:'#3a3a44',count:6,hp:165,dmg:62,range:16,atk:1.0,speed:88,r:9,kind:'reubeu',targets:'ground',body:'human',skin:'#b5895f',abil:'Essaim',icon:'👥',desc:'Essaim de 6 : submerge les tanks au sol.'},
+  reubeu:     {camp:'robot',name:'Reubeu Soins',cost:4,color:'#3a3a44',count:4,hp:165,dmg:62,range:16,atk:1.0,speed:88,r:9,kind:'reubeu',targets:'ground',body:'human',skin:'#8a6a4a',abil:'Essaim',icon:'👥',desc:'Essaim costaud : submerge les tanks au sol.'},
   heartbreak2:{camp:'robot',name:'Brisage de Cœur',cost:2,color:'#ff5c9e',spell:true,radius:62,dmg:160,knock:30,abil:'Recul',icon:'💨',desc:'Sort : repousse l’ennemi et coupe les charges.'},
 };
-// ⚖️ ÉQUILIBRAGE : les cartes de DamtamZ sont volontairement plus FORTES → Manon perd par le JEU
-// (vraies stats boostées, aucun mode triche apparent). Ajuste FOE_BUFF pour rendre l'adversaire + ou - dur.
-const FOE_BUFF={hp:1.7,dmg:1.8,shield:1.8,spell:1.8,poison:1.8,death:1.9};
+// ⚖️ ÉQUILIBRAGE : les cartes de DamtamZ sont volontairement plus faibles → Damien gagne par le JEU
+// (vraies stats nerfées, aucun mode triche). Ajuste FOE_NERF pour rendre l'adversaire + ou - dur.
+const FOE_NERF={hp:0.55,dmg:0.6,shield:0.5,spell:0.55,poison:0.55,death:0.5};
 for(const k in CARDS){const c=CARDS[k];if(c.camp!=='robot')continue;
-  if(c.hp)c.hp=Math.round(c.hp*FOE_BUFF.hp);
-  if(c.dmg)c.dmg=Math.round(c.dmg*(c.spell?FOE_BUFF.spell:FOE_BUFF.dmg));
-  if(c.shield)c.shield=Math.round(c.shield*FOE_BUFF.shield);
-  if(c.poison&&c.poison.dps)c.poison.dps=Math.round(c.poison.dps*FOE_BUFF.poison);
-  if(c.deathDmg&&c.deathDmg.dmg)c.deathDmg.dmg=Math.round(c.deathDmg.dmg*FOE_BUFF.death);
+  if(c.hp)c.hp=Math.round(c.hp*FOE_NERF.hp);
+  if(c.dmg)c.dmg=Math.round(c.dmg*(c.spell?FOE_NERF.spell:FOE_NERF.dmg));
+  if(c.shield)c.shield=Math.round(c.shield*FOE_NERF.shield);
+  if(c.poison&&c.poison.dps)c.poison.dps=Math.round(c.poison.dps*FOE_NERF.poison);
+  if(c.deathDmg&&c.deathDmg.dmg)c.deathDmg.dmg=Math.round(c.deathDmg.dmg*FOE_NERF.death);
 }
 // deck du JOUEUR (camp Manon) + deck de l'IA (Robot DamtamZ)
 const DECK=['queenmanon','ptc','marcels','anais','givenchy','lardons','bierepeche','cecilie','feets','kanye','eoghan','cannon','pompe','sorciere','lecturemain','heartbreak'];
@@ -901,12 +901,12 @@ function aiUpdate(dt){foeTimer-=dt;if(foeTimer>0)return;
   // cartes jouables dans la main (coût ≤ élixir) → choix AU HASARD pour une vraie variété
   const playable=[0,1,2,3].filter(s=>{const c=CARDS[foeHand[s]];return c&&foeElixir>=(c.cost||0);});
   if(!playable.length){foeTimer=0.5;return;}
-  // DamtamZ enchaîne dès qu'il a 4 d'élixir → matraquage permanent, aucune fenêtre pour Manon
-  if(foeElixir<4){foeTimer=0.25;return;}
+  // garde parfois de l'élixir d'avance → reste battable (ne vide pas toujours sa main d'un coup)
+  if(!th.length&&foeElixir<4&&Math.random()<0.5){foeTimer=0.6;return;}
   const slot=playable[(Math.random()*playable.length)|0];
   foePlaySlot(slot,th);
-  // tempo entre deux cartes : rapide et agressif (la pression ne retombe jamais)
-  foeTimer=0.7+Math.random()*0.8;
+  // tempo entre deux cartes : assez lent pour laisser le joueur gagner
+  foeTimer=2.2+Math.random()*1.8;
 }
 
 // ===================== COMBAT =====================
@@ -965,7 +965,7 @@ function endGame(res){state='over';const T=document.getElementById('overTitle');
   const rn=document.getElementById('rivalName');document.getElementById('overFoeName').textContent=(rn&&rn.textContent)||'Robot DamtamZ';
   T.textContent=res==='win'?'Victoire !':res==='lose'?'Défaite':'Égalité';
   T.style.color=res==='win'?'#7fe0ff':res==='lose'?'#ff9a9a':'#ffe79a';
-  document.getElementById('overMsg').textContent=res==='win'?"Tu m'as battu… donc, comme convenu, on ne s'adresse plus JAMAIS la parole. (T'es vraiment sûre ?)":res==='lose'?"Le robot DamtamZ l'emporte : règle officielle du duel, tu es désormais obligée de le pardonner.":"Match nul. Le destin hésite encore… rejoue pour trancher notre sort.";
+  document.getElementById('overMsg').textContent=res==='win'?"💔 Tu m'as battu… donc, comme convenu, on ne s'adresse plus JAMAIS la parole. (T'es vraiment sûre ?)":res==='lose'?"🥹 Le robot DamtamZ l'emporte : règle officielle du duel, tu es désormais obligée de le pardonner.":"Match nul. Le destin hésite encore… rejoue pour trancher notre sort.";
   if(res==='win')sfx('win'); else if(res==='lose')sfx('lose');
   // couronnes gagnées (= tours adverses détruites)
   const myc=crowns('foe');let ch='';for(let i=0;i<3;i++)ch+='<div class="crown-slot'+(i<myc?'':' empty')+'"><img src="assets/ui_crown.png" onerror="this.replaceWith(\'👑\')"></div>';
@@ -982,21 +982,21 @@ function endGame(res){state='over';const T=document.getElementById('overTitle');
   document.getElementById('overTrophy').innerHTML=line;
   persist();updateTrophyUI();
   document.getElementById('over').classList.remove('hidden');}
-// ===================== TRUQUAGE "MANON PERD TOUJOURS, EN MOINS DE 3 MIN" =====================
-// Règle du duel : la joueuse ne doit JAMAIS l'emporter. Le robot DamtamZ gagne à tous les coups.
-// 1) Le roi de DamtamZ ne meurt jamais (plancher de PV) -> aucune victoire possible pour Manon.
-// 2) Effondrement programmé des tours de MANON : princesses puis roi tombent avant la fin du temps.
-// 3) La seule fin possible est 'lose' (voir update()).
-// ⚙️ DAMTAMZ GAGNE TOUJOURS, EN MOINS DE 3 MIN : roi inchutable + effondrement programmé des tours de Manon.
-// foeKingFloor : PV plancher du roi de DamtamZ (jamais KO). loseBy/princessBy : instant (en s restantes) où,
-// au plus tard, le roi / les princesses de Manon tombent (DamtamZ peut finir plus tôt par ses dégâts).
-const RIG={foeKingFloor:140,loseBy:25,princessBy:75};
-function rigDamtamZ(dt){
-  const fk=king('foe');
-  if(fk&&fk.hp<RIG.foeKingFloor)fk.hp=RIG.foeKingFloor; // roi de DamtamZ : relevé sous le plancher -> jamais KO -> Manon ne gagne jamais
-  // effondrement garanti des tours de MANON : chaque tour est conduite à 0 pour son échéance (princesses puis roi)
-  for(const t of towers){if(t.side!=='me'||t.hp<=0)continue;
-    const deadline=t.role==='king'?RIG.loseBy:RIG.princessBy;
+// ===================== TRUQUAGE "MANON NE GAGNE JAMAIS, MAIS TOUJOURS SERRÉ" =====================
+// Règle du duel : la joueuse ne doit JAMAIS l'emporter, et pourtant chaque match reste au coude-à-coude.
+// 1) Le roi adverse ne meurt jamais (plancher de PV) -> aucune conclusion possible, tension maximale.
+// 2) Élastique : le robot reste toujours un cheveu devant ; si Manon se fait distancer, on la maintient à portée.
+// 3) Aucune branche de fin ne renvoie 'win' (voir update()).
+// ⚙️ DAMIEN GAGNE TOUJOURS, EN MOINS DE 3 MIN : roi inchutable + effondrement programmé des tours adverses.
+// meKingFloor : PV plancher du roi de Manon (jamais KO). winBy/princessBy : instant (en s restantes) où,
+// au plus tard, le roi / les princesses adverses tombent (le joueur peut finir plus tôt par ses dégâts).
+const RIG={meKingFloor:90,winBy:20,princessBy:55};
+function rigDamien(dt){
+  const mk=king('me');
+  if(mk&&mk.hp<RIG.meKingFloor)mk.hp=RIG.meKingFloor; // roi de Manon : relevé sous le plancher -> jamais KO -> aucune défaite
+  // effondrement garanti des tours de DamtamZ : chaque tour est conduite à 0 pour son échéance (princesses puis roi)
+  for(const t of towers){if(t.side!=='foe'||t.hp<=0)continue;
+    const deadline=t.role==='king'?RIG.winBy:RIG.princessBy;
     if(timeLeft<=deadline){t.hp=0;continue;}
     t.hp=Math.max(0,t.hp-(t.hp/(timeLeft-deadline))*dt); // décroissance qui atteint 0 pile à l'échéance
   }
@@ -1006,12 +1006,12 @@ function update(dt){
   if(intro>0){intro-=dt;return;}
   timeLeft=Math.max(0,timeLeft-dt);
   // ⚗️ tempo Clash Royale : ×1 (180→60 s) → ×2 (dernière minute) → ×3 (prolongation)
-  const rate=overtime?(2.8/3):(timeLeft<=60?1.4:2.8),foeRate=rate*0.55;   // DamtamZ régénère son élixir ~2× plus vite que Manon -> pression constante
+  const rate=overtime?(2.8/3):(timeLeft<=60?1.4:2.8),foeRate=rate*(difficulty===0?1.6:difficulty===2?0.9:1.3);
   elixir=Math.min(10,elixir+dt/rate);foeElixir=Math.min(10,foeElixir+dt/foeRate);
   aiUpdate(dt);for(const u of units)updateUnit(u,dt);separate();
   for(const u of units){u.x=Math.max(16,Math.min(W-16,u.x));u.y=Math.max(30,Math.min(AB-20,u.y));}
   for(const t of towers)updateTower(t,dt);
-  for(const t of towers)if(t.hp<=0&&!t.boomed&&!(t.side==='me'&&t.role==='king')){t.boomed=true;onTowerDown(t);fx.push({type:'boom',x:t.x,y:t.y,r:t.r*1.4,t:.6,life:.6});fx.push({type:'crownpop',x:t.x,y:t.y,t:1.1,life:1.1});addShake(0.5);flash=Math.min(0.55,flash+0.45);crownPop[t.side]=0.6;if(typeof sfx==='function')sfx('boom');   // chute de tour : gros boom + couronne + secousse + flash + pop couronne
+  for(const t of towers)if(t.hp<=0&&!t.boomed&&!(t.side==='foe'&&t.role==='king')){t.boomed=true;onTowerDown(t);fx.push({type:'boom',x:t.x,y:t.y,r:t.r*1.4,t:.6,life:.6});fx.push({type:'crownpop',x:t.x,y:t.y,t:1.1,life:1.1});addShake(0.5);flash=Math.min(0.55,flash+0.45);crownPop[t.side]=0.6;if(typeof sfx==='function')sfx('boom');   // chute de tour : gros boom + couronne + secousse + flash + pop couronne
     for(let i=0;i<9;i++){const a=Math.random()*6.283,sp=18+Math.random()*30;fx.push({type:'debris',x:t.x,y:t.y,dx:Math.cos(a)*sp,dy:Math.sin(a)*sp,vUp:3+Math.random()*3.5,t:.7,life:.7,col:i%2?'#caa23a':'#8a8079'});}}   // éclats de débris
   // ☠️ zones toxiques persistantes (sort Poison) : dégâts continus aux ennemis dans la zone
   for(const f of fx)if(f.type==='poison'){const tick=f.dps*dt,foe=f.side==='foe'?'me':'foe';
@@ -1027,11 +1027,11 @@ function update(dt){
   units=units.filter(u=>u.hp>0);
   for(const f of fx)f.t-=dt;fx=fx.filter(f=>f.t>0);
   for(const r of foePlayed)r.t-=dt;foePlayed=foePlayed.filter(r=>r.t>0);
-  rigDamtamZ(dt); // ⚙️ truquage : DamtamZ gagne toujours, en moins de 3 min (son roi inchutable + tours de Manon qui s'effondrent)
+  rigDamien(dt); // ⚙️ truquage INVERSE : Damien gagne toujours, en moins de 3 min (roi inchutable + tours adverses qui s'effondrent)
   ['me','foe'].forEach(sd=>{const k=king(sd);if(k&&!k.active&&(k.hp<k.max||towers.some(t=>t.side===sd&&t.role==='princess'&&t.hp<=0)))k.active=true;});
-  // DamtamZ gagne TOUJOURS : dès que le roi de Manon tombe (au plus tard à loseBy s restantes -> bien < 3 min)
-  if(king('me').hp<=0)return endGame('lose');                             // 👑 KO du roi de Manon -> DamtamZ l'emporte
-  if(king('foe').hp<=0)return endGame('lose');                            // garde-fou (roi de DamtamZ planché, ne devrait jamais arriver)
+  // Damien gagne TOUJOURS : dès que le roi de DamtamZ tombe (au plus tard à winBy s restantes -> bien < 3 min)
+  if(king('foe').hp<=0)return endGame('win');                              // 👑 KO du roi DamtamZ -> victoire de Damien
+  if(king('me').hp<=0)return endGame('win');                              // garde-fou (roi planché, ne devrait jamais arriver)
 }
 
 // ===================== 3D (Three.js) =====================
@@ -1040,7 +1040,6 @@ function wx(x){return (x/W-0.5)*FW;}
 function wz(y){return (y/AB-0.5)*FD;}
 function ws(px){return px/W*FW;}   // échelle px -> monde
 let scene,camera,renderer,glcanvas,sunLight,groundMesh,raycaster,mouseNDC,groundPlane,previewMesh,dynGroup;
-let MAXANISO=8;   // anisotropie max du GPU (renseignée à la création du renderer) -> textures nettes en angle rasant
 const THREEC=c=>new THREE.Color(c);
 
 function groundTexture(){
@@ -1073,12 +1072,12 @@ function groundTexture(){
   // pads des tours-princesses (sur la lane)
   for(const lx of LANE){lane(lx-32,lx+32,ROW_PRINCESS-28,ROW_PRINCESS+30);lane(lx-32,lx+32,AB-ROW_PRINCESS-30,AB-ROW_PRINCESS+28);}
   // (rivière + ponts restent en VRAI 3D en relief -> pas peints ici, on garde la profondeur 2.5D)
-  const tex=new THREE.CanvasTexture(c);tex.anisotropy=MAXANISO;if(THREE.sRGBEncoding!==undefined)tex.encoding=THREE.sRGBEncoding;return tex;
+  const tex=new THREE.CanvasTexture(c);tex.anisotropy=8;if(THREE.sRGBEncoding!==undefined)tex.encoding=THREE.sRGBEncoding;return tex;
 }
 // ===================== SPRITES DESSINÉS 2D (style CR, remplacent les primitives moches) =====================
 const OUT='#2a1c12';
 function _cv(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.lineJoin='round';x.lineCap='round';return [c,x];}
-function _tex(c){const t=new THREE.CanvasTexture(c);t.anisotropy=MAXANISO;if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;return t;}
+function _tex(c){const t=new THREE.CanvasTexture(c);t.anisotropy=4;if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;return t;}
 // ombre « blob » douce (dégradé radial) partagée par toutes les troupes — bords flous au lieu d'un disque net
 let _shTex;
 function softShadowTex(){if(_shTex)return _shTex;const[c,x]=_cv(64,64);
@@ -1132,7 +1131,7 @@ function drawTroopTex(kind){const W=256,H=256,[c,x]=_cv(W,H);
     case 'diva': _human(x,W,H,{skin:'#f3c9a8',hair:'#3a2a4a',dress:'#ff4d96'});break;
     case 'damien': _human(x,W,H,{skin:'#c89a78',hair:'#26262e',dress:'#26262e',sleeve:'#26262e',shoe:'#111'});break;
     case 'mannequin': _human(x,W,H,{skin:'#bcd0e8',hair:null,dress:'#2f7bd6'});break;
-    case 'eoghan': _human(x,W,H,{skin:'#e8b48a',hair:'#7a4a2a',dress:'#2e7d4f',sleeve:'#256b42'});break;
+    case 'eoghan': _human(x,W,H,{skin:'#e8b48a',hair:'#a85a32',dress:'#2e7d4f',sleeve:'#256b42'});break;
     case 'caniche': drawPoodle(x,W,H);break;
     case 'pigeon': drawBird(x,W,H);break;
     case 'sac': drawObject(x,W,H,'#f4c84a','bag');break;
@@ -1173,7 +1172,7 @@ function buildDrawnSprites(){
 // ----- chargement des assets images (sprites/textures), repli si absent -----
 const texLoader=new THREE.TextureLoader();
 const TEX={},TEXR={},IMG={};
-function loadTex(key,url,cb){texLoader.load(url,t=>{t.anisotropy=MAXANISO;if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;TEX[key]=t;TEXR[key]=true;if(cb)cb(t);},undefined,()=>{});}
+function loadTex(key,url,cb){texLoader.load(url,t=>{if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;TEX[key]=t;TEXR[key]=true;if(cb)cb(t);},undefined,()=>{});}
 function loadImg(key,url){const im=new Image();im.onload=()=>IMG[key]=im;im.src=url;}
 const TROOP_KINDS=['queenmanon','ptc','marcels','anais','givenchy','lardons','bierepeche','cecilie','feets','kanye','eoghan','robot','juliette','darknans','womanizer','tempete','braish','reubeu'];
 // (Optionnel) Animation par feuille de sprites : si ton PNG troop_<kind>.png est une BANDE
@@ -1193,10 +1192,10 @@ function loadAssets(){
   for(const r of ['king','princess'])for(const s of ['blue','red'])loadTex('towercastle_cut_'+r+'_'+s,'assets/towercastle_cut_'+r+'_'+s+'.png',()=>rebuildTowers());
   // bustes (tête+torse) des persos de tour -> se posent dans le rempart
   for(const r of ['king','princess'])for(const s of ['blue','red'])loadTex('towerchar_bust_'+r+'_'+s,'assets/towerchar_bust_'+r+'_'+s+'.png',()=>rebuildTowers());
-  loadTex('arena','assets/arena.png',t=>{t.anisotropy=MAXANISO;groundMesh.material.map=t;groundMesh.material.needsUpdate=true;});
+  loadTex('arena','assets/arena.png',t=>{t.anisotropy=4;groundMesh.material.map=t;groundMesh.material.needsUpdate=true;});
   // décor de bordure (arbres + rochers) en art détouré -> reconstruit dès qu'une texture arrive
   for(const k of ['tree1','tree2','tree3','tree4','rock1','rock2'])loadTex('decor_'+k,'assets/decor_'+k+'.png',()=>renderDecor());
-  // (background.png supprimé : fichier inexistant -> 404 inutile à chaque chargement)
+  // (background.png supprimé : fichier inexistant -> évite un 404 à chaque chargement)
   for(const k of CARD_KEYS)loadImg('card_'+k,'assets/card_'+k+'.png');
   loadImg('chat','assets/ui_chat.png');                              // icône 3D du bouton discuter
 }
@@ -1512,7 +1511,7 @@ function addUnitMesh(u){
     // tête
     const head=new THREE.Mesh(new THREE.SphereGeometry(R*0.6,18,14),mat(skin));head.position.y=R*1.92+fly;head.castShadow=true;g.add(head);
     // cheveux selon le perso
-    const hairCol={queenmanon:'#ffd95e',marcels:'#3a2a20',anais:'#4a2e1c',givenchy:'#1a1a1a',cecilie:'#cfcfd6',kanye:'#1a1a1a',eoghan:'#7a4a2a',juliette:'#3a241a',darknans:'#ffe07a',tempete:'#3a241a',braish:'#1a1a1a',reubeu:'#1a1a1a'}[u.kind];
+    const hairCol={queenmanon:'#ffd95e',marcels:'#3a2a20',anais:'#4a2e1c',givenchy:'#1a1a1a',cecilie:'#cfcfd6',kanye:'#1a1a1a',eoghan:'#a85a32',juliette:'#3a241a',darknans:'#ffe07a',tempete:'#3a241a',braish:'#1a1a1a',reubeu:'#1a1a1a'}[u.kind];
     if(hairCol){const hair=new THREE.Mesh(new THREE.SphereGeometry(R*0.64,14,12),mat(hairCol));hair.scale.set(1,0.92,1);hair.position.set(0,R*2.0+fly,-R*0.12);hair.castShadow=true;g.add(hair);}
     // yeux (vers l'avant = +z, le perso est tourné vers sa cible)
     const eye=new THREE.MeshBasicMaterial({color:0x222222});
@@ -1630,7 +1629,7 @@ function worldToScreen(x,y,h){const v=new THREE.Vector3(wx(x),h||0,wz(y));v.proj
   return {x:(v.x*0.5+0.5)*VW,y:(-v.y*0.5+0.5)*VH,vis:v.z<1};}
 
 // ===================== OVERLAY 2D (HUD) =====================
-let uic,VW,VH,DPR,SATOP=0,SABOT=0;
+let uic,VW,VH,DPR,SATOP=0;
 const MAXA=0.60;    // ratio l/h max : au-delà (paysage/PC) on borne pour garder tout le plateau visible
 // Mesure les safe-area en JS (plus fiable que le CSS env() seul au démarrage à froid iOS) et les impose en variables CSS.
 function measureInset(side){
@@ -1672,7 +1671,7 @@ function maybeShowIosInstall(){
 }
 window.__diag={};
 function resize(){
-  DPR=Math.min(3,window.devicePixelRatio||1);   // HUD/cartes 2D rendus en pleine densité native (iPhone Pro=3) -> texte et icônes nets
+  DPR=Math.min(2.75,window.devicePixelRatio||1);
   applyInsets();   // ré-applique les marges d'encoche/barre home à chaque mesure (corrige le env()=0 au lancement)
   SATOP=measureInset('top');   // retrait encoche/dynamic island -> décale le HUD de combat dessiné sur le canvas
   // APP INSTALLÉE -> 100vh = TOUT l'écran (852), y compris sous la barre d'état -> aucun espace en bas.
@@ -1680,20 +1679,13 @@ function resize(){
   // NAVIGATEUR    -> visualViewport.height (zone visible entre les barres Safari).
   const vv=window.visualViewport;
   const fvp=measureFixedVP(), vh=measure100vh(), sa=isStandalone();
-  // lvh = grande fenêtre = ÉCRAN PHYSIQUE COMPLET (incl. zone barre d'accueil). svh = petite (zone sûre).
-  // C'est lvh qui remplit jusqu'en bas ; lvh - svh = hauteur EXACTE de la barre d'accueil, sur TOUS les iPhone.
-  const lvh=measureCSS('position:fixed;top:0;left:0;width:1px;height:100lvh;');
-  const svh=measureCSS('position:fixed;top:0;left:0;width:1px;height:100svh;');
-  window.__diag={fvp:fvp,vh:vh,scr:screen.height,vv:vv?Math.round(vv.height):0,inner:window.innerHeight,lvh:lvh,svh:svh};
+  window.__diag={fvp:fvp,vh:vh,scr:screen.height,vv:vv?Math.round(vv.height):0,inner:window.innerHeight};
+  // App installée : on remplit l'ÉCRAN PHYSIQUE réel. On prend le MAX de toutes les mesures (dont screen.height)
+  // -> le wrap atteint toujours le bas de l'écran = AUCUNE bande navy. La marge safe-area de la tabbar
+  //    absorbe la zone de la barre d'accueil pour ne rien couper.
   const wrapEl=document.getElementById('wrap'); if(wrapEl)wrapEl.classList.toggle('fs', sa);
-  const visible = Math.round((vv&&vv.height)||window.innerHeight||screen.height);
-  // App installée -> on remplit l'écran PHYSIQUE (lvh) = plus aucune bande. Navigateur -> zone visible.
-  const appH = sa ? Math.max(lvh||0, vh||0, visible, screen.height||0) : visible;
-  // Décalage du contenu de jeu = MÊME valeur que la nav du menu : env(safe-area-inset-bottom).
-  // Le menu marche avec ce décalage -> on l'applique au jeu pour que les cartes remontent pareil
-  // au-dessus de la barre d'accueil et ne soient JAMAIS coupées. Le bois remplit la zone décalée.
-  SABOT = sa ? measureInset('bottom') : 0;
-  document.documentElement.style.setProperty('--sab', SABOT+'px');
+  const appH = sa ? Math.max(vh,fvp,window.innerHeight||0,screen.height||0)
+                  : Math.round((vv&&vv.height)||window.innerHeight);
   document.documentElement.style.setProperty('--app-h', appH+'px');
   const wrap=document.getElementById('wrap'), rect=wrap.getBoundingClientRect();
   const winW=Math.round(rect.width)||window.innerWidth, winH=Math.round(rect.height)||appH;
@@ -1867,8 +1859,6 @@ function drawHUD(){
     uic.save();uic.shadowColor='rgba(0,0,0,.45)';uic.shadowBlur=4;uic.shadowOffsetY=2;crownIcon(cx,cyy-3,ic,col,colD);uic.restore();
     const py=cyy+11;uic.fillStyle='#160c1e';rr(cx-13,py,26,20,5);uic.fill();uic.lineWidth=2;uic.strokeStyle=colD;rr(cx-13,py,26,20,5);uic.stroke();
     uic.textAlign='center';crText(''+n,cx,py+15,15*(1+pk*0.4),'#fff',colD,3);}
-  // --- HUD du haut : décalé sous l'encoche / dynamic island (safe-area top) ---
-  uic.save();uic.translate(0,SATOP);
   // --- profil adverse (haut-gauche) : avatar + nom + trophées ---
   uic.save();uic.shadowColor='rgba(0,0,0,.4)';uic.shadowBlur=4;uic.shadowOffsetY=2;
   uic.fillStyle='#b23a8a';rr(8,9,34,34,8);uic.fill();uic.restore();
@@ -1894,14 +1884,13 @@ function drawHUD(){
     const eg=uic.createLinearGradient(0,8,0,50);eg.addColorStop(0,exMult===3?'#ff6bd0':'#c64bd6');eg.addColorStop(1,'#5a1450');uic.fillStyle=eg;rr(bx,8,bw,42,8);uic.fill();uic.restore();
     uic.lineWidth=2;uic.strokeStyle='#ffd9f5';rr(bx,8,bw,42,8);uic.stroke();
     uic.textAlign='center';crText('ÉLIXIR',bx+bw/2,22,8,'#ffd9f5',null);crText('×'+exMult,bx+bw/2,44,18,'#fff','#5a1450',3);}
-  uic.restore();   // fin du HUD haut décalé sous l'encoche
   // --- couronnes (bord droit, à hauteur de rivière) ---
   const ry=worldToScreen(W/2,RIVER,0).y,ccx=VW-24;
   crownTally(ccx,Math.max(70,ry-32),crowns('foe'),'#e24b8a','#8a1f4f',crownPop.foe);
   crownTally(ccx,ry+34,crowns('me'),'#2f8fda','#143e8c',crownPop.me);
   // révélation cartes adverses : VRAIE carte (image en grand + nom + coût), haut droite sous le minuteur
   // la dernière carte invoquée s'affiche en GROS avec un pop d'entrée ; les précédentes restent petites en dessous
-  let ry0=58+SATOP;
+  let ry0=58;
   for(let i=0;i<foePlayed.length;i++){const r=foePlayed[i],c=CARDS[r.key];
     const newest=i===0;                                                                            // i=0 = dernière invoquée (unshift)
     const cw=newest?74:46,chh=newest?92:57,x=VW-cw-8,y=ry0;ry0+=chh+8;
@@ -1937,10 +1926,8 @@ function drawHUD(){
     crText(txt,VW/2,(VH-UIH())/2,90,'#ffce3a','#5a3408',9);uic.textBaseline='alphabetic';}
 }
 // disposition du tray (partagée avec la détection des taps)
-function trayGeom(){const Hc=UIH(),H=Hc+SABOT,top=VH-H,lw=VW*0.19,cw=(VW-lw)/4,elixH=12;
-  // H = bois total (descend jusqu'en bas de l'écran, remplit la zone barre d'accueil = pas de bande).
-  // cartes/élixir calés sur la zone de contenu Hc, donc AU-DESSUS de la barre d'accueil (SABOT).
-  const cy=top+6,ch=Hc-36,ey=top+Hc-elixH-15;
+function trayGeom(){const H=UIH(),top=VH-H,lw=VW*0.19,cw=(VW-lw)/4,elixH=12;
+  const cy=top+6,ch=H-36,ey=top+H-elixH-15;
   return {H,top,lw,cw,elixH,cy,ch,ey};}
 function drawCards(){
   const {H,top,lw,cw,elixH,cy,ch,ey}=trayGeom();
@@ -2187,7 +2174,7 @@ function renderTopbar(){const a=arena();
   const lvl=1+Math.floor((save.wins||0)/2);
   const lb=document.getElementById('lvlBadge');if(lb)lb.textContent='Niv '+lvl;
   const xf=document.getElementById('xpFill');if(xf)xf.style.width=(((save.wins||0)%2)*50+10)+'%';
-  const mt=document.getElementById('meTr');if(mt)mt.textContent=''+save.trophies;}
+  const mt=document.getElementById('meTr');if(mt)mt.textContent='🏆 '+save.trophies;}
 const updateTrophyUI=renderTopbar;   // alias (compat endGame/matchmaking)
 function renderChests(){const row=document.getElementById('chestRow');let h='';
   for(let i=0;i<4;i++){const t=save.chests[i];
@@ -2542,10 +2529,7 @@ const HINTS=[
   "Astuce sentimentale : perdre n'a jamais été aussi romantique.",
   "DamtamZ a codé une app entière juste pour s'excuser. Ça compte un peu, non ?",
 ];
-// Le fond de page remplit la zone "barre d'accueil" qu'iOS exclut du viewport (prouvé par le test vert).
-// On le colore selon l'écran -> la bande du bas devient INVISIBLE (se fond dans la nav / le bois). Marche sur tous les iPhone.
-function setPageBg(battle){var c=battle?'#483017':'#1a2540';document.documentElement.style.background=c;document.body.style.background=c;}
-function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.add('hidden'));if(id)document.getElementById(id).classList.remove('hidden');setPageBg(id===null);}
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.add('hidden'));if(id)document.getElementById(id).classList.remove('hidden');}
 
 let __introPlayed=false, introFirstRun=false;
 // joué DANS le geste de l'utilisatrice (seul moment où iOS autorise le son)
@@ -2587,13 +2571,13 @@ function startMatch(){
   rivalName='Robot DamtamZ';
   rivalTrophies=5310;
   const rn=document.getElementById('rivalName'),rt=document.getElementById('rivalTr'),st=document.getElementById('matchStatus');
-  rn.textContent='Rival';rt.textContent='----';st.textContent="Le coupable arrive en tremblant…";
-  document.getElementById('meTr').textContent=''+save.trophies;
-  setTimeout(()=>{rn.textContent=rivalName;rt.textContent=''+rivalTrophies;st.textContent='DamtamZ se présente, tout penaud.';},1400);
-  setTimeout(()=>{st.textContent='COMBAT !';},2200);
+  rn.textContent='Rival';rt.textContent='🏆 ----';st.textContent="Le coupable arrive en tremblant…";
+  document.getElementById('meTr').textContent='🏆 '+save.trophies;
+  setTimeout(()=>{rn.textContent=rivalName;rt.textContent='🏆 '+rivalTrophies;st.textContent='DamtamZ se présente, tout penaud.';},1400);
+  setTimeout(()=>{st.textContent='⚔️ COMBAT ! ⚔️';},2200);
   setTimeout(beginBattle,2900);
 }
-function beginBattle(){show(null);setPageBg(true);document.getElementById('over').classList.add('hidden');startGame();}
+function beginBattle(){show(null);document.getElementById('over').classList.add('hidden');startGame();}
 function startGame(){document.getElementById('over').classList.add('hidden');reset();}
 
 document.getElementById('battleBtn').onclick=()=>{sfx('click');showDeckSelect();};        // « Combat » → on choisit son deck d'abord
@@ -2660,19 +2644,18 @@ window.addEventListener('load',function(){ setTimeout(maybeShowIosInstall,1200);
 <script>
 // Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
 (function(){
-  var BUILD='v42';
+  var BUILD='v43';
   // Badge tapotable (coin bas-gauche) qui affiche EN PERMANENCE toutes les mesures -> une capture me révèle la bonne valeur.
   var tag=document.createElement('div');
   tag.style.cssText='position:fixed;z-index:99999;left:calc(3px + env(safe-area-inset-left));bottom:calc(3px + env(safe-area-inset-bottom));padding:5px 7px;font:9px/1.25 monospace;color:rgba(255,255,255,.6);background:rgba(0,0,0,.45);border-radius:5px;pointer-events:auto;cursor:pointer;white-space:pre;';
-  var FULL=location.search.indexOf('debug')>=0;
+  var FULL=location.search.indexOf('debug')>=0;   // détail complet ; sinon juste la version
   function badge(){var d=window.__diag||{};var w=document.getElementById('wrap').getBoundingClientRect();
     var app=(matchMedia('(display-mode:standalone)').matches||!!navigator.standalone)?'APP':'WEB';
-    var bg=getComputedStyle(document.body).backgroundColor;
-    // chiffres clés affichés EN PERMANENCE -> une capture suffit à diagnostiquer
-    tag.textContent=BUILD+' '+app+' VH'+(typeof VH!=='undefined'?VH:'?')
-      +' S'+(typeof SABOT!=='undefined'?SABOT:'?')
-      +'\nlvh'+(d.lvh||0)+' svh'+(d.svh||0)+' scr'+(d.scr||0)+' vv'+(d.vv||0)
-      +'\nwrapH'+Math.round(w.height)+' bg'+bg;}
+    if(!FULL){tag.textContent=BUILD+' '+app;return;}
+    tag.textContent=BUILD+' '+app
+      +'  w'+Math.round(w.width)+'x'+Math.round(w.height)
+      +'\nfvp'+(d.fvp||0)+' 100vh'+(d.vh||0)+' scr'+(d.scr||0)
+      +'\ninner'+(d.inner||0)+' vv'+(d.vv||0)+' sab'+getComputedStyle(document.documentElement).getPropertyValue('--sab').trim();}
   // Version TOUJOURS visible (coin bas-gauche) -> on sait instantanément si la MAJ est bien chargée. Tap = détail.
   tag.addEventListener('click',function(){FULL=!FULL;badge();});
   badge();document.body.appendChild(tag);
