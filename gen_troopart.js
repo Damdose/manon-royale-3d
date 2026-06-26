@@ -21,23 +21,24 @@ const STYLE="Official Clash Royale battle unit by Supercell, single stylized 3D-
 
 // mêmes sujets que les cartes, mais uniquement les TROUPES (pas les sorts)
 const PROMPTS={
-  queenmanon:"a glamorous blonde queen wearing a hot-pink swimsuit and a small gold crown, confident sassy pose",
+  queenmanon:"a glamorous slim slender blonde queen with a chic shoulder-length blonde bob haircut (carré) and a small gold crown, wearing a hot-pink swimsuit, confident sassy pose",
   ptc:"a small glowing blue CBD crystal pebble creature with a cheeky cartoon face and wisps of blue smoke, with little stubby legs",
-  marcels:"a cheerful muscular man wearing a bright colorful tank top (marcel undershirt), street style, grinning",
+  marcels:"a single cartoon sleeveless ribbed tank-top vest undershirt (French 'marcel' débardeur garment) standing on its own, a clearly recognizable ribbed tank top with two shoulder straps and arm holes, given a cute little face, tiny arms and legs, bright vivid color, standing, NO human person, NO body inside",
   anais:"two brunette women with curly brown hair, chic fashion-industry outfits, holding measuring tape and fabric",
-  givenchy:"a sharp elegant black male luxury salesman in a suit proudly presenting a pair of glossy designer high heels",
+  givenchy:"a sharp elegant black male luxury salesman in a suit, FURIOUS and angry, scowling and shouting with an irritated aggressive expression, forcefully shoving a pair of glossy designer high heels forward",
   lardons:"a cute anthropomorphic bacon-bit (lardon) creature with a little happy face, sizzling golden brown, with tiny legs",
   bierepeche:"a peach-beer mascot: a frosty golden beer mug character with little arms and legs, smiling",
   cecilie:"an elegant chic fashion designer woman holding fabric and golden scissors, sophisticated",
-  feets:"a dynamic rock-climbing shoe creature with five cartoon toes, sporty and energetic, standing",
+  feets:"a single tight skin-tight rubber climbing shoe shaped like a foot with five distinct cartoon toes, stretchy moulante sport climbing shoe, sporty and dynamic, standing",
   kanye:"a bold black male rapper artist with sunglasses and a microphone, dramatic intense expression",
+  eoghan:"a young Irishman in his early twenties fresh out of a pub, medium-length wavy chestnut-brown hair with only a faint auburn tint, youthful sturdy build (not skinny, not fat), cheerful boyish face, wearing a green shirt and dark trousers, raising a foamy pint of beer with a crazy euphoric grin, full body",
   robot:"a sleek powerful AI battle robot with a chrome metallic body and glowing eyes, heroic menacing stance, full body",
   juliette:"a tall menacing brunette woman, towering and fierce, intimidating villain expression",
   darknans:"a pale blonde-haired demon with dark shadowy aura and glowing eyes, sinister and powerful, full body",
-  womanizer:"a playful pink gadget mascot character with a cheeky cartoon face, glossy, with little arms and legs",
-  tempete:"a brown-haired teenage boy in an emotional dramatic love crisis, stormy mood with tears",
-  braish:"a confident black female singer performing with a microphone, musical energy, full body",
-  reubeu:"a tough young man in urban streetwear tracksuit and cap, confident street-fighter pose",
+  womanizer:"a sleek glossy pale blue-green mint-teal handheld personal massager wand gadget with a small rounded silicone nozzle tip, smooth modern ergonomic wellness device, floating upright, a single object, NO person, NO character, NO face, NO arms or legs",
+  tempete:"a young French-Arab man crying his eyes out, sobbing very heavily with thick streams of tears pouring down his cheeks, devastated heartbroken expression, wearing a plain black t-shirt and dark trousers, short dark hair slightly on the longer side, full body",
+  braish:"a confident light-skinned mixed-race (métisse) female singer with light caramel skin performing with a microphone, musical energy, full body",
+  reubeu:"a single well-dressed young Arab man in stylish urban streetwear, designer tracksuit, cap, gold chain and sneakers, confident street pose, full body",
 };
 
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));

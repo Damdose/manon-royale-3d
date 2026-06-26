@@ -12,15 +12,21 @@ ASSETS = os.path.join(os.path.dirname(__file__), 'assets')
 
 TROOP_KINDS = ['queenmanon','ptc','marcels','anais','givenchy','lardons','bierepeche',
                'cecilie','feets','kanye','robot','juliette','darknans','womanizer',
-               'tempete','braish','reubeu']
+               'tempete','braish','reubeu',
+               # bâtiments : rendus en billboard comme les troupes (plus de boîtes 3D grises)
+               'cannon','pump','inferno','cimetiere']
+
+# certains "kind" du jeu ne portent pas le même nom que leur carte
+SRC_ALIAS = {'pump': 'pompe'}
 
 # u2net = modèle généraliste robuste pour objets/persos
 SESSION = new_session(os.environ.get('REMBG_MODEL', 'u2net'))
 
 def detour(kind):
     # priorité à l'art corps entier (troopart_), sinon repli sur la carte portrait (card_)
-    art = os.path.join(ASSETS, 'troopart_%s.png' % kind)
-    src = art if os.path.exists(art) else os.path.join(ASSETS, 'card_%s.png' % kind)
+    base = SRC_ALIAS.get(kind, kind)
+    art = os.path.join(ASSETS, 'troopart_%s.png' % base)
+    src = art if os.path.exists(art) else os.path.join(ASSETS, 'card_%s.png' % base)
     dst = os.path.join(ASSETS, 'troop_%s.png' % kind)
     if not os.path.exists(src):
         print('  (manquant) %s' % src); return False
