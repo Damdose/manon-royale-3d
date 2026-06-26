@@ -2534,7 +2534,10 @@ const HINTS=[
   "Astuce sentimentale : perdre n'a jamais été aussi romantique.",
   "DamtamZ a codé une app entière juste pour s'excuser. Ça compte un peu, non ?",
 ];
-function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.add('hidden'));if(id)document.getElementById(id).classList.remove('hidden');}
+// Le fond de page remplit la zone "barre d'accueil" qu'iOS laisse sous le wrap.
+// On le colore selon l'écran -> la bande du bas se FOND (nav au menu, bois en combat). N'altère NI le viewport NI la position du contenu.
+function setPageBg(battle){var c=battle?'#483017':'#1a2540';document.documentElement.style.background=c;document.body.style.background=c;}
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.add('hidden'));if(id)document.getElementById(id).classList.remove('hidden');setPageBg(id===null);}
 
 let __introPlayed=false, introFirstRun=false;
 // joué DANS le geste de l'utilisatrice (seul moment où iOS autorise le son)
@@ -2582,7 +2585,7 @@ function startMatch(){
   setTimeout(()=>{st.textContent='⚔️ COMBAT ! ⚔️';},2200);
   setTimeout(beginBattle,2900);
 }
-function beginBattle(){show(null);document.getElementById('over').classList.add('hidden');startGame();}
+function beginBattle(){show(null);setPageBg(true);document.getElementById('over').classList.add('hidden');startGame();}
 function startGame(){document.getElementById('over').classList.add('hidden');reset();}
 
 document.getElementById('battleBtn').onclick=()=>{sfx('click');showDeckSelect();};        // « Combat » → on choisit son deck d'abord
@@ -2649,7 +2652,7 @@ window.addEventListener('load',function(){ setTimeout(maybeShowIosInstall,1200);
 <script>
 // Badge de version (coin bas-droit) + diagnostic ?debug=1 — pour lever toute ambiguïté cache/dimensions.
 (function(){
-  var BUILD='v44';
+  var BUILD='v45';
   // Badge tapotable (coin bas-gauche) qui affiche EN PERMANENCE toutes les mesures -> une capture me révèle la bonne valeur.
   var tag=document.createElement('div');
   tag.style.cssText='position:fixed;z-index:99999;left:calc(3px + env(safe-area-inset-left));bottom:calc(3px + env(safe-area-inset-bottom));padding:5px 7px;font:9px/1.25 monospace;color:rgba(255,255,255,.6);background:rgba(0,0,0,.45);border-radius:5px;pointer-events:auto;cursor:pointer;white-space:pre;';
